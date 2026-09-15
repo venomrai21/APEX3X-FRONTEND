@@ -21,6 +21,7 @@ import {
   MarketingOverview,
   BusinessInsightsData
 } from '../types';
+import { UniversalConnectionDraft } from '../components/integrations/UniversalConnector';
 
 const API_BASE_URL = (import.meta.env.VITE_APEX3X_API_BASE_URL || '').replace(/\/$/, '');
 let currentActiveWorkspaceId = '';
@@ -64,47 +65,24 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
 export const api = {
   getMe: () => request<{ user: User; workspace: Workspace }>('/api/auth/me'),
   getWorkspaces: () => request<Workspace[]>('/api/workspaces'),
-  createWorkspace: (data: Partial<Workspace>) =>
-    request<Workspace>('/api/workspaces', { method: 'POST', body: JSON.stringify(data) }),
-  updateWorkspace: (data: Partial<Workspace>) =>
-    request<Workspace>('/api/workspace', { method: 'PUT', body: JSON.stringify(data) }),
-  verifyWorkspace: () =>
-    request<{ success: boolean; workspace: Workspace }>('/api/workspace/verify', { method: 'POST' }),
+  createWorkspace: (data: Partial<Workspace>) => request<Workspace>('/api/workspaces', { method: 'POST', body: JSON.stringify(data) }),
+  updateWorkspace: (data: Partial<Workspace>) => request<Workspace>('/api/workspace', { method: 'PUT', body: JSON.stringify(data) }),
+  verifyWorkspace: () => request<{ success: boolean; workspace: Workspace }>('/api/workspace/verify', { method: 'POST' }),
   getDashboardSummary: () => request<DashboardSummary>('/api/dashboard/summary'),
   getBrainAudit: () => request<BrainAuditResponse>('/api/brain/audit'),
   getBrainAlerts: () => request<AutonomousAlert[]>('/api/brain/alerts'),
-  executeBrainAction: (alertId: string) =>
-    request<{ success: boolean; alert: AutonomousAlert; message: string }>('/api/brain/execute-action', {
-      method: 'POST',
-      body: JSON.stringify({ alertId }),
-    }),
-  getBusinessInsights: (refresh = false) =>
-    request<BusinessInsightsData>(`/api/insights/overview${refresh ? '?refresh=true' : ''}`),
-  triggerInsightsAnalysis: () =>
-    request<BusinessInsightsData>('/api/insights/analyze', { method: 'POST' }),
-  executeInsightAction: (id: string) =>
-    request<{ success: boolean; message: string }>(`/api/insights/actions/${id}/execute`, { method: 'POST' }),
+  executeBrainAction: (alertId: string) => request<{ success: boolean; alert: AutonomousAlert; message: string }>('/api/brain/execute-action', { method: 'POST', body: JSON.stringify({ alertId }) }),
+  getBusinessInsights: (refresh = false) => request<BusinessInsightsData>(`/api/insights/overview${refresh ? '?refresh=true' : ''}`),
+  triggerInsightsAnalysis: () => request<BusinessInsightsData>('/api/insights/analyze', { method: 'POST' }),
+  executeInsightAction: (id: string) => request<{ success: boolean; message: string }>(`/api/insights/actions/${id}/execute`, { method: 'POST' }),
   getLeads: () => request<Lead[]>('/api/crm/leads'),
-  createLead: (data: Partial<Lead>) =>
-    request<Lead>('/api/crm/leads', { method: 'POST', body: JSON.stringify(data) }),
-  updateLead: (id: string, data: Partial<Lead>) =>
-    request<Lead>(`/api/crm/leads/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
-  qualifyLead: (id: string) =>
-    request<Lead>(`/api/crm/leads/${id}/qualify`, { method: 'POST' }),
-  convertLead: (id: string) =>
-    request<{ success: boolean; customer: Customer; lead: Lead }>(`/api/crm/leads/${id}/convert`, { method: 'POST' }),
+  createLead: (data: Partial<Lead>) => request<Lead>('/api/crm/leads', { method: 'POST', body: JSON.stringify(data) }),
+  updateLead: (id: string, data: Partial<Lead>) => request<Lead>(`/api/crm/leads/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  qualifyLead: (id: string) => request<Lead>(`/api/crm/leads/${id}/qualify`, { method: 'POST' }),
+  convertLead: (id: string) => request<{ success: boolean; customer: Customer; lead: Lead }>(`/api/crm/leads/${id}/convert`, { method: 'POST' }),
   getCustomers: () => request<Customer[]>('/api/crm/customers'),
-  getConversations: (params?: { channel?: string; status?: string; search?: string; unreadOnly?: boolean }) => {
-    const query = new URLSearchParams();
-    if (params?.channel) query.append('channel', params.channel);
-    if (params?.status) query.append('status', params.status);
-    if (params?.search) query.append('search', params.search);
-    if (params?.unreadOnly) query.append('unreadOnly', 'true');
-    const qs = query.toString();
-    return request<ConversationThread[]>(`/api/conversations${qs ? `?${qs}` : ''}`);
-  },
-  createConversation: (data: { contactName: string; contactEmail?: string; contactPhone?: string; company?: string; channel?: 'whatsapp' | 'email' | 'web_chat'; initialMessage?: string }) =>
-    request<ConversationThread>('/api/conversations', { method: 'POST', body: JSON.stringify(data) }),
+  getConversations: (params?: { channel?: string; status?: string; search?: string; unreadOnly?: boolean }) => { const query = new URLSearchParams(); if (params?.channel) query.append('channel', params.channel); if (params?.status) query.append('status', params.status); if (params?.search) query.append('search', params.search); if (params?.unreadOnly) query.append('unreadOnly', 'true'); const qs = query.toString(); return request<ConversationThread[]>(`/api/conversations${qs ? `?${qs}` : ''}`); },
+  createConversation: (data: { contactName: string; contactEmail?: string; contactPhone?: string; company?: string; channel?: 'whatsapp' | 'email' | 'web_chat'; initialMessage?: string }) => request<ConversationThread>('/api/conversations', { method: 'POST', body: JSON.stringify(data) }),
   getConversation: (id: string) => request<ConversationThread>(`/api/conversations/${id}`),
   getConversationCustomerContext: (id: string) => request<{ conversation: ConversationThread; customer: Customer | null; lead: Lead | null; deals: PipelineDeal[]; invoices: Invoice[] }>(`/api/conversations/${id}/customer-context`),
   sendMessage: (id: string, content: string, channel: 'whatsapp' | 'email' | 'web_chat' | 'internal' | 'sms') => request<ConversationMessage>(`/api/conversations/${id}/messages`, { method: 'POST', body: JSON.stringify({ content, channel }) }),
@@ -131,6 +109,7 @@ export const api = {
   getWorkflowLogs: () => request<WorkflowExecutionLog[]>('/api/workflows/logs'),
   getIntegrations: () => request<IntegrationConnection[]>('/api/integrations'),
   connectIntegration: (provider: string, data: { accountName?: string; accountId?: string }) => request<{ success: boolean; integration: IntegrationConnection }>(`/api/integrations/${provider}/connect`, { method: 'POST', body: JSON.stringify(data) }),
+  connectUniversalIntegration: (data: UniversalConnectionDraft) => request<{ success: boolean; integration: IntegrationConnection }>(`/api/integrations/universal/connect`, { method: 'POST', body: JSON.stringify(data) }),
   disconnectIntegration: (provider: string) => request<{ success: boolean; integration: IntegrationConnection }>(`/api/integrations/${provider}/disconnect`, { method: 'POST' }),
   syncIntegration: (provider: string) => request<{ success: boolean; integration: IntegrationConnection; message: string }>(`/api/integrations/${provider}/sync`, { method: 'POST' }),
   getAiProviders: () => request<AIProviderConfig[]>('/api/ai/providers'),
