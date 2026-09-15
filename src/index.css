@@ -8,17 +8,7 @@
 }
 
 @layer base {
-  :root {
-    color-scheme: dark;
-    --font-geist-sans: 'Geist Variable', Geist, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    --font-geist-mono: 'Geist Mono Variable', 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    --apex-black: #000000;
-    --apex-text: #ffffff;
-    --apex-text-secondary: #d4d4d8;
-    --apex-text-muted: #8b8b93;
-    --apex-border: rgba(255, 255, 255, 0.08);
-    --apex-border-strong: rgba(255, 255, 255, 0.13);
-  }
+  :root { color-scheme: dark; --font-geist-sans: 'Geist Variable', Geist, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; --font-geist-mono: 'Geist Mono Variable', 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; --apex-black: #000000; --apex-text: #ffffff; --apex-text-secondary: #d4d4d8; --apex-text-muted: #8b8b93; --apex-border: rgba(255,255,255,0.08); --apex-border-strong: rgba(255,255,255,0.13); }
   html { min-height: 100%; background: #000000; }
   body { min-height: 100vh; margin: 0; background: #000000; color: #ffffff; font-family: var(--font-geist-sans); font-synthesis: none; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
   button, input, textarea, select { font: inherit; }
@@ -36,18 +26,8 @@
 .surface-card, .surface-elevated, .surface-sunken { background: #000000; }
 
 /* APEX3X is intentionally monochrome until the product owner authorizes color. */
-[class*="amber"], [class*="emerald"], [class*="rose"], [class*="gold"], [class*="blue"], [class*="purple"], [class*="violet"], [class*="pink"], [class*="cyan"], [class*="teal"], [class*="indigo"], [class*="orange"], [class*="yellow"], [class*="green"], [class*="red"] {
-  color: #d4d4d8 !important;
-  border-color: rgba(255,255,255,0.10) !important;
-  background-color: rgba(255,255,255,0.04) !important;
-  background-image: none !important;
-  box-shadow: none !important;
-}
+[class*="amber"], [class*="emerald"], [class*="rose"], [class*="gold"], [class*="blue"], [class*="purple"], [class*="violet"], [class*="pink"], [class*="cyan"], [class*="teal"], [class*="indigo"], [class*="orange"], [class*="yellow"], [class*="green"], [class*="red"] { color:#d4d4d8 !important; border-color:rgba(255,255,255,0.10) !important; background-color:rgba(255,255,255,0.04) !important; background-image:none !important; box-shadow:none !important; }
+[class*="from-amber"], [class*="via-amber"], [class*="to-amber"], [class*="from-emerald"], [class*="via-emerald"], [class*="to-emerald"], [class*="from-rose"], [class*="via-rose"], [class*="to-rose"], [class*="from-blue"], [class*="via-blue"], [class*="to-blue"], [class*="from-purple"], [class*="via-purple"], [class*="to-purple"], [class*="from-violet"], [class*="via-violet"], [class*="to-violet"], [class*="from-orange"], [class*="via-orange"], [class*="to-orange"], [class*="from-pink"], [class*="via-pink"], [class*="to-pink"] { background-image:none !important; }
+[class*="rgba(245,158,11"], [class*="#12100b"], [class*="#0d0d12"], [class*="#09090d"] { background-image:none !important; background-color:#000000 !important; }
 
-[class*="from-amber"], [class*="via-amber"], [class*="to-amber"], [class*="from-emerald"], [class*="via-emerald"], [class*="to-emerald"], [class*="from-rose"], [class*="via-rose"], [class*="to-rose"], [class*="from-blue"], [class*="via-blue"], [class*="to-blue"], [class*="from-purple"], [class*="via-purple"], [class*="to-purple"], [class*="from-violet"], [class*="via-violet"], [class*="to-violet"], [class*="from-orange"], [class*="via-orange"], [class*="to-orange"], [class*="from-pink"], [class*="via-pink"], [class*="to-pink"] {
-  background-image: none !important;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
-}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior:auto !important; animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; } }
