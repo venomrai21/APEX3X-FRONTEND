@@ -25,9 +25,6 @@
 .apex-system-state, .apex-id, .apex-timestamp, .apex-log { font-family: var(--font-geist-mono); font-size: 0.75rem; line-height: 1.25; letter-spacing: 0.02em; font-variant-numeric: tabular-nums; }
 .surface-card, .surface-elevated, .surface-sunken { background: #000000; }
 
-/* APEX3X is intentionally monochrome until the product owner authorizes color. */
-[class*="amber"], [class*="emerald"], [class*="rose"], [class*="gold"], [class*="blue"], [class*="purple"], [class*="violet"], [class*="pink"], [class*="cyan"], [class*="teal"], [class*="indigo"], [class*="orange"], [class*="yellow"], [class*="green"], [class*="red"] { color:#d4d4d8 !important; border-color:rgba(255,255,255,0.10) !important; background-color:rgba(255,255,255,0.04) !important; background-image:none !important; box-shadow:none !important; }
-[class*="from-amber"], [class*="via-amber"], [class*="to-amber"], [class*="from-emerald"], [class*="via-emerald"], [class*="to-emerald"], [class*="from-rose"], [class*="via-rose"], [class*="to-rose"], [class*="from-blue"], [class*="via-blue"], [class*="to-blue"], [class*="from-purple"], [class*="via-purple"], [class*="to-purple"], [class*="from-violet"], [class*="via-violet"], [class*="to-violet"], [class*="from-orange"], [class*="via-orange"], [class*="to-orange"], [class*="from-pink"], [class*="via-pink"], [class*="to-pink"] { background-image:none !important; }
-[class*="rgba(245,158,11"], [class*="#12100b"], [class*="#0d0d12"], [class*="#09090d"] { background-image:none !important; background-color:#000000 !important; }
+/* APEX3X product components own their visual identity. No repository-wide color masking. */
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior:auto !important; animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; } }
