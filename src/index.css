@@ -15,18 +15,13 @@
     --font-geist-mono: 'Geist Mono Variable', 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
     --apex-black: #000000;
-    --apex-surface-0: #050505;
-    --apex-surface-1: #0a0a0b;
-    --apex-surface-2: #101011;
-    --apex-surface-3: #171718;
-    --apex-border: rgba(255, 255, 255, 0.08);
-    --apex-border-strong: rgba(255, 255, 255, 0.13);
     --apex-text: #ffffff;
     --apex-text-secondary: #d4d4d8;
     --apex-text-muted: #8b8b93;
+    --apex-border: rgba(255, 255, 255, 0.08);
+    --apex-border-strong: rgba(255, 255, 255, 0.13);
     --apex-status-success: #39ff88;
     --apex-status-danger: #ff4d5d;
-    --apex-status-warning: #f5c84b;
     --apex-status-neutral: #8b8b93;
   }
 
@@ -38,9 +33,7 @@
   body {
     min-height: 100vh;
     margin: 0;
-    background:
-      radial-gradient(circle at 50% -12%, rgba(255, 255, 255, 0.055), transparent 34%),
-      linear-gradient(180deg, #030303 0%, #000000 48%, #020202 100%);
+    background: #000000;
     color: var(--apex-text);
     font-family: var(--font-geist-sans);
     font-synthesis: none;
@@ -124,54 +117,42 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Dark operational surfaces */
-.surface-card {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.018), rgba(255, 255, 255, 0.008)), var(--apex-surface-1);
+/* APEX3X surface contract: black only. */
+.surface-card,
+.surface-elevated,
+.surface-sunken {
+  background: #000000;
   border: 1px solid var(--apex-border);
-  box-shadow: 0 12px 32px -20px rgba(0, 0, 0, 0.9);
+  box-shadow: none;
 }
 
 .surface-elevated {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.026), rgba(255, 255, 255, 0.01)), var(--apex-surface-2);
-  border: 1px solid var(--apex-border-strong);
-  box-shadow: 0 18px 42px -24px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.012);
+  border-color: var(--apex-border-strong);
 }
 
-.surface-sunken {
-  background: var(--apex-surface-0);
-  border: 1px solid rgba(255, 255, 255, 0.055);
-}
-
-/* Neutral illumination — never used as a brand color */
+/* Legacy utility names remain compatible but have no colored treatment. */
 .gold-glow,
-.gold-glow-sm {
-  box-shadow: 0 0 28px -18px rgba(255, 255, 255, 0.22);
+.gold-glow-sm,
+.gold-border-glow {
+  box-shadow: none;
 }
 
 .gold-border-glow {
-  border-color: rgba(255, 255, 255, 0.18);
-  box-shadow: 0 0 22px -16px rgba(255, 255, 255, 0.25);
+  border-color: var(--apex-border-strong);
 }
 
-.ambient-radial-gold {
-  background: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.055) 0%, rgba(0, 0, 0, 0) 68%);
-}
-
+.ambient-radial-gold,
 .light-streak {
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+  background: transparent;
 }
 
-/* Semantic status colors */
+/* Semantic status colors only. */
 .apex-status-success {
   color: var(--apex-status-success);
 }
 
 .apex-status-danger {
   color: var(--apex-status-danger);
-}
-
-.apex-status-warning {
-  color: var(--apex-status-warning);
 }
 
 .apex-status-neutral {
@@ -185,14 +166,14 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #030303;
+  background: #000000;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #29292d;
+  background: #242424;
   border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #414146;
+  background: #383838;
 }
