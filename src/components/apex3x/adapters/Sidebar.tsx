@@ -38,7 +38,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     <div className={mobile ? 'space-y-4' : 'flex-1 overflow-y-auto p-2.5 space-y-4'}>
       {sections.map((section) => (
         <div key={section.title} className="space-y-0.5">
-          <p className="px-2.5 py-1 text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">
+          <p className="px-2.5 py-1 text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-wider font-mono">
             {section.title}
           </p>
           {section.items.map((item) => {
@@ -52,16 +52,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   onSelect(item.key);
                   onMobileSelect?.();
                 }}
-                className={`relative w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#09090e] ${
+                className={`relative w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--sidebar)] ${
                   isActive
-                    ? 'text-amber-300 font-semibold'
-                    : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]'
+                    ? 'text-[var(--text-primary)] font-semibold'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-2)]'
                 }`}
               >
                 {isActive && (
                   <motion.span
                     layoutId="apex3x-sidebar-active"
-                    className="absolute inset-0 rounded-lg bg-amber-500/15 border border-amber-500/30"
+                    className="absolute inset-0 rounded-lg border border-[var(--accent)]/25 bg-[var(--accent)]/10"
                     transition={
                       reduceMotion
                         ? { duration: 0 }
@@ -70,11 +70,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   />
                 )}
                 <span className="relative z-10 flex items-center gap-2.5 truncate">
-                  <span className={isActive ? 'text-amber-400' : 'text-zinc-500'}>{item.icon}</span>
+                  <span className={isActive ? 'text-[var(--accent)]' : 'text-[var(--text-muted)]'}>{item.icon}</span>
                   <span className="truncate">{item.label}</span>
                 </span>
                 {item.badge && (
-                  <span className="relative z-10 text-[9px] px-1.5 py-0.2 rounded bg-white/[0.06] text-zinc-400 border border-white/[0.08] font-mono">
+                  <span className="relative z-10 text-[9px] px-1.5 py-0.2 rounded bg-[var(--surface-2)] text-[var(--text-muted)] border border-[var(--border)] font-mono">
                     {item.badge}
                   </span>
                 )}
