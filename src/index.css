@@ -15,18 +15,25 @@
     --font-geist-mono: "Geist Mono Variable", "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
     --background: #08090A;
-    --sidebar: #0B0D0E;
-    --surface: #121416;
-    --surface-elevated: #181B1D;
-    --border: #292D30;
-    --text-primary: #F2F2F0;
-    --text-secondary: #A3A6A8;
-    --text-muted: #6F7478;
-    --accent: #C7BBA8;
-    --success: #8FAF9A;
-    --warning: #C6A56A;
-    --error: #B87878;
-    --info: #8E9AA3;
+    --sidebar: #0B0D0F;
+    --surface: #111417;
+    --surface-2: #171B1F;
+    --surface-3: #1D2227;
+    --border: #292F34;
+    --text-primary: #F5F5F2;
+    --text-secondary: #A7ADB2;
+    --text-muted: #6D747A;
+
+    --accent: #C9B27C;
+    --accent-bright: #E0CB96;
+    --accent-dark: #8F7950;
+
+    --success: #36C98F;
+    --warning: #E3A84B;
+    --error: #E06464;
+    --info: #6FA8C9;
+    --ai: #9B8AFB;
+    --neutral-data: #687078;
 
     --radius-sm: 8px;
     --radius-md: 12px;
@@ -38,7 +45,7 @@
     --apex-text-secondary: var(--text-secondary);
     --apex-text-muted: var(--text-muted);
     --apex-border: var(--border);
-    --apex-border-strong: #383D41;
+    --apex-border-strong: #383F45;
   }
 
   html {
@@ -79,15 +86,26 @@
 .apex-metric, .apex-revenue, .apex-number { font-family: var(--font-geist-sans); font-variant-numeric: tabular-nums; letter-spacing: -0.035em; }
 .apex-system-state, .apex-id, .apex-timestamp, .apex-log { font-family: var(--font-geist-mono); font-size: 0.75rem; line-height: 1.25; letter-spacing: 0.02em; font-variant-numeric: tabular-nums; }
 .surface-card { background: var(--surface); }
-.surface-elevated { background: var(--surface-elevated); }
+.surface-elevated { background: var(--surface-2); }
+.surface-hover { background: var(--surface-3); }
 .surface-sunken { background: var(--background); }
 
-/* APEX OS design-system utilities. Components remain responsible for semantic states. */
+/* APEX OS semantic color utilities. Color communicates brand, state, or intelligence — never decoration. */
 .apex-accent { color: var(--accent); }
+.apex-accent-bright { color: var(--accent-bright); }
 .apex-success { color: var(--success); }
 .apex-warning { color: var(--warning); }
 .apex-error { color: var(--error); }
 .apex-info { color: var(--info); }
+.apex-ai { color: var(--ai); }
+.apex-neutral-data { color: var(--neutral-data); }
+
+.apex-accent-bg { background: var(--accent); color: var(--background); }
+.apex-success-bg { background: color-mix(in srgb, var(--success) 14%, transparent); color: var(--success); }
+.apex-warning-bg { background: color-mix(in srgb, var(--warning) 14%, transparent); color: var(--warning); }
+.apex-error-bg { background: color-mix(in srgb, var(--error) 14%, transparent); color: var(--error); }
+.apex-info-bg { background: color-mix(in srgb, var(--info) 14%, transparent); color: var(--info); }
+.apex-ai-bg { background: color-mix(in srgb, var(--ai) 14%, transparent); color: var(--ai); }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
