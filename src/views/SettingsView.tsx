@@ -3,54 +3,18 @@ import { ShieldCheck, Save } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { api } from '../api/client';
 import { Workspace } from '../types';
-import { Card } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
-import { Badge } from '../components/ui/Badge';
-import { Input } from '../components/ui/Input';
-import { Select } from '../components/ui/Select';
+import { Card, Button, Badge, Input, Select, APEXReveal } from '../components/apex3x';
 
 export const SettingsView: React.FC = () => {
   const { addToast, triggerRefresh, refreshKey, currentWorkspace, setCurrentWorkspace } = useApp();
-  const [workspace, setWorkspace] = useState<Workspace | null>(currentWorkspace);
-  const [saving, setSaving] = useState(false);
-  const [verifying, setVerifying] = useState(false);
-  const [companyName, setCompanyName] = useState('');
-  const [taxId, setTaxId] = useState('');
-  const [industry, setIndustry] = useState('');
-  const [website, setWebsite] = useState('');
-  const [address, setAddress] = useState('');
-  const [currency, setCurrency] = useState('');
-  const [timezone, setTimezone] = useState('');
-
-  useEffect(() => {
-    setWorkspace(currentWorkspace);
-    setCompanyName(currentWorkspace?.name || '');
-    setTaxId(currentWorkspace?.taxId || '');
-    setIndustry(currentWorkspace?.industry || '');
-    setWebsite(currentWorkspace?.website || '');
-    setAddress(currentWorkspace?.registeredAddress || '');
-    setCurrency(currentWorkspace?.currency || '');
-    setTimezone(currentWorkspace?.timezone || '');
-  }, [currentWorkspace, refreshKey]);
-
-  const handleSave = async () => {
-    try { setSaving(true); const updated = await api.updateWorkspace({ name: companyName, taxId, industry, website, registeredAddress: address, currency, timezone }); setWorkspace(updated); setCurrentWorkspace(updated); addToast({ type: 'success', title: 'Business Profile Updated', description: 'Business profile changes saved.' }); triggerRefresh(); }
-    catch (err) { addToast({ type: 'error', title: 'Save failed', description: (err as Error).message }); }
-    finally { setSaving(false); }
-  };
-
-  const handleVerify = async () => {
-    try { setVerifying(true); const res = await api.verifyWorkspace(); setWorkspace(res.workspace); setCurrentWorkspace(res.workspace); addToast({ type: 'success', title: 'Verification Updated', description: 'Business verification status updated by the connected platform.' }); triggerRefresh(); }
-    catch (err) { addToast({ type: 'error', title: 'Verification failed', description: (err as Error).message }); }
-    finally { setVerifying(false); }
-  };
-
+  const [workspace, setWorkspace] = useState<Workspace | null>(currentWorkspace); const [saving, setSaving] = useState(false); const [verifying, setVerifying] = useState(false); const [companyName, setCompanyName] = useState(''); const [taxId, setTaxId] = useState(''); const [industry, setIndustry] = useState(''); const [website, setWebsite] = useState(''); const [address, setAddress] = useState(''); const [currency, setCurrency] = useState(''); const [timezone, setTimezone] = useState('');
+  useEffect(() => { setWorkspace(currentWorkspace); setCompanyName(currentWorkspace?.name || ''); setTaxId(currentWorkspace?.taxId || ''); setIndustry(currentWorkspace?.industry || ''); setWebsite(currentWorkspace?.website || ''); setAddress(currentWorkspace?.registeredAddress || ''); setCurrency(currentWorkspace?.currency || ''); setTimezone(currentWorkspace?.timezone || ''); }, [currentWorkspace, refreshKey]);
+  const handleSave = async () => { try { setSaving(true); const updated = await api.updateWorkspace({ name: companyName, taxId, industry, website, registeredAddress: address, currency, timezone }); setWorkspace(updated); setCurrentWorkspace(updated); addToast({ type: 'success', title: 'Business Profile Updated', description: 'Business profile changes saved.' }); triggerRefresh(); } catch (err) { addToast({ type: 'error', title: 'Save failed', description: (err as Error).message }); } finally { setSaving(false); } };
+  const handleVerify = async () => { try { setVerifying(true); const res = await api.verifyWorkspace(); setWorkspace(res.workspace); setCurrentWorkspace(res.workspace); addToast({ type: 'success', title: 'Verification Updated', description: 'Business verification status updated by the connected platform.' }); triggerRefresh(); } catch (err) { addToast({ type: 'error', title: 'Verification failed', description: (err as Error).message }); } finally { setVerifying(false); } };
   const statusLabel = !workspace ? 'NOT CONNECTED' : workspace.verificationStatus === 'verified' ? 'VERIFIED ENTITY' : workspace.verificationStatus === 'in_review' ? 'IN REVIEW' : 'UNVERIFIED';
-  const statusVariant = !workspace ? 'slate' : workspace.verificationStatus === 'verified' ? 'emerald' : workspace.verificationStatus === 'in_review' ? 'amber' : 'slate';
-
-  return <div className="space-y-6 pb-12">
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"><div><div className="flex items-center gap-2"><h2 className="text-lg font-serif-display font-bold text-zinc-100">Business Profile & Verification</h2><Badge variant={statusVariant as any} size="sm"><ShieldCheck className="w-3 h-3" /> {statusLabel}</Badge></div><p className="text-xs text-zinc-400 mt-1">Business identity, verification state, and localized operating parameters.</p></div><div className="flex items-center gap-3">{workspace && workspace.verificationStatus !== 'verified' && <Button variant="secondary" size="md" isLoading={verifying} onClick={handleVerify}>Submit Verification</Button>}<Button variant="primary" size="md" isLoading={saving} onClick={handleSave} disabled={!workspace} leftIcon={<Save className="w-4 h-4" />}>Save Changes</Button></div></div>
-    <Card variant="gold-accent" padding="md"><div className="flex items-center gap-3"><span className="p-2 rounded-lg border bg-amber-950/30 text-amber-400 border-amber-500/20"><ShieldCheck className="w-5 h-5" /></span><div><div className="text-xs font-semibold text-zinc-200">Business Verification: {workspace?.verificationStatus || 'Not connected'}</div><p className="text-[11px] text-zinc-400 mt-0.5">Verification status is supplied by the connected APEX3X platform.</p></div></div></Card>
-    <Card variant="default" padding="lg" className="space-y-6"><div className="space-y-4"><h3 className="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Business Entity Information</h3><div className="grid grid-cols-1 md:grid-cols-2 gap-4"><Input label="Operating Company Name" value={companyName} onChange={e => setCompanyName(e.target.value)} required /><Input label="Federal Tax ID / EIN" value={taxId} onChange={e => setTaxId(e.target.value)} /></div><div className="grid grid-cols-1 md:grid-cols-2 gap-4"><Input label="Industry Classification" value={industry} onChange={e => setIndustry(e.target.value)} /><Input label="Corporate Website URL" value={website} onChange={e => setWebsite(e.target.value)} /></div><Input label="Registered Business Address" value={address} onChange={e => setAddress(e.target.value)} /></div><div className="space-y-4 pt-4 border-t border-white/[0.06]"><h3 className="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Financial & Operational Localization</h3><div className="grid grid-cols-1 md:grid-cols-2 gap-4"><Select label="Primary Settlement Currency" value={currency} onChange={e => setCurrency(e.target.value)} options={[{ value: '', label: 'Select currency' }, { value: 'USD', label: 'USD - United States Dollar ($)' }, { value: 'EUR', label: 'EUR - Euro (€)' }, { value: 'GBP', label: 'GBP - British Pound (£)' }, { value: 'SGD', label: 'SGD - Singapore Dollar (S$)' }, { value: 'INR', label: 'INR - Indian Rupee (₹)' }]} /><Select label="Operating Timezone" value={timezone} onChange={e => setTimezone(e.target.value)} options={[{ value: '', label: 'Select timezone' }, { value: 'America/New_York', label: 'Eastern Time (US & Canada)' }, { value: 'America/Chicago', label: 'Central Time (US & Canada)' }, { value: 'America/Los_Angeles', label: 'Pacific Time (US & Canada)' }, { value: 'Europe/London', label: 'London / GMT' }, { value: 'Asia/Singapore', label: 'Singapore (SGT)' }]} /></div></div></Card>
-  </div>;
+  return <div className="space-y-6 pb-12"><APEXReveal>
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"><div><div className="flex items-center gap-2"><h2 className="text-lg font-bold text-zinc-100">Business Profile & Verification</h2><Badge variant="neutral" size="sm"><ShieldCheck className="w-3 h-3" /> {statusLabel}</Badge></div><p className="text-xs text-zinc-400 mt-1">Business identity, verification state, and localized operating parameters.</p></div><div className="flex items-center gap-3">{workspace && workspace.verificationStatus !== 'verified' && <Button variant="secondary" size="md" isLoading={verifying} onClick={handleVerify}>Submit Verification</Button>}<Button variant="primary" size="md" isLoading={saving} onClick={handleSave} disabled={!workspace} leftIcon={<Save className="w-4 h-4" />}>Save Changes</Button></div></div>
+    <Card padding="md"><div className="flex items-center gap-3"><span className="p-2 rounded-lg border border-white/[0.10] bg-white/[0.04] text-zinc-300"><ShieldCheck className="w-5 h-5" /></span><div><div className="text-xs font-semibold text-zinc-200">Business Verification: {workspace?.verificationStatus || 'Not connected'}</div><p className="text-[11px] text-zinc-400 mt-0.5">Verification status is supplied by the connected APEX3X platform.</p></div></div></Card>
+    <Card padding="lg" className="space-y-6"><div className="space-y-4"><h3 className="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Business Entity Information</h3><div className="grid grid-cols-1 md:grid-cols-2 gap-4"><Input label="Operating Company Name" value={companyName} onChange={e => setCompanyName(e.target.value)} required /><Input label="Federal Tax ID / EIN" value={taxId} onChange={e => setTaxId(e.target.value)} /></div><div className="grid grid-cols-1 md:grid-cols-2 gap-4"><Input label="Industry Classification" value={industry} onChange={e => setIndustry(e.target.value)} /><Input label="Corporate Website URL" value={website} onChange={e => setWebsite(e.target.value)} /></div><Input label="Registered Business Address" value={address} onChange={e => setAddress(e.target.value)} /></div><div className="space-y-4 pt-4 border-t border-white/[0.06]"><h3 className="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Financial & Operational Localization</h3><div className="grid grid-cols-1 md:grid-cols-2 gap-4"><Select label="Primary Settlement Currency" value={currency} onChange={e => setCurrency(e.target.value)} options={[{ value: '', label: 'Select currency' }, { value: 'USD', label: 'USD - United States Dollar ($)' }, { value: 'EUR', label: 'EUR - Euro (€)' }, { value: 'GBP', label: 'GBP - British Pound (£)' }, { value: 'SGD', label: 'SGD - Singapore Dollar (S$)' }, { value: 'INR', label: 'INR - Indian Rupee (₹)' }]} /><Select label="Operating Timezone" value={timezone} onChange={e => setTimezone(e.target.value)} options={[{ value: '', label: 'Select timezone' }, { value: 'America/New_York', label: 'Eastern Time (US & Canada)' }, { value: 'America/Chicago', label: 'Central Time (US & Canada)' }, { value: 'America/Los_Angeles', label: 'Pacific Time (US & Canada)' }, { value: 'Europe/London', label: 'London / GMT' }, { value: 'Asia/Singapore', label: 'Singapore (SGT)' }]} /></div></div></Card>
+  </APEXReveal></div>;
 };
