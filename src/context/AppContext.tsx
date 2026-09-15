@@ -13,6 +13,7 @@ interface AppContextType {
   currentWorkspace: Workspace | null;
   availableWorkspaces: Workspace[];
   currentUser: User | null;
+  setCurrentWorkspace: (workspace: Workspace | null) => void;
   activeNav: NavItemKey;
   setActiveNav: (nav: NavItemKey) => void;
   switchWorkspace: (workspaceId: string) => Promise<void>;
@@ -56,9 +57,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setTimeout(() => removeToast(id), 4000);
   };
 
-  const removeToast = (id: string) => {
-    setToasts(prev => prev.filter(t => t.id !== id));
-  };
+  const removeToast = (id: string) => setToasts(prev => prev.filter(t => t.id !== id));
 
   const loadSession = async () => {
     setIsLoadingSession(true);
@@ -91,13 +90,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         if (match) setCurrentWorkspace(match);
       }
       triggerRefresh();
-      if (target) {
-        addToast({
-          type: 'info',
-          title: 'Workspace Switched',
-          description: `Now operating in ${target.name}.`,
-        });
-      }
+      if (target) addToast({ type: 'info', title: 'Workspace Switched', description: `Now operating in ${target.name}.` });
     } catch (err) {
       console.error('Failed switching workspace:', err);
     }
@@ -112,9 +105,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  useEffect(() => {
-    loadSession();
-  }, []);
+  useEffect(() => { loadSession(); }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -128,31 +119,30 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, []);
 
   return (
-    <AppContext.Provider
-      value={{
-        currentWorkspace,
-        availableWorkspaces,
-        currentUser,
-        activeNav,
-        setActiveNav,
-        switchWorkspace,
-        refreshWorkspaces,
-        commandPaletteOpen,
-        setCommandPaletteOpen,
-        connectDrawerOpen,
-        setConnectDrawerOpen,
-        notificationDrawerOpen,
-        setNotificationDrawerOpen,
-        onboardingOpen,
-        setOnboardingOpen,
-        toasts,
-        addToast,
-        removeToast,
-        refreshKey,
-        triggerRefresh,
-        isLoadingSession,
-      }}
-    >
+    <AppContext.Provider value={{
+      currentWorkspace,
+      availableWorkspaces,
+      currentUser,
+      setCurrentWorkspace,
+      activeNav,
+      setActiveNav,
+      switchWorkspace,
+      refreshWorkspaces,
+      commandPaletteOpen,
+      setCommandPaletteOpen,
+      connectDrawerOpen,
+      setConnectDrawerOpen,
+      notificationDrawerOpen,
+      setNotificationDrawerOpen,
+      onboardingOpen,
+      setOnboardingOpen,
+      toasts,
+      addToast,
+      removeToast,
+      refreshKey,
+      triggerRefresh,
+      isLoadingSession,
+    }}>
       {children}
     </AppContext.Provider>
   );
