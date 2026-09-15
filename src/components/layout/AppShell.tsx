@@ -7,6 +7,7 @@ import {
 import { useApp } from '../../context/AppContext';
 import { NavItemKey } from '../../types';
 import { Button } from '../ui/Button';
+import { Sidebar } from '../apex3x/adapters/Sidebar';
 import { CommandPalette } from './CommandPalette';
 import { ConnectDrawer } from './ConnectDrawer';
 import { NotificationDrawer } from './NotificationDrawer';
@@ -64,24 +65,6 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
     ]},
   ];
 
-  const renderNav = (mobile = false) => (
-    <div className={mobile ? 'space-y-4' : 'flex-1 overflow-y-auto p-2.5 space-y-4'}>
-      {navSections.map(section => (
-        <div key={section.title} className="space-y-0.5">
-          <p className="px-2.5 py-1 text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">{section.title}</p>
-          {section.items.map(item => {
-            const isActive = activeNav === item.key;
-            return <button key={item.key} onClick={() => { setActiveNav(item.key); if (mobile) setMobileMenuOpen(false); }}
-              className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer text-left ${isActive ? 'bg-amber-500/15 text-amber-300 font-semibold border border-amber-500/30' : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04] border border-transparent'}`}>
-              <div className="flex items-center gap-2.5 truncate"><span className={isActive ? 'text-amber-400' : 'text-zinc-500'}>{item.icon}</span><span className="truncate">{item.label}</span></div>
-              {item.badge && <span className="text-[9px] px-1.5 py-0.2 rounded bg-white/[0.06] text-zinc-400 border border-white/[0.08] font-mono">{item.badge}</span>}
-            </button>;
-          })}
-        </div>
-      ))}
-    </div>
-  );
-
   const workspaceName = currentWorkspace?.name || 'Workspace unavailable';
   const userName = currentUser?.name || 'Account unavailable';
   const userRole = currentUser?.role;
@@ -105,7 +88,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
             </div>
             <div className="mt-2"><Button variant="secondary" size="sm" className="w-full text-xs py-1.5 border-amber-500/20 hover:border-amber-500/40 text-amber-300 bg-[#12121c]" onClick={() => setConnectDrawerOpen(true)} leftIcon={<Plug className="w-3.5 h-3.5 text-amber-400" />}>+ Connect Ecosystem</Button></div>
           </div>
-          {renderNav()}
+          <Sidebar sections={navSections} activeKey={activeNav} onSelect={(key) => setActiveNav(key as NavItemKey)} />
           <div className="p-3 border-t border-white/[0.07] bg-[#07070a] flex items-center justify-between text-xs"><div className="flex items-center gap-2"><div className="w-6 h-6 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center justify-center text-[10px] font-semibold">{currentUser?.name ? currentUser.name.charAt(0) : '—'}</div><div className="truncate"><p className="text-[11px] font-medium text-zinc-200 truncate">{userName}</p>{userRole && <p className="text-[9px] text-zinc-500 capitalize">{userRole}</p>}</div></div><button onClick={() => setOnboardingOpen(true)} className="text-zinc-500 hover:text-zinc-300 p-1 rounded hover:bg-white/[0.05]" title="Business Settings"><Settings className="w-3.5 h-3.5" /></button></div>
         </aside>
 
@@ -118,7 +101,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
         </div>
       </div>
 
-      {mobileMenuOpen && <div className="fixed inset-0 z-50 lg:hidden flex"><div className="fixed inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} /><div className="relative w-72 bg-[#09090e] border-r border-white/[0.1] flex flex-col p-4 z-10 overflow-y-auto"><div className="flex items-center justify-between pb-4 border-b border-white/[0.08] mb-4"><div className="flex items-center gap-2"><div className="w-7 h-7 rounded-lg bg-amber-500 text-black flex items-center justify-center font-bold">A</div><span className="font-serif-display font-bold text-white text-sm">APEX3X</span></div><button onClick={() => setMobileMenuOpen(false)} className="text-zinc-400 hover:text-white"><X className="w-5 h-5" /></button></div>{renderNav(true)}</div></div>}
+      {mobileMenuOpen && <div className="fixed inset-0 z-50 lg:hidden flex"><div className="fixed inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} /><div className="relative w-72 bg-[#09090e] border-r border-white/[0.1] flex flex-col p-4 z-10 overflow-y-auto"><div className="flex items-center justify-between pb-4 border-b border-white/[0.08] mb-4"><div className="flex items-center gap-2"><div className="w-7 h-7 rounded-lg bg-amber-500 text-black flex items-center justify-center font-bold">A</div><span className="font-serif-display font-bold text-white text-sm">APEX3X</span></div><button onClick={() => setMobileMenuOpen(false)} className="text-zinc-400 hover:text-white"><X className="w-5 h-5" /></button></div><Sidebar sections={navSections} activeKey={activeNav} onSelect={(key) => setActiveNav(key as NavItemKey)} onMobileSelect={() => setMobileMenuOpen(false)} mobile /></div></div>}
 
       <CommandPalette /><ConnectDrawer /><NotificationDrawer /><OnboardingModal />
       <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none max-w-sm w-full">{toasts.map(toast => <div key={toast.id} className={`pointer-events-auto p-3.5 rounded-xl border shadow-2xl transition-all duration-200 flex items-start gap-3 ${toast.type === 'success' ? 'bg-[#0a150f] border-emerald-500/40 text-emerald-300' : toast.type === 'warning' ? 'bg-[#19140a] border-amber-500/40 text-amber-300' : toast.type === 'error' ? 'bg-[#180a0d] border-rose-500/40 text-rose-300' : 'bg-[#0d0d16] border-white/[0.12] text-zinc-200'}`}><div className="shrink-0 mt-0.5">{toast.type === 'success' && <CheckCircle2 className="w-4 h-4 text-emerald-400" />}{toast.type === 'warning' && <AlertCircle className="w-4 h-4 text-amber-400" />}{toast.type === 'error' && <AlertCircle className="w-4 h-4 text-rose-400" />}{toast.type === 'info' && <Bot className="w-4 h-4 text-amber-400" />}</div><div className="flex-1 min-w-0"><p className="text-xs font-semibold">{toast.title}</p>{toast.description && <p className="text-[11px] opacity-80 mt-0.5 leading-snug">{toast.description}</p>}</div><button onClick={() => removeToast(toast.id)} className="text-zinc-500 hover:text-zinc-300 p-0.5 shrink-0"><X className="w-3 h-3" /></button></div>)}</div>
