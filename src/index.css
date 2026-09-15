@@ -8,11 +8,66 @@
 }
 
 @layer base {
-  :root { color-scheme: dark; --font-geist-sans: 'Geist Variable', Geist, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; --font-geist-mono: 'Geist Mono Variable', 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; --apex-black: #000000; --apex-text: #ffffff; --apex-text-secondary: #d4d4d8; --apex-text-muted: #8b8b93; --apex-border: rgba(255,255,255,0.08); --apex-border-strong: rgba(255,255,255,0.13); }
-  html { min-height: 100%; background: #000000; }
-  body { min-height: 100vh; margin: 0; background: #000000; color: #ffffff; font-family: var(--font-geist-sans); font-synthesis: none; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  :root {
+    color-scheme: dark;
+
+    --font-geist-sans: "Geist Variable", Geist, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-geist-mono: "Geist Mono Variable", "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+    --background: #08090A;
+    --sidebar: #0B0D0E;
+    --surface: #121416;
+    --surface-elevated: #181B1D;
+    --border: #292D30;
+    --text-primary: #F2F2F0;
+    --text-secondary: #A3A6A8;
+    --text-muted: #6F7478;
+    --accent: #C7BBA8;
+    --success: #8FAF9A;
+    --warning: #C6A56A;
+    --error: #B87878;
+    --info: #8E9AA3;
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+
+    /* Backward-compatible APEX aliases. */
+    --apex-black: var(--background);
+    --apex-text: var(--text-primary);
+    --apex-text-secondary: var(--text-secondary);
+    --apex-text-muted: var(--text-muted);
+    --apex-border: var(--border);
+    --apex-border-strong: #383D41;
+  }
+
+  html {
+    min-height: 100%;
+    background: var(--background);
+  }
+
+  body {
+    min-height: 100vh;
+    margin: 0;
+    background: var(--background);
+    color: var(--text-primary);
+    font-family: var(--font-geist-sans);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   button, input, textarea, select { font: inherit; }
-  h1, h2, h3, h4, h5, h6 { margin: 0; font-family: var(--font-geist-sans); color: #ffffff; letter-spacing: -0.025em; }
+
+  h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+    font-family: var(--font-geist-sans);
+    color: var(--text-primary);
+    letter-spacing: -0.025em;
+  }
+
   h1, h2 { font-weight: 650; }
   h3, h4, h5, h6 { font-weight: 600; }
   code, pre, kbd, samp, .font-mono-code { font-family: var(--font-geist-mono); }
@@ -23,8 +78,22 @@
 .font-mono-code, .apex-mono { font-family: var(--font-geist-mono); font-variant-numeric: tabular-nums; }
 .apex-metric, .apex-revenue, .apex-number { font-family: var(--font-geist-sans); font-variant-numeric: tabular-nums; letter-spacing: -0.035em; }
 .apex-system-state, .apex-id, .apex-timestamp, .apex-log { font-family: var(--font-geist-mono); font-size: 0.75rem; line-height: 1.25; letter-spacing: 0.02em; font-variant-numeric: tabular-nums; }
-.surface-card, .surface-elevated, .surface-sunken { background: #000000; }
+.surface-card { background: var(--surface); }
+.surface-elevated { background: var(--surface-elevated); }
+.surface-sunken { background: var(--background); }
 
-/* APEX3X product components own their visual identity. No repository-wide color masking. */
+/* APEX OS design-system utilities. Components remain responsible for semantic states. */
+.apex-accent { color: var(--accent); }
+.apex-success { color: var(--success); }
+.apex-warning { color: var(--warning); }
+.apex-error { color: var(--error); }
+.apex-info { color: var(--info); }
 
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior:auto !important; animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
