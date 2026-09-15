@@ -20,21 +20,18 @@
     --apex-text-muted: #8b8b93;
     --apex-border: rgba(255, 255, 255, 0.08);
     --apex-border-strong: rgba(255, 255, 255, 0.13);
-    --apex-status-success: #39ff88;
-    --apex-status-danger: #ff4d5d;
-    --apex-status-neutral: #8b8b93;
   }
 
   html {
     min-height: 100%;
-    background: var(--apex-black);
+    background: #000000;
   }
 
   body {
     min-height: 100vh;
     margin: 0;
     background: #000000;
-    color: var(--apex-text);
+    color: #ffffff;
     font-family: var(--font-geist-sans);
     font-synthesis: none;
     text-rendering: optimizeLegibility;
@@ -57,7 +54,7 @@
   h6 {
     margin: 0;
     font-family: var(--font-geist-sans);
-    color: var(--apex-text);
+    color: #ffffff;
     letter-spacing: -0.025em;
   }
 
@@ -130,36 +127,64 @@
   border-color: var(--apex-border-strong);
 }
 
-/* Legacy utility names remain compatible but have no colored treatment. */
+/* Strict monochrome contract. No branded or semantic color is permitted until explicitly requested. */
+[class*="amber"],
+[class*="yellow"],
+[class*="gold"],
+[class*="orange"],
+[class*="blue"],
+[class*="indigo"],
+[class*="purple"],
+[class*="violet"],
+[class*="pink"],
+[class*="cyan"],
+[class*="teal"],
+[class*="emerald"],
+[class*="green"],
+[class*="lime"],
+[class*="sky"],
+[class*="fuchsia"],
+[class*="rose"],
+[class*="red"] {
+  color: #ffffff !important;
+  background-color: #000000 !important;
+  background-image: none !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+/* Neutralize colored Tailwind gradient stops even when the element itself has no background utility. */
+[class*="from-amber"], [class*="from-yellow"], [class*="from-gold"], [class*="from-orange"],
+[class*="from-blue"], [class*="from-indigo"], [class*="from-purple"], [class*="from-violet"],
+[class*="from-pink"], [class*="from-cyan"], [class*="from-teal"], [class*="from-emerald"],
+[class*="from-green"], [class*="from-lime"], [class*="from-sky"], [class*="from-fuchsia"],
+[class*="from-rose"], [class*="from-red"],
+[class*="via-amber"], [class*="via-yellow"], [class*="via-gold"], [class*="via-orange"],
+[class*="via-blue"], [class*="via-indigo"], [class*="via-purple"], [class*="via-violet"],
+[class*="via-pink"], [class*="via-cyan"], [class*="via-teal"], [class*="via-emerald"],
+[class*="via-green"], [class*="via-lime"], [class*="via-sky"], [class*="via-fuchsia"],
+[class*="via-rose"], [class*="via-red"],
+[class*="to-amber"], [class*="to-yellow"], [class*="to-gold"], [class*="to-orange"],
+[class*="to-blue"], [class*="to-indigo"], [class*="to-purple"], [class*="to-violet"],
+[class*="to-pink"], [class*="to-cyan"], [class*="to-teal"], [class*="to-emerald"],
+[class*="to-green"], [class*="to-lime"], [class*="to-sky"], [class*="to-fuchsia"],
+[class*="to-rose"], [class*="to-red"] {
+  background-image: none !important;
+}
+
+/* Legacy color utility names are intentionally inert. */
 .gold-glow,
 .gold-glow-sm,
-.gold-border-glow {
-  box-shadow: none;
-}
-
-.gold-border-glow {
-  border-color: var(--apex-border-strong);
-}
-
+.gold-border-glow,
 .ambient-radial-gold,
 .light-streak {
-  background: transparent;
+  box-shadow: none !important;
+  background: transparent !important;
+  border-color: var(--apex-border-strong) !important;
 }
 
-/* Semantic status colors only. */
-.apex-status-success {
-  color: var(--apex-status-success);
-}
-
-.apex-status-danger {
-  color: var(--apex-status-danger);
-}
-
-.apex-status-neutral {
-  color: var(--apex-status-neutral);
-}
-
-/* Custom scrollbars for dark operational surfaces */
+/* Scrollbars remain monochrome. */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
