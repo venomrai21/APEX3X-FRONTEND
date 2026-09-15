@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Globe2, KeyRound, Webhook, Database, Braces, Server, ShieldCheck, X } from 'lucide-react';
+import { Globe2, KeyRound, Webhook, Braces, Server, ShieldCheck, X } from 'lucide-react';
 import { AnimatedInput, AnimatedTabs } from '../apex3x/adapters';
 import { Button } from '../ui/Button';
 
@@ -67,7 +67,7 @@ export const UniversalConnector: React.FC<UniversalConnectorProps> = ({ open, on
       </div>
       <div className="p-5 space-y-5">
         <AnimatedInput label="Connection name" placeholder="e.g. WhatsApp Business, HubSpot, Shopify, custom ERP" value={name} onChange={e => setName(e.target.value)} required />
-        <div><p className="text-[11px] font-medium text-zinc-400 mb-2">Connection method</p><AnimatedTabs items={methods.map(m => ({ id: m.id, label: m.label, icon: <m.icon className="w-3 h-3" /> }))} activeId={method} onChange={id => setMethod(id as UniversalConnectionMethod)} /></div>
+        <div><p className="text-[11px] font-medium text-zinc-400 mb-2">Connection method</p><AnimatedTabs tabs={methods.map(m => ({ id: m.id, label: m.label, icon: <m.icon className="w-3 h-3" /> }))} activeTab={method} onChange={id => setMethod(id as UniversalConnectionMethod)} /></div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3"><AnimatedInput label={method === 'webhook' ? 'Webhook URL' : 'Endpoint / Base URL'} placeholder="https://..." value={endpointUrl} onChange={e => setEndpointUrl(e.target.value)} required /><AnimatedInput label="Account / Resource ID" placeholder="Optional provider account, page, store, project, etc." value={accountId} onChange={e => setAccountId(e.target.value)} /></div>
         {(method === 'api_key' || method === 'custom_http' || method === 'mcp') && <AnimatedInput label="Secret / API key" type="password" placeholder="Stored by the connected platform; never displayed back" value={apiKey} onChange={e => setApiKey(e.target.value)} />}
         {method === 'basic_auth' && <div className="grid grid-cols-1 md:grid-cols-2 gap-3"><AnimatedInput label="Username" value={username} onChange={e => setUsername(e.target.value)} /><AnimatedInput label="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} /></div>}
