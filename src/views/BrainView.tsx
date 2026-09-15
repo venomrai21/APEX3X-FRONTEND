@@ -18,80 +18,20 @@ export const BrainView: React.FC = () => {
   const [executingId, setExecutingId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'recommendations' | 'cycle' | 'history'>('recommendations');
 
-  const load = async () => {
-    try {
-      setLoading(true);
-      const [auditRes, logsRes] = await Promise.all([api.getBrainAudit(), api.getWorkflowLogs()]);
-      setAudit(auditRes);
-      setLogs(logsRes);
-    } catch (err) {
-      console.error('Failed fetching brain audit:', err);
-    } finally { setLoading(false); }
-  };
-
+  const load = async () => { try { setLoading(true); const [auditRes, logsRes] = await Promise.all([api.getBrainAudit(), api.getWorkflowLogs()]); setAudit(auditRes); setLogs(logsRes); } catch (err) { console.error('Failed fetching brain audit:', err); } finally { setLoading(false); } };
   useEffect(() => { load(); }, [refreshKey]);
 
-  const runScan = async () => {
-    try {
-      setScanning(true);
-      const result = await api.getBrainAudit();
-      setAudit(result);
-      addToast({ type: 'success', title: 'Autonomous Scan Complete', description: 'Fresh Brain telemetry loaded from the connected platform.' });
-    } catch (err) {
-      addToast({ type: 'error', title: 'Scan Failed', description: (err as Error).message });
-    } finally { setScanning(false); }
-  };
+  const runScan = async () => { try { setScanning(true); const result = await api.getBrainAudit(); setAudit(result); addToast({ type: 'success', title: 'Autonomous Scan Complete', description: 'Fresh Brain telemetry loaded from the connected platform.' }); } catch (err) { addToast({ type: 'error', title: 'Scan Failed', description: (err as Error).message }); } finally { setScanning(false); } };
+  const executeRecommendation = async (id: string) => { try { setExecutingId(id); const result = await api.executeBrainAction(id); addToast({ type: 'success', title: 'Action Executed', description: result.message }); await load(); triggerRefresh(); } catch (err) { addToast({ type: 'error', title: 'Execution Failed', description: (err as Error).message }); } finally { setExecutingId(null); } };
 
-  const executeRecommendation = async (id: string) => {
-    try {
-      setExecutingId(id);
-      const result = await api.executeBrainAction(id);
-      addToast({ type: 'success', title: 'Action Executed', description: result.message });
-      await load();
-      triggerRefresh();
-    } catch (err) {
-      addToast({ type: 'error', title: 'Execution Failed', description: (err as Error).message });
-    } finally { setExecutingId(null); }
-  };
+  if (loading || !audit) return <div className="space-y-6"><Skeleton className="h-32" /><Skeleton className="h-24" /><Skeleton className="h-80" /></div>;
 
-  if (loading || !audit) {
-    return <div className="space-y-6"><Skeleton className="h-32" /><Skeleton className="h-24" /><Skeleton className="h-80" /></div>;
-  }
-
-  return (
-    <div className="space-y-6 pb-12">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-xl bg-gradient-to-r from-[#0d0d14] via-[#12121b] to-[#0d0d14] border border-amber-500/30">
-        <div>
-          <div className="flex items-center gap-2"><span className="p-1.5 rounded-lg bg-amber-500/15 text-amber-400 border border-amber-500/30"><Bot className="w-5 h-5" /></span><h2 className="text-lg font-serif-display font-bold text-zinc-100">APEX3X Autonomous Revenue Engine</h2><Badge variant="gold" size="sm">Live workspace telemetry</Badge></div>
-          <p className="text-xs text-zinc-300 mt-1 max-w-2xl">{audit.headline}</p>
-        </div>
-        <Button variant="primary" size="md" isLoading={scanning} onClick={runScan} leftIcon={<RefreshCw className="w-4 h-4" />}>Run Live Autonomous Audit</Button>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card variant="gold-accent" padding="md"><span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Diagnosed Revenue at Risk</span><div className="text-2xl font-serif-display font-bold text-rose-300 mt-3">${audit.totalRevenueAtRisk.toLocaleString()}</div><p className="text-[11px] text-zinc-400 mt-1">{audit.criticalLeakagesCount} reported operational anomalies</p></Card>
-        <Card variant="default" padding="md"><span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Decide / Act State</span><div className="text-sm font-serif-display font-bold text-amber-300 mt-3">{audit.autonomousCycle.decide}</div><p className="text-[11px] text-zinc-400 mt-1">Current decision context returned by the Brain audit.</p></Card>
-        <Card variant="default" padding="md"><span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Learn State</span><div className="text-sm font-serif-display font-bold text-emerald-400 mt-3">{audit.autonomousCycle.learn}</div><p className="text-[11px] text-zinc-400 mt-1">Current learning context returned by the Brain audit.</p></Card>
-      </div>
-
-      <Tabs tabs={[{ id: 'recommendations', label: 'Actionable Interventions', count: audit.recommendations.length }, { id: 'cycle', label: 'Autonomous Loop' }, { id: 'history', label: 'Execution Log', count: logs.length }]} activeTab={activeTab} onChange={id => setActiveTab(id as typeof activeTab)} />
-
-      {activeTab === 'recommendations' && (
-        <div className="space-y-4">
-          {audit.recommendations.length === 0 ? <Card padding="lg"><p className="text-sm text-zinc-400">No recommendations returned by the current Brain audit.</p></Card> : audit.recommendations.map(rec => (
-            <Card key={rec.id} variant="elevated" padding="lg" className="border-amber-500/25 space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2"><div className="flex items-center gap-2"><Badge variant={rec.severity === 'critical' ? 'rose' : 'amber'} size="sm"><AlertTriangle className="w-3 h-3" /> {rec.severity.toUpperCase()}</Badge><span className="text-xs font-mono px-2 py-0.5 rounded bg-white/[0.05] text-zinc-300 uppercase">{rec.category}</span></div><span className="text-sm font-mono font-bold text-amber-300">${rec.estimatedRecovery.toLocaleString()} estimated recovery</span></div>
-              <div><h3 className="text-base font-semibold text-zinc-100">{rec.title}</h3><p className="text-xs text-zinc-400 mt-1.5 leading-relaxed">{rec.rationale}</p></div>
-              <div className="p-3.5 rounded-lg bg-[#08080c] border border-white/[0.07]"><div className="text-xs font-medium text-amber-300 flex items-center gap-2"><Zap className="w-3.5 h-3.5" /> Recommended action</div><p className="text-xs text-zinc-300 mt-2 leading-relaxed">{rec.recommendedAction}</p></div>
-              <div className="flex items-center justify-end"><Button variant="primary" size="sm" isLoading={executingId === rec.id} onClick={() => executeRecommendation(rec.id)}>Execute Decision</Button></div>
-            </Card>
-          ))}
-        </div>
-      )}
-
-      {activeTab === 'cycle' && <div className="space-y-3">{(['detect', 'understand', 'decide', 'act', 'learn'] as const).map((stage, index) => <Card key={stage} padding="md"><div className="flex items-center justify-between mb-2"><span className="text-xs font-mono font-bold text-amber-300">{index + 1}. {stage.toUpperCase()}</span><Badge variant={stage === 'act' ? 'emerald' : 'slate'} size="sm">Telemetry</Badge></div><p className="text-sm text-zinc-300">{audit.autonomousCycle[stage]}</p></Card>)}</div>}
-
-      {activeTab === 'history' && <Card variant="default" padding="none" className="overflow-hidden"><div className="divide-y divide-white/[0.06]">{logs.length === 0 ? <div className="p-6 text-sm text-zinc-500">No execution history returned by the connected platform.</div> : logs.map(log => <div key={log.id} className="p-4 flex items-start justify-between gap-4"><div><div className="flex items-center gap-2"><Badge variant={log.status === 'success' ? 'emerald' : 'rose'} size="sm"><CheckCircle2 className="w-3 h-3" /> {log.status.toUpperCase()}</Badge><span className="text-xs font-medium text-zinc-200">{log.triggerEvent}</span></div><p className="text-xs text-zinc-400 mt-1">{log.details}</p></div><span className="text-[11px] text-zinc-500 font-mono">{new Date(log.executedAt).toLocaleString()}</span></div>)}</div></Card>}
-    </div>
-  );
+  return <div className="space-y-6 pb-12">
+    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-xl bg-gradient-to-r from-[#0d0d14] via-[#12121b] to-[#0d0d14] border border-amber-500/30"><div><div className="flex items-center gap-2"><span className="p-1.5 rounded-lg bg-amber-500/15 text-amber-400 border border-amber-500/30"><Bot className="w-5 h-5" /></span><h2 className="text-lg font-serif-display font-bold text-zinc-100">APEX3X Autonomous Revenue Engine</h2><Badge variant="gold" size="sm">Live workspace telemetry</Badge></div><p className="text-xs text-zinc-300 mt-1 max-w-2xl">{audit.headline}</p></div><Button variant="primary" size="md" isLoading={scanning} onClick={runScan} leftIcon={<RefreshCw className="w-4 h-4" />}>Run Live Autonomous Audit</Button></div>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4"><Card variant="gold-accent" padding="md"><span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Diagnosed Revenue at Risk</span><div className="text-2xl font-serif-display font-bold text-rose-300 mt-3">${audit.totalRevenueAtRisk.toLocaleString()}</div><p className="text-[11px] text-zinc-400 mt-1">{audit.criticalLeakagesCount} reported operational anomalies</p></Card><Card variant="default" padding="md"><span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Decide / Act State</span><div className="text-sm font-serif-display font-bold text-amber-300 mt-3">{audit.autonomousCycle.decide}</div><p className="text-[11px] text-zinc-400 mt-1">Current decision context returned by the Brain audit.</p></Card><Card variant="default" padding="md"><span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Learn State</span><div className="text-sm font-serif-display font-bold text-emerald-400 mt-3">{audit.autonomousCycle.learn}</div><p className="text-[11px] text-zinc-400 mt-1">Current learning context returned by the Brain audit.</p></Card></div>
+    <Tabs tabs={[{ id: 'recommendations', label: 'Actionable Interventions', count: audit.recommendations.length }, { id: 'cycle', label: 'Autonomous Loop' }, { id: 'history', label: 'Execution Log', count: logs.length }]} activeTab={activeTab} onChange={id => setActiveTab(id as typeof activeTab)} />
+    {activeTab === 'recommendations' && <div className="space-y-4">{audit.recommendations.length === 0 ? <Card padding="lg"><p className="text-sm text-zinc-400">No recommendations returned by the current Brain audit.</p></Card> : audit.recommendations.map(rec => <Card key={rec.id} variant="elevated" padding="lg" className="border-amber-500/25 space-y-4"><div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2"><div className="flex items-center gap-2"><Badge variant={rec.severity === 'critical' ? 'rose' : 'amber'} size="sm"><AlertTriangle className="w-3 h-3" /> {rec.severity.toUpperCase()}</Badge><span className="text-xs font-mono px-2 py-0.5 rounded bg-white/[0.05] text-zinc-300 uppercase">{rec.category}</span></div><span className="text-sm font-mono font-bold text-amber-300">${rec.estimatedRecovery.toLocaleString()} estimated recovery</span></div><div><h3 className="text-base font-semibold text-zinc-100">{rec.title}</h3><p className="text-xs text-zinc-400 mt-1.5 leading-relaxed">{rec.rationale}</p></div><div className="p-3.5 rounded-lg bg-[#08080c] border border-white/[0.07]"><div className="text-xs font-medium text-amber-300 flex items-center gap-2"><Zap className="w-3.5 h-3.5" /> Recommended action</div><p className="text-xs text-zinc-300 mt-2 leading-relaxed">{rec.recommendedAction}</p></div><div className="flex items-center justify-end"><Button variant="primary" size="sm" isLoading={executingId === rec.id} onClick={() => executeRecommendation(rec.id)}>Execute Decision</Button></div></Card>)}</div>}
+    {activeTab === 'cycle' && <div className="space-y-3">{(['detect', 'understand', 'decide', 'act', 'learn'] as const).map((stage, index) => <Card key={stage} padding="md"><div className="flex items-center justify-between mb-2"><span className="text-xs font-mono font-bold text-amber-300">{index + 1}. {stage.toUpperCase()}</span></div><p className="text-sm text-zinc-300">{audit.autonomousCycle[stage]}</p></Card>)}</div>}
+    {activeTab === 'history' && <Card variant="default" padding="none" className="overflow-hidden"><div className="divide-y divide-white/[0.06]">{logs.length === 0 ? <div className="p-6 text-sm text-zinc-500">No execution history returned by the connected platform.</div> : logs.map(log => <div key={log.id} className="p-4 flex items-start justify-between gap-4"><div><div className="flex items-center gap-2"><Badge variant={log.status === 'success' ? 'emerald' : 'rose'} size="sm"><CheckCircle2 className="w-3 h-3" /> {log.status.toUpperCase()}</Badge><span className="text-xs font-medium text-zinc-200">{log.triggerEvent}</span></div><p className="text-xs text-zinc-400 mt-1">{log.details}</p></div><span className="text-[11px] text-zinc-500 font-mono">{new Date(log.executedAt).toLocaleString()}</span></div>)}</div></Card>}
+  </div>;
 };
