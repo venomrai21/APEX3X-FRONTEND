@@ -14,7 +14,7 @@ import { InvoicesView } from './views/InvoicesView';
 import { FormsView } from './views/FormsView';
 import { MarketingView } from './views/MarketingView';
 import { WorkflowsView } from './views/WorkflowsView';
-import { ConnectorHubView } from './views/ConnectorHubView';
+import { ConnectorKernelView } from './views/ConnectorKernelView';
 import { AiProviderHubView } from './views/AiProviderHubView';
 import { TeamSecurityView } from './views/TeamSecurityView';
 import { BillingView } from './views/BillingView';
@@ -35,7 +35,7 @@ const MainViewRouter: React.FC = () => {
     case 'forms': return <FormsView />;
     case 'marketing': return <MarketingView />;
     case 'workflows': return <WorkflowsView />;
-    case 'integrations': return <ConnectorHubView />;
+    case 'integrations': return <ConnectorKernelView />;
     case 'ai_hub': return <AiProviderHubView />;
     case 'team_security': return <TeamSecurityView />;
     case 'billing': return <BillingView />;
