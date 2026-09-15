@@ -52,7 +52,7 @@ export const APEXSpotlight: React.FC<MotionProps & { intensity?: number }> = ({ 
   };
 
   return (
-    <div ref={ref} onPointerMove={onPointerMove} className={`relative overflow-hidden ${className}`}>
+    <div ref={ref} onPointerMove={onPointerMove} className={`group relative overflow-hidden ${className}`}>
       {!reducedMotion && (
         <div
           aria-hidden="true"
