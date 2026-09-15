@@ -1,10 +1,11 @@
 import React from 'react';
-import { APEXSpotlight } from '../apex3x/foundation/InteractionPrimitives';
+import { APEXHoverCard, APEXSpotlight } from '../apex3x/foundation/InteractionPrimitives';
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'elevated' | 'sunken' | 'gold-accent';
   padding?: 'none' | 'sm' | 'md' | 'lg';
   spotlight?: boolean;
+  interactive?: boolean;
 }
 
 export const Card: React.FC<CardProps> = ({
@@ -12,6 +13,7 @@ export const Card: React.FC<CardProps> = ({
   variant = 'default',
   padding = 'md',
   spotlight = true,
+  interactive = true,
   className = '',
   ...props
 }) => {
@@ -38,5 +40,6 @@ export const Card: React.FC<CardProps> = ({
     </div>
   );
 
-  return spotlight ? <APEXSpotlight>{content}</APEXSpotlight> : content;
+  const surfaced = spotlight ? <APEXSpotlight>{content}</APEXSpotlight> : content;
+  return interactive ? <APEXHoverCard>{surfaced}</APEXHoverCard> : surfaced;
 };
