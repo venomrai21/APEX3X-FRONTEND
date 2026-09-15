@@ -28,10 +28,10 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           <input
             id={inputId}
             ref={ref}
-            className={`w-full bg-[#0a0a0f] border ${
+            className={`w-full bg-black border ${
               error
-                ? 'border-rose-500/60 focus:border-rose-500 focus:ring-rose-500/20'
-                : 'border-white/[0.09] focus:border-amber-500/60 focus:ring-amber-500/20'
+                ? 'border-white/[0.24] focus:border-white/[0.5] focus:ring-white/[0.12]'
+                : 'border-white/[0.09] focus:border-white/[0.5] focus:ring-white/[0.12]'
             } text-zinc-200 placeholder-zinc-500 text-sm rounded-lg px-3.5 py-2 transition-all duration-150 focus:outline-none focus:ring-2 ${
               leftIcon ? 'pl-9' : ''
             } ${rightIcon ? 'pr-9' : ''} ${className}`}
@@ -43,7 +43,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             </div>
           )}
         </div>
-        {error && <p className="text-xs text-rose-400 font-medium">{error}</p>}
+        {error && <p className="text-xs text-white font-medium">{error}</p>}
         {hint && !error && <p className="text-xs text-zinc-500">{hint}</p>}
       </div>
     );
