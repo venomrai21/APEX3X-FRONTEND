@@ -1,14 +1,17 @@
 import React from 'react';
+import { APEXSpotlight } from '../apex3x/foundation/InteractionPrimitives';
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'elevated' | 'sunken' | 'gold-accent';
   padding?: 'none' | 'sm' | 'md' | 'lg';
+  spotlight?: boolean;
 }
 
 export const Card: React.FC<CardProps> = ({
   children,
   variant = 'default',
   padding = 'md',
+  spotlight = true,
   className = '',
   ...props
 }) => {
@@ -26,7 +29,7 @@ export const Card: React.FC<CardProps> = ({
     lg: 'p-6',
   };
 
-  return (
+  const content = (
     <div
       className={`rounded-xl transition-all duration-200 ${variantStyles[variant]} ${paddingStyles[padding]} ${className}`}
       {...props}
@@ -34,4 +37,6 @@ export const Card: React.FC<CardProps> = ({
       {children}
     </div>
   );
+
+  return spotlight ? <APEXSpotlight>{content}</APEXSpotlight> : content;
 };
