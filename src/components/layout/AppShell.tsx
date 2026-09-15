@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { NavItemKey } from '../../types';
-import { NavigationMenu, Sidebar } from '../apex3x';
+import { APEXReveal, NavigationMenu, Sidebar } from '../apex3x';
 import { CommandPalette } from './CommandPalette';
 import { ConnectDrawer } from './ConnectDrawer';
 import { NotificationDrawer } from './NotificationDrawer';
@@ -19,11 +19,7 @@ interface NavSection {
 }
 
 export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const {
-    currentWorkspace, availableWorkspaces, currentUser, activeNav, setActiveNav, switchWorkspace,
-    setCommandPaletteOpen, setNotificationDrawerOpen, setOnboardingOpen, setSubWorkspaceOpen,
-    toasts, removeToast,
-  } = useApp();
+  const { currentWorkspace, availableWorkspaces, currentUser, activeNav, setActiveNav, switchWorkspace, setCommandPaletteOpen, setNotificationDrawerOpen, setOnboardingOpen, setSubWorkspaceOpen, toasts, removeToast } = useApp();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [workspaceMenuOpen, setWorkspaceMenuOpen] = useState(false);
 
@@ -41,19 +37,13 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
       { key: 'leads', label: 'CRM & Qualified Leads', icon: <Users className="w-4 h-4" /> },
       { key: 'customers', label: 'Customer Directory', icon: <Building className="w-4 h-4" /> },
     ]},
-    { title: 'Communicate', items: [
-      { key: 'conversations', label: 'Unified Inbox', icon: <MessageSquare className="w-4 h-4" /> },
-    ]},
-    { title: 'Book & Schedule', items: [
-      { key: 'bookings', label: 'Bookings & Calendar', icon: <Calendar className="w-4 h-4" /> },
-    ]},
+    { title: 'Communicate', items: [{ key: 'conversations', label: 'Unified Inbox', icon: <MessageSquare className="w-4 h-4" /> }]},
+    { title: 'Book & Schedule', items: [{ key: 'bookings', label: 'Bookings & Calendar', icon: <Calendar className="w-4 h-4" /> }]},
     { title: 'Sell & Revenue', items: [
       { key: 'pipeline', label: 'Sales Pipeline', icon: <GitPullRequest className="w-4 h-4" /> },
       { key: 'invoices', label: 'Invoices & Payments', icon: <CreditCard className="w-4 h-4" /> },
     ]},
-    { title: 'Automate', items: [
-      { key: 'workflows', label: 'Workflows & Rules', icon: <Zap className="w-4 h-4" /> },
-    ]},
+    { title: 'Automate', items: [{ key: 'workflows', label: 'Workflows & Rules', icon: <Zap className="w-4 h-4" /> }]},
     { title: 'Connected Ecosystem', items: [
       { key: 'integrations', label: 'Integrations Hub', icon: <Plug className="w-4 h-4" /> },
       { key: 'ai_hub', label: 'AI Provider Hub (BYOK)', icon: <Sparkles className="w-4 h-4" /> },
@@ -96,7 +86,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
             <div className="flex items-center gap-3"><button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="lg:hidden p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-white/[0.05]">{mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}</button><div className="flex items-center gap-2"><span className="text-xs font-mono text-zinc-500 hidden sm:inline">APEX3X</span><span className="text-zinc-600 hidden sm:inline">/</span><NavigationMenu sections={navSections} activeKey={activeNav} onSelect={(key) => setActiveNav(key as NavItemKey)} /></div></div>
             <div className="flex items-center gap-2 sm:gap-3"><button onClick={() => setCommandPaletteOpen(true)} className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#0e0e16] border border-white/[0.08] hover:border-white/[0.16] text-zinc-400 hover:text-zinc-200 text-xs transition-all cursor-pointer"><Search className="w-3.5 h-3.5 text-zinc-500" /><span className="hidden sm:inline">Search commands...</span><kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.2 text-[10px] font-mono text-zinc-400 bg-white/[0.06] border border-white/[0.08] rounded"><Command className="w-2.5 h-2.5" /> K</kbd></button><button onClick={() => setNotificationDrawerOpen(true)} className="relative p-2 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.05] transition-colors" title="Decision Feed"><Bell className="w-4 h-4" /></button><button onClick={() => setOnboardingOpen(true)} className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium border cursor-pointer bg-[#0e0e16] text-zinc-200 border-white/[0.12] hover:border-white/[0.2] hover:text-white"><Building className="w-3 h-3" /><span>Business Profile</span></button></div>
           </header>
-          <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-[#060609]"><div className="max-w-7xl mx-auto w-full">{children}</div></main>
+          <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-[#060609]"><div className="max-w-7xl mx-auto w-full"><APEXReveal>{children}</APEXReveal></div></main>
         </div>
       </div>
 
