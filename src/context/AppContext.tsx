@@ -53,9 +53,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const addToast = (toast: Omit<ToastMessage, 'id'>) => {
     const id = Math.random().toString(36).substring(2, 9);
     setToasts(prev => [...prev, { ...toast, id }]);
-    setTimeout(() => {
-      removeToast(id);
-    }, 4000);
+    setTimeout(() => removeToast(id), 4000);
   };
 
   const removeToast = (id: string) => {
@@ -63,8 +61,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const loadSession = async () => {
+    setIsLoadingSession(true);
     try {
-      setIsLoadingSession(true);
       const [meRes, wsList] = await Promise.all([api.getMe(), api.getWorkspaces()]);
       setCurrentUser(meRes.user);
       setCurrentWorkspace(meRes.workspace);
@@ -72,25 +70,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setActiveWorkspaceId(meRes.workspace.id);
     } catch (err) {
       console.error('Failed to load session:', err);
-      // Fallback state
-      setCurrentWorkspace({
-        id: 'ws_apex_core',
-        name: 'APEX Industrial Logistics',
-        slug: 'apex-industrial',
-        industry: 'B2B Logistics & Freight',
-        website: 'https://apexindustrial.com',
-        currency: 'USD',
-        timezone: 'America/New_York',
-        verificationStatus: 'verified',
-        createdAt: '2025-01-10T09:00:00Z',
-      });
-      setCurrentUser({
-        id: 'usr_owner_01',
-        email: 'venomrai21@gmail.com',
-        name: 'Alex Vance',
-        role: 'admin',
-        workspaceId: 'ws_apex_core',
-      });
+      setCurrentUser(null);
+      setCurrentWorkspace(null);
+      setAvailableWorkspaces([]);
     } finally {
       setIsLoadingSession(false);
     }
@@ -109,11 +91,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         if (match) setCurrentWorkspace(match);
       }
       triggerRefresh();
-      addToast({
-        type: 'info',
-        title: 'Workspace Switched',
-        description: `Now operating in ${target?.name || 'selected workspace'}.`,
-      });
+      if (target) {
+        addToast({
+          type: 'info',
+          title: 'Workspace Switched',
+          description: `Now operating in ${target.name}.`,
+        });
+      }
     } catch (err) {
       console.error('Failed switching workspace:', err);
     }
@@ -132,7 +116,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     loadSession();
   }, []);
 
-  // Keyboard shortcut listener for Cmd+K / Ctrl+K
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
