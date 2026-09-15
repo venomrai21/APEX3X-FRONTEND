@@ -26,6 +26,8 @@ interface AppContextType {
   setNotificationDrawerOpen: (open: boolean) => void;
   onboardingOpen: boolean;
   setOnboardingOpen: (open: boolean) => void;
+  subWorkspaceOpen: boolean;
+  setSubWorkspaceOpen: (open: boolean) => void;
   toasts: ToastMessage[];
   addToast: (toast: Omit<ToastMessage, 'id'>) => void;
   removeToast: (id: string) => void;
@@ -45,6 +47,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [connectDrawerOpen, setConnectDrawerOpen] = useState(false);
   const [notificationDrawerOpen, setNotificationDrawerOpen] = useState(false);
   const [onboardingOpen, setOnboardingOpen] = useState(false);
+  const [subWorkspaceOpen, setSubWorkspaceOpen] = useState(false);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
   const [isLoadingSession, setIsLoadingSession] = useState(true);
@@ -136,6 +139,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setNotificationDrawerOpen,
       onboardingOpen,
       setOnboardingOpen,
+      subWorkspaceOpen,
+      setSubWorkspaceOpen,
       toasts,
       addToast,
       removeToast,
