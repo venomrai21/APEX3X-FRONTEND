@@ -32,11 +32,11 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     };
 
     const variantStyles = {
-      primary: 'bg-[var(--text-primary)] hover:bg-white active:bg-[var(--text-secondary)] text-[var(--background)] font-semibold border border-[var(--text-primary)] transition-colors duration-150',
-      secondary: 'bg-[var(--surface)] hover:bg-[var(--surface-elevated)] active:bg-[var(--surface)] text-[var(--text-primary)] font-medium border border-[var(--border)] hover:border-[#383D41] transition-colors duration-150',
-      outline: 'bg-transparent hover:bg-[var(--surface)] active:bg-[var(--surface-elevated)] text-[var(--text-primary)] font-medium border border-[var(--border)] hover:border-[#383D41] transition-colors duration-150',
-      ghost: 'bg-transparent hover:bg-[var(--surface)] active:bg-[var(--surface-elevated)] text-[var(--text-primary)] font-medium transition-colors duration-150',
-      danger: 'bg-transparent hover:bg-[var(--surface)] active:bg-[var(--surface-elevated)] text-[var(--error)] font-medium border border-[var(--border)] hover:border-[#383D41] transition-colors duration-150',
+      primary: 'bg-[var(--accent)] hover:bg-[var(--accent-bright)] active:bg-[var(--accent-dark)] text-[var(--background)] font-semibold border border-[var(--accent)] transition-colors duration-150',
+      secondary: 'bg-[var(--surface)] hover:bg-[var(--surface-2)] active:bg-[var(--surface)] text-[var(--text-primary)] font-medium border border-[var(--border)] hover:border-[#383F45] transition-colors duration-150',
+      outline: 'bg-transparent hover:bg-[var(--surface)] active:bg-[var(--surface-2)] text-[var(--text-primary)] font-medium border border-[var(--border)] hover:border-[#383F45] transition-colors duration-150',
+      ghost: 'bg-transparent hover:bg-[var(--surface)] active:bg-[var(--surface-2)] text-[var(--text-primary)] font-medium transition-colors duration-150',
+      danger: 'bg-[var(--error)] hover:brightness-110 active:brightness-95 text-white font-semibold border border-[var(--error)] transition-colors duration-150',
     };
 
     return (
