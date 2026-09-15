@@ -1,0 +1,6 @@
+{
+  "name": "APEX3X Business Operating System",
+  "description": "Autonomous Business Operating System to detect revenue loss, decide next actions, and act through connected systems.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

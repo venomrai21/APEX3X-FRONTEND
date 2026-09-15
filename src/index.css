@@ -1,0 +1,89 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-serif: 'Newsreader', Georgia, serif;
+    --font-display: 'Cinzel', serif;
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    color-scheme: dark;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: #060608;
+    color: #e2e8f0;
+  }
+
+  h1, h2, h3, .font-serif-display {
+    font-family: var(--font-serif);
+    letter-spacing: -0.015em;
+  }
+
+  .font-brand {
+    font-family: var(--font-display);
+    letter-spacing: 0.08em;
+  }
+
+  .font-mono-code {
+    font-family: var(--font-mono);
+  }
+}
+
+/* Custom scrollbars for dark operational surfaces */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #08080b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #23232c;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #383846;
+}
+
+/* APEX3X spatial & lighting utility classes */
+.surface-card {
+  background-color: #0d0d12;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+}
+
+.surface-elevated {
+  background-color: #121219;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(245, 158, 11, 0.05);
+}
+
+.surface-sunken {
+  background-color: #07070a;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.gold-glow {
+  box-shadow: 0 0 25px -5px rgba(245, 158, 11, 0.15);
+}
+
+.gold-glow-sm {
+  box-shadow: 0 0 12px -2px rgba(245, 158, 11, 0.2);
+}
+
+.gold-border-glow {
+  border-color: rgba(245, 158, 11, 0.4);
+  box-shadow: 0 0 15px -3px rgba(245, 158, 11, 0.25);
+}
+
+.ambient-radial-gold {
+  background: radial-gradient(circle at 50% 0%, rgba(217, 119, 6, 0.09) 0%, rgba(6, 6, 8, 0) 70%);
+}
+
+.light-streak {
+  background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.15), transparent);
+}
