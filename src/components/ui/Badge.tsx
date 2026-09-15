@@ -14,16 +14,16 @@ export const Badge: React.FC<BadgeProps> = ({
   className = '',
 }) => {
   const variantStyles: Record<string, string> = {
-    gold: 'bg-amber-500/10 text-amber-200 border-amber-500/25',
-    amber: 'bg-white/[0.04] text-zinc-300 border-white/[0.08]',
-    warning: 'bg-amber-500/10 text-amber-300 border-amber-500/20',
-    emerald: 'bg-emerald-950/40 text-emerald-400 border-emerald-500/30',
-    success: 'bg-emerald-950/40 text-emerald-400 border-emerald-500/30',
-    rose: 'bg-red-950/40 text-red-400 border-red-500/30',
-    danger: 'bg-red-950/40 text-red-400 border-red-500/30',
-    slate: 'bg-white/[0.04] text-zinc-300 border-white/[0.08]',
-    neutral: 'bg-white/[0.04] text-zinc-300 border-white/[0.08]',
-    outline: 'bg-transparent text-zinc-400 border-white/[0.12]',
+    gold: 'bg-black text-white border-white/[0.12]',
+    amber: 'bg-black text-white border-white/[0.12]',
+    warning: 'bg-black text-white border-white/[0.12]',
+    emerald: 'bg-black text-white border-white/[0.12]',
+    success: 'bg-black text-white border-white/[0.12]',
+    rose: 'bg-black text-white border-white/[0.12]',
+    danger: 'bg-black text-white border-white/[0.12]',
+    slate: 'bg-black text-zinc-300 border-white/[0.08]',
+    neutral: 'bg-black text-zinc-300 border-white/[0.08]',
+    outline: 'bg-transparent text-zinc-300 border-white/[0.12]',
   };
 
   const sizeStyles = {
