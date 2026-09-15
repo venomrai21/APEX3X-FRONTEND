@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Building, Search, Mail, Phone, ExternalLink, ShieldCheck, Heart, ArrowUpRight } from 'lucide-react';
+import { Building, Search, Mail, Phone, ArrowUpRight } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { api } from '../api/client';
 import { Customer } from '../types';
@@ -39,10 +39,14 @@ export const CustomersView: React.FC = () => {
   );
 
   const totalLtv = customers.reduce((acc, c) => acc + c.lifetimeValue, 0);
+  const customersWithHealth = customers.filter(c => Number.isFinite(c.healthScore));
+  const averageHealth = customersWithHealth.length
+    ? Math.round(customersWithHealth.reduce((acc, c) => acc + c.healthScore, 0) / customersWithHealth.length)
+    : null;
+  const activeCustomers = customers.filter(c => c.status === 'active').length;
 
   return (
     <div className="space-y-6 pb-12">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
@@ -70,7 +74,6 @@ export const CustomersView: React.FC = () => {
         </div>
       </div>
 
-      {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card variant="default" padding="sm">
           <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
@@ -85,22 +88,21 @@ export const CustomersView: React.FC = () => {
           <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
             Average Account Health
           </span>
-          <div className="text-xl font-serif-display font-bold text-emerald-400 mt-1 flex items-center gap-1.5">
-            <Heart className="w-4 h-4 text-emerald-400 fill-emerald-400/20" /> 94%
+          <div className="text-xl font-serif-display font-bold text-emerald-400 mt-1">
+            {averageHealth === null ? '—' : `${averageHealth}%`}
           </div>
         </Card>
 
         <Card variant="default" padding="sm">
           <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
-            Active Retainer Accounts
+            Active Accounts
           </span>
           <div className="text-xl font-serif-display font-bold text-zinc-100 mt-1">
-            {customers.filter(c => c.status === 'active').length}
+            {activeCustomers}
           </div>
         </Card>
       </div>
 
-      {/* Search Input */}
       <div className="p-3 bg-[#0a0a0f] border border-white/[0.08] rounded-xl flex items-center max-w-md">
         <Search className="w-4 h-4 text-zinc-500 mr-2.5 shrink-0" />
         <input
@@ -112,7 +114,6 @@ export const CustomersView: React.FC = () => {
         />
       </div>
 
-      {/* List */}
       {loading ? (
         <div className="space-y-3">
           {[1, 2, 3].map(i => (
@@ -123,7 +124,7 @@ export const CustomersView: React.FC = () => {
         <EmptyState
           icon={<Building className="w-6 h-6" />}
           title="No Accounts Found"
-          description="No customer accounts match your search filter."
+          description={search ? 'No customer accounts match your search filter.' : 'No customer accounts are available for this workspace.'}
         />
       ) : (
         <div className="space-y-3">
