@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Building2, Plus, ArrowRight } from 'lucide-react';
+import { Building2, ArrowRight } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { api } from '../../api/client';
 import { Modal } from '../ui/Modal';
@@ -58,7 +58,7 @@ export const SubWorkspaceModal: React.FC = () => {
             <Building2 className="w-4 h-4" /> Multi-tenant workspace
           </div>
           <p className="mt-2 text-xs text-zinc-400 leading-relaxed">
-            Each Sub Workspace can represent a different business, such as Milk Service, Real Estate, or Car Repairing Services. Data and connected operations remain scoped to the selected workspace.
+            Each Sub Workspace can represent a different business. For example: Real Estate → Sub Workspace 1, Milk Service → Sub Workspace 2, Car Repairing Services → Sub Workspace 3. Additional Sub Workspaces can be created as needed.
           </p>
         </div>
 
@@ -77,7 +77,6 @@ export const SubWorkspaceModal: React.FC = () => {
             size="md"
             isLoading={isSubmitting}
             onClick={handleCreate}
-            leftIcon={<Plus className="w-4 h-4" />}
             rightIcon={<ArrowRight className="w-4 h-4" />}
           >
             Create Sub Workspace
