@@ -16,10 +16,10 @@ export const AnimatedInput = React.forwardRef<HTMLInputElement, AnimatedInputPro
         ref={ref}
         whileFocus={reduceMotion ? undefined : { scale: 1.005 }}
         transition={{ duration: 0.12 }}
-        className={`w-full rounded-lg bg-[#101018] border border-white/[0.09] px-3 py-2 text-xs text-zinc-100 placeholder-zinc-500 outline-none transition-colors focus:border-amber-500/60 focus:ring-1 focus:ring-amber-500/15 ${error ? 'border-rose-500/50 focus:border-rose-500/70' : ''} ${className}`}
+        className={`w-full rounded-lg bg-black border border-white/[0.09] px-3 py-2 text-xs text-zinc-100 placeholder-zinc-500 outline-none transition-colors focus:border-white/[0.5] focus:ring-1 focus:ring-white/[0.12] ${error ? 'border-white/[0.24]' : ''} ${className}`}
         {...props}
       />
-      {error ? <span className="block text-[10px] text-rose-400">{error}</span> : hint ? <span className="block text-[10px] text-zinc-500">{hint}</span> : null}
+      {error ? <span className="block text-[10px] text-zinc-200">{error}</span> : hint ? <span className="block text-[10px] text-zinc-500">{hint}</span> : null}
     </label>
   );
 });
