@@ -1,6 +1,6 @@
 {
   "name": "APEX3X Business Operating System",
-  "description": "Autonomous Business Operating System to detect revenue loss, decide next actions, and act through connected systems.",
+  "description": "APEX3X customer-facing frontend. Backend, authentication, data, AI providers, billing, and integrations are connected later through the existing SaaS platform.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": []
 }
