@@ -22,9 +22,9 @@ export const AnimatedToggle: React.FC<AnimatedToggleProps> = ({ checked, onChang
       onClick={() => !disabled && onChange(!checked)}
       className={`flex items-center gap-3 text-left disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
     >
-      <span className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border transition-colors ${checked ? 'bg-amber-500/80 border-amber-400/60' : 'bg-zinc-800 border-white/[0.12]'}`}>
+      <span className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border transition-colors ${checked ? 'bg-white border-white' : 'bg-zinc-900 border-white/[0.12]'}`}>
         <motion.span
-          className={`absolute h-4 w-4 rounded-full ${checked ? 'bg-zinc-950' : 'bg-zinc-400'}`}
+          className={`absolute h-4 w-4 rounded-full ${checked ? 'bg-black' : 'bg-zinc-400'}`}
           animate={reduceMotion ? undefined : { x: checked ? 21 : 3 }}
           initial={false}
           transition={{ type: 'spring', stiffness: 500, damping: 30 }}
