@@ -7,13 +7,7 @@ import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 
 export const SubWorkspaceModal: React.FC = () => {
-  const {
-    subWorkspaceOpen,
-    setSubWorkspaceOpen,
-    refreshWorkspaces,
-    switchWorkspace,
-    addToast,
-  } = useApp();
+  const { subWorkspaceOpen, setSubWorkspaceOpen, refreshWorkspaces, switchWorkspace, addToast } = useApp();
   const [name, setName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -45,20 +39,14 @@ export const SubWorkspaceModal: React.FC = () => {
   };
 
   return (
-    <Modal
-      isOpen={subWorkspaceOpen}
-      onClose={() => setSubWorkspaceOpen(false)}
-      title="Create Sub Workspace"
-      subtitle="Create a separate operating space for another business or business unit."
-      maxWidth="md"
-    >
+    <Modal isOpen={subWorkspaceOpen} onClose={() => setSubWorkspaceOpen(false)} title="Create Sub Workspace" subtitle="Create a separate operating space for another business or business unit." maxWidth="md">
       <div className="space-y-5">
         <div className="p-4 rounded-xl bg-[#08080c] border border-white/[0.08]">
           <div className="flex items-center gap-2 text-amber-400 text-xs font-semibold uppercase tracking-wider">
             <Building2 className="w-4 h-4" /> Multi-tenant workspace
           </div>
           <p className="mt-2 text-xs text-zinc-400 leading-relaxed">
-            Each Sub Workspace can represent a different business. For example: Real Estate → Sub Workspace 1, Milk Service → Sub Workspace 2, Car Repairing Services → Sub Workspace 3. Additional Sub Workspaces can be created as needed.
+            Each Sub Workspace can represent a separate business or business unit. Additional Sub Workspaces can be created as needed.
           </p>
         </div>
 
@@ -66,19 +54,13 @@ export const SubWorkspaceModal: React.FC = () => {
           label="Sub Workspace / Business Name"
           value={name}
           onChange={e => setName(e.target.value)}
-          placeholder="e.g. Milk Service"
+          placeholder="Enter workspace or business name"
           leftIcon={<Building2 className="w-4 h-4 text-zinc-500" />}
           autoFocus
         />
 
         <div className="flex justify-end pt-1">
-          <Button
-            variant="primary"
-            size="md"
-            isLoading={isSubmitting}
-            onClick={handleCreate}
-            rightIcon={<ArrowRight className="w-4 h-4" />}
-          >
+          <Button variant="primary" size="md" isLoading={isSubmitting} onClick={handleCreate} rightIcon={<ArrowRight className="w-4 h-4" />}>
             Create Sub Workspace
           </Button>
         </div>
