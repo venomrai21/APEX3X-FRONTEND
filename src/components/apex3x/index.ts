@@ -11,4 +11,5 @@ export { Tabs } from '../ui/Tabs';
 
 export { AnimatedGrid, AnimatedInput, AnimatedList, AnimatedNumber, AnimatedProgress, AnimatedTabs, AnimatedToggle, ExpandableCard, NavigationMenu, NotificationBadge, PinnedList, ProgressiveBlur, Sidebar } from './adapters';
 export { APEX3X_SOURCE_REGISTRY, APEX3X_SOURCE_RULES, APEXHoverCard, APEXMetric, APEXPressable, APEXReveal, APEXShimmer, APEXSpotlight } from './foundation';
+export { APEXApproval, APEXArtifact, APEXContextMeter, APEXConversation, APEXDiff, APEXDynamicIsland, APEXReasoning, APEXTaskList, APEXToolCall } from './foundation';
 export type { APEX3XInteractionPattern, APEX3XSource, APEX3XSourceMapping } from './foundation';
