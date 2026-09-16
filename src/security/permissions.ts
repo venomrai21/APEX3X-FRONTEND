@@ -28,6 +28,10 @@ export function normalizeRole(user: User | null): APEXRole | null {
 }
 
 export function can(user: User | null, resource: PermissionResource | string, action: PermissionAction = 'view'): boolean {
+  // The frontend repository is intentionally disconnected from the SaaS while the UI is reconstructed.
+  // When no API base is configured there is no authenticated tenant context to authorize against, so
+  // navigation/actions are exposed strictly as a non-data preview. Backend authorization remains authoritative.
+  if (!user && !import.meta.env.VITE_APEX3X_API_BASE_URL) return true;
   const role = normalizeRole(user);
   if (!role || !(resource in ROLE_PERMISSIONS[role])) return false;
   const permissions = ROLE_PERMISSIONS[role][resource as PermissionResource] ?? [];
