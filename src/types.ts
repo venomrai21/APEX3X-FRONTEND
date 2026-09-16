@@ -1,8 +1,17 @@
 export type NavItemKey =
-  | 'dashboard' | 'brain' | 'insights' | 'forms' | 'marketing' | 'leads' | 'customers' | 'conversations' | 'bookings' | 'pipeline' | 'invoices' | 'workflows' | 'integrations' | 'ai_hub' | 'team' | 'billing' | 'settings';
+  | 'dashboard'
+  | 'unified_inbox'
+  | 'campaigns' | 'advertising' | 'creatives' | 'social' | 'forms' | 'growth'
+  | 'leads' | 'qualified_leads' | 'customers'
+  | 'bookings' | 'calendar'
+  | 'pipeline' | 'orders' | 'invoices' | 'revenue'
+  | 'workflows' | 'rules' | 'tasks' | 'automation_runs'
+  | 'integrations' | 'ai_hub'
+  | 'team' | 'security' | 'billing' | 'workspace_settings'
+  | 'brain' | 'insights' | 'marketing';
 
 export interface Workspace { id: string; name: string; slug: string; industry: string; website: string; currency: string; timezone: string; verificationStatus: 'verified' | 'in_review' | 'unverified'; taxId?: string; registeredAddress?: string; createdAt: string; }
-export interface User { id: string; email: string; name: string; role: 'admin' | 'manager' | 'operator' | 'viewer'; workspaceId: string; avatarUrl?: string; }
+export interface User { id: string; email: string; name: string; role: 'platform_owner' | 'owner' | 'admin' | 'manager' | 'operator' | 'specialist' | 'marketing' | 'sales' | 'finance' | 'support' | 'viewer'; workspaceId: string; avatarUrl?: string; }
 export interface Lead { id: string; workspaceId: string; name: string; email: string; phone: string; company: string; source: 'google_ads' | 'meta_ads' | 'website_form' | 'whatsapp' | 'referral' | 'outbound'; status: 'new' | 'contacted' | 'qualifying' | 'qualified' | 'converted' | 'lost'; estimatedValue: number; score: number; leakRisk: 'high' | 'medium' | 'low'; leakReason?: string; lastContactAt: string; createdAt: string; assignedTo: string; notes: string; }
 export interface Customer { id: string; workspaceId: string; name: string; email: string; phone: string; company: string; tier: 'starter' | 'growth' | 'enterprise'; lifetimeValue: number; healthScore: number; status: 'active' | 'at_risk' | 'churned'; joinedAt: string; lastActiveAt: string; industry: string; }
 export interface ConversationMessage { id: string; conversationId: string; sender: 'customer' | 'agent' | 'system' | 'ai'; senderName: string; content: string; channel: 'whatsapp' | 'email' | 'web_chat' | 'internal' | 'sms'; timestamp: string; status: 'sent' | 'delivered' | 'read' | 'failed'; }
@@ -13,22 +22,7 @@ export interface Invoice { id: string; workspaceId: string; invoiceNumber: strin
 export interface WebsiteForm { id: string; workspaceId: string; title: string; slug: string; fields: { id: string; label: string; type: 'text' | 'email' | 'phone' | 'textarea' | 'select'; required: boolean; options?: string[]; }[]; submitButtonText: string; successMessage: string; submissionsCount: number; conversionRate: number; isActive: boolean; }
 export interface WorkflowRule { id: string; workspaceId: string; title: string; triggerEvent: 'lead_captured' | 'payment_overdue' | 'booking_confirmed' | 'revenue_leak_detected' | 'deal_stalled'; conditionSummary: string; actionSummary: string; actionType: 'send_whatsapp' | 'send_email' | 'create_task' | 'escalate_alert' | 'update_pipeline'; isActive: boolean; totalExecutions: number; lastExecutedAt?: string; successRate: number; }
 export interface WorkflowExecutionLog { id: string; workflowId: string; workspaceId: string; triggerEvent: string; status: 'success' | 'failed' | 'running'; details: string; executedAt: string; recoveredValue?: number; }
-
-export interface IntegrationConnection {
-  id: string;
-  workspaceId: string;
-  provider: string;
-  name: string;
-  category: 'advertising' | 'communication' | 'payment' | 'reputation' | 'crm' | 'commerce' | 'storage' | 'productivity' | 'developer' | 'database' | 'other';
-  status: 'connected' | 'disconnected' | 'error' | 'syncing' | 'pending';
-  connectionMethod?: 'oauth2' | 'api_key' | 'basic_auth' | 'webhook' | 'custom_http' | 'mcp' | 'native';
-  connectedAccountName?: string;
-  connectedAccountId?: string;
-  lastSyncedAt?: string;
-  capabilities: string[];
-  errorDetails?: string;
-}
-
+export interface IntegrationConnection { id: string; workspaceId: string; provider: string; name: string; category: 'advertising' | 'communication' | 'payment' | 'reputation' | 'crm' | 'commerce' | 'storage' | 'productivity' | 'developer' | 'database' | 'other'; status: 'connected' | 'disconnected' | 'error' | 'syncing' | 'pending'; connectionMethod?: 'oauth2' | 'api_key' | 'basic_auth' | 'webhook' | 'custom_http' | 'mcp' | 'native'; connectedAccountName?: string; connectedAccountId?: string; lastSyncedAt?: string; capabilities: string[]; errorDetails?: string; }
 export interface AIProviderConfig { id: string; workspaceId: string; provider: 'gemini' | 'openai' | 'anthropic' | 'custom_openai'; name: string; status: 'connected' | 'not_configured' | 'error'; modelSelected: string; hasCustomKey: boolean; maskedKey?: string; endpointUrl?: string; lastTestedAt?: string; latencyMs?: number; }
 export interface AutonomousAlert { id: string; workspaceId: string; stage: 'detect' | 'understand' | 'decide' | 'act' | 'learn'; severity: 'critical' | 'warning' | 'info'; category: 'unresponsive_lead' | 'overdue_receivable' | 'ad_spend_leak' | 'calendar_noshow' | 'pipeline_stall'; headline: string; detectedIssue: string; revenueAtRisk: number; recommendedAction: string; executionStatus: 'pending_approval' | 'executed' | 'dismissed'; suggestedAt: string; executedAt?: string; }
 export interface SecurityAuditRecord { id: string; workspaceId: string; userId: string; userName: string; action: string; category: 'auth' | 'data_export' | 'integration' | 'ai_config' | 'financial'; ipAddress: string; timestamp: string; }
