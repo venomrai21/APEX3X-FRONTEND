@@ -37,7 +37,7 @@ const MainViewRouter: React.FC = () => {
     case 'workflows': return <WorkflowsView />;
     case 'integrations': return <ConnectorKernelView />;
     case 'ai_hub': return <AiProviderHubView />;
-    case 'team_security': return <TeamSecurityView />;
+    case 'team': return <TeamSecurityView />;
     case 'billing': return <BillingView />;
     case 'settings': return <SettingsView />;
     default: return <DashboardView />;
