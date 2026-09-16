@@ -25,7 +25,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
     { title: 'Sell and revenue', items: [{ key: 'pipeline', label: 'Sales Pipeline', icon: <GitPullRequest className="w-4 h-4" /> }, { key: 'invoices', label: 'Invoices and Payments', icon: <CreditCard className="w-4 h-4" /> }] },
     { title: 'Automate', items: [{ key: 'workflows', label: 'Workflows and Rules', icon: <Zap className="w-4 h-4" /> }] },
     { title: 'Connected ecosystem', items: [{ key: 'integrations', label: 'Integrations Hub', icon: <Plug className="w-4 h-4" /> }, { key: 'ai_hub', label: 'AI Provider Hub (BYOK)', icon: <Sparkles className="w-4 h-4" /> }] },
-    { title: 'Governance', items: [{ key: 'team', label: 'Team and Security Audit', icon: <Shield className="w-4 h-4" /> }, { key: 'billing', label: 'Billing and Entitlements', icon: <CreditCard className="w-4 h-4" /> }] },
+    { title: 'Governance', items: [{ key: 'team_security', label: 'Team and Security Audit', icon: <Shield className="w-4 h-4" /> }, { key: 'billing', label: 'Billing and Entitlements', icon: <CreditCard className="w-4 h-4" /> }] },
   ];
   const userName = currentUser?.name || 'Account unavailable';
   const selectNav = (key: string) => setActiveNav(key as NavItemKey);
