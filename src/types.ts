@@ -8,7 +8,8 @@ export type NavItemKey =
   | 'workflows' | 'rules' | 'tasks' | 'automation_runs'
   | 'integrations' | 'ai_hub'
   | 'team' | 'security' | 'billing' | 'workspace_settings'
-  | 'brain' | 'insights' | 'marketing';
+  | 'brain' | 'insights' | 'marketing'
+  | 'conversations' | 'settings';
 
 export interface Workspace { id: string; name: string; slug: string; industry: string; website: string; currency: string; timezone: string; verificationStatus: 'verified' | 'in_review' | 'unverified'; taxId?: string; registeredAddress?: string; createdAt: string; }
 export interface User { id: string; email: string; name: string; role: 'platform_owner' | 'owner' | 'admin' | 'manager' | 'operator' | 'specialist' | 'marketing' | 'sales' | 'finance' | 'support' | 'viewer'; workspaceId: string; avatarUrl?: string; }
