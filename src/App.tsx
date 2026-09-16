@@ -19,9 +19,16 @@ import { AiProviderHubView } from './views/AiProviderHubView';
 import { TeamSecurityView } from './views/TeamSecurityView';
 import { BillingView } from './views/BillingView';
 import { SettingsView } from './views/SettingsView';
+import { ModuleSurfaceView } from './views/ModuleSurfaceView';
+
+const GUIDED_SURFACES = new Set([
+  'unified_inbox','campaigns','advertising','creatives','social','growth','qualified_leads',
+  'calendar','orders','revenue','rules','tasks','automation_runs','security','workspace_settings',
+]);
 
 const MainViewRouter: React.FC = () => {
   const { activeNav } = useApp();
+  if (GUIDED_SURFACES.has(activeNav)) return <ModuleSurfaceView />;
   switch (activeNav) {
     case 'dashboard': return <DashboardView />;
     case 'brain': return <BrainView />;
@@ -38,8 +45,10 @@ const MainViewRouter: React.FC = () => {
     case 'integrations': return <ConnectorKernelView />;
     case 'ai_hub': return <AiProviderHubView />;
     case 'team': return <TeamSecurityView />;
+    case 'security': return <TeamSecurityView />;
     case 'billing': return <BillingView />;
     case 'settings': return <SettingsView />;
+    case 'workspace_settings': return <ModuleSurfaceView />;
     default: return <DashboardView />;
   }
 };
