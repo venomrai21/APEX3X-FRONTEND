@@ -1,24 +1,171 @@
-@import "@fontsource-variable/geist";
+@import "@fontsource-variable/inter";
 @import "@fontsource-variable/geist-mono";
 @import "tailwindcss";
 
-@theme inline { --font-sans: var(--font-geist-sans); --font-mono: var(--font-geist-mono); }
+@theme inline {
+  --font-sans: var(--font-ui);
+  --font-mono: var(--font-code);
+}
+
+:root {
+  --theme-mode: dark;
+  --font-ui: "Inter Variable", Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-display: "ABC Favorit", "Favorit", "Resend Favorit", Inter, system-ui, sans-serif;
+  --font-code: "CommitMono", "Geist Mono Variable", "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  --background: #000000;
+  --foreground: #FDFDFD;
+  --text-primary: #FDFDFD;
+  --text-secondary: rgba(253, 253, 253, 0.70);
+  --text-muted: rgba(253, 253, 253, 0.48);
+  --text-subtle: rgba(253, 253, 253, 0.34);
+
+  --surface: #0A0A0C;
+  --surface-elevated: #141517;
+  --surface-2: #141517;
+  --surface-3: #1B1C20;
+  --sidebar: #050506;
+  --border: #16171AEB;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
+
+  --bg-brand: #FDFDFD;
+  --bg-brand-hover: #FFFFFF;
+  --text-on-brand: #000000;
+  --ring-brand: rgba(255, 255, 255, 0.48);
+
+  /* Compatibility aliases remain monochrome. */
+  --accent: var(--bg-brand);
+  --accent-bright: var(--bg-brand-hover);
+  --accent-dark: rgba(253, 253, 253, 0.82);
+
+  --error: #FF9592;
+  --error-bg: #FF173F2D;
+  --success: #46FEA5D4;
+  --success-bg: #22FF991E;
+  --info: #70B8FF;
+  --info-bg: #0077FF3A;
+  --warning: var(--text-secondary);
+  --warning-bg: var(--surface-elevated);
+  --neutral-data: var(--text-muted);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+
+  --apex-black: var(--background);
+  --apex-text: var(--text-primary);
+  --apex-text-secondary: var(--text-secondary);
+  --apex-text-muted: var(--text-muted);
+  --apex-border: var(--border);
+  --apex-border-strong: var(--border-strong);
+}
+
+[data-theme="light"] {
+  --theme-mode: light;
+  --background: #FFFFFF;
+  --foreground: #111214;
+  --text-primary: #111214;
+  --text-secondary: rgba(17, 18, 20, 0.68);
+  --text-muted: rgba(17, 18, 20, 0.48);
+  --text-subtle: rgba(17, 18, 20, 0.34);
+  --surface: #F7F7F8;
+  --surface-elevated: #FFFFFF;
+  --surface-2: #F0F0F1;
+  --surface-3: #E8E8EA;
+  --sidebar: #FBFBFC;
+  --border: rgba(17, 18, 20, 0.12);
+  --border-subtle: rgba(17, 18, 20, 0.08);
+  --border-strong: rgba(17, 18, 20, 0.18);
+  --bg-brand: #111214;
+  --bg-brand-hover: #000000;
+  --text-on-brand: #FFFFFF;
+  --ring-brand: rgba(17, 18, 20, 0.42);
+  --accent: var(--bg-brand);
+  --accent-bright: var(--bg-brand-hover);
+  --accent-dark: rgba(17, 18, 20, 0.82);
+  --warning: var(--text-secondary);
+  --warning-bg: var(--surface-2);
+  --neutral-data: var(--text-muted);
+}
+
+@media (prefers-color-scheme: light) {
+  [data-theme="system"] {
+    --theme-mode: light;
+    --background: #FFFFFF;
+    --foreground: #111214;
+    --text-primary: #111214;
+    --text-secondary: rgba(17, 18, 20, 0.68);
+    --text-muted: rgba(17, 18, 20, 0.48);
+    --text-subtle: rgba(17, 18, 20, 0.34);
+    --surface: #F7F7F8;
+    --surface-elevated: #FFFFFF;
+    --surface-2: #F0F0F1;
+    --surface-3: #E8E8EA;
+    --sidebar: #FBFBFC;
+    --border: rgba(17, 18, 20, 0.12);
+    --border-subtle: rgba(17, 18, 20, 0.08);
+    --border-strong: rgba(17, 18, 20, 0.18);
+    --bg-brand: #111214;
+    --bg-brand-hover: #000000;
+    --text-on-brand: #FFFFFF;
+    --ring-brand: rgba(17, 18, 20, 0.42);
+    --accent: var(--bg-brand);
+    --accent-bright: var(--bg-brand-hover);
+    --accent-dark: rgba(17, 18, 20, 0.82);
+    --warning: var(--text-secondary);
+    --warning-bg: var(--surface-2);
+    --neutral-data: var(--text-muted);
+  }
+}
 
 @layer base {
-  :root { color-scheme: dark; --font-geist-sans: "Geist Variable", Geist, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; --font-geist-mono: "Geist Mono Variable", "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; --background: #08090A; --sidebar: #0B0D0F; --surface: #111417; --surface-2: #171B1F; --surface-3: #1D2227; --border: #292F34; --text-primary: #F5F5F2; --text-secondary: #A7ADB2; --text-muted: #6D747A; --accent: #C9B27C; --accent-bright: #E0CB96; --accent-dark: #8F7950; --success: #36C98F; --warning: #E3A84B; --error: #E06464; --info: #B8A98A; --ai: #D6B66C; --neutral-data: #687078; --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px; --apex-black: var(--background); --apex-text: var(--text-primary); --apex-text-secondary: var(--text-secondary); --apex-text-muted: var(--text-muted); --apex-border: var(--border); --apex-border-strong: #383F45; }
   html, body, #root { height: 100%; min-height: 100%; }
-  html { background: var(--background); }
-  body { margin: 0; overflow: hidden; background: var(--background); color: var(--text-primary); font-family: var(--font-geist-sans); font-feature-settings: "cv02", "cv03", "cv04", "cv11"; font-synthesis: none; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  html { background: var(--background); color-scheme: dark; }
+  html[data-theme="light"] { color-scheme: light; }
+  body { margin: 0; overflow: hidden; background: var(--background); color: var(--text-primary); font-family: var(--font-ui); font-feature-settings: "cv02", "cv03", "cv04", "cv11"; font-synthesis: none; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
   button, input, textarea, select { font: inherit; }
-  h1, h2, h3, h4, h5, h6 { margin: 0; font-family: var(--font-geist-sans); color: var(--text-primary); letter-spacing: -0.025em; }
-  h1, h2 { font-weight: 650; } h3, h4, h5, h6 { font-weight: 600; } code, pre, kbd, samp, .font-mono-code { font-family: var(--font-geist-mono); }
+  h1, h2, h3, h4, h5, h6 { margin: 0; font-family: var(--font-display); color: var(--text-primary); letter-spacing: -0.035em; }
+  h1, h2 { font-weight: 600; } h3, h4, h5, h6 { font-weight: 550; }
+  code, pre, kbd, samp, .font-mono-code { font-family: var(--font-code); }
+  a { color: inherit; }
+  ::selection { background: rgba(127, 127, 127, 0.22); color: var(--text-primary); }
 }
-.font-serif-display { font-family: Georgia, "Times New Roman", serif; letter-spacing: -0.02em; }
-.font-brand { font-family: var(--font-geist-sans); letter-spacing: -0.025em; }
-.font-mono-code, .apex-mono { font-family: var(--font-geist-mono); font-variant-numeric: tabular-nums; }
-.apex-metric, .apex-revenue, .apex-number { font-family: var(--font-geist-sans); font-variant-numeric: tabular-nums; letter-spacing: -0.035em; }
-.apex-system-state, .apex-id, .apex-timestamp, .apex-log { font-family: var(--font-geist-mono); font-size: 0.75rem; line-height: 1.25; letter-spacing: 0.02em; font-variant-numeric: tabular-nums; }
-.surface-card { background: var(--surface); } .surface-elevated { background: var(--surface-2); } .surface-hover { background: var(--surface-3); } .surface-sunken { background: var(--background); }
-.apex-accent { color: var(--accent); } .apex-accent-bright { color: var(--accent-bright); } .apex-success { color: var(--success); } .apex-warning { color: var(--warning); } .apex-error { color: var(--error); } .apex-info { color: var(--info); } .apex-ai { color: var(--ai); } .apex-neutral-data { color: var(--neutral-data); }
-.apex-accent-bg { background: var(--accent); color: var(--background); } .apex-success-bg { background: color-mix(in srgb, var(--success) 14%, transparent); color: var(--success); } .apex-warning-bg { background: color-mix(in srgb, var(--warning) 14%, transparent); color: var(--warning); } .apex-error-bg { background: color-mix(in srgb, var(--error) 14%, transparent); color: var(--error); } .apex-info-bg { background: color-mix(in srgb, var(--info) 14%, transparent); color: var(--info); } .apex-ai-bg { background: color-mix(in srgb, var(--ai) 14%, transparent); color: var(--ai); }
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }
+
+.font-serif-display { font-family: "Domaine Display Narrow", "Domaine Display", Georgia, "Times New Roman", serif; letter-spacing: -0.01em; font-weight: 400; }
+.font-brand { font-family: var(--font-display); letter-spacing: -0.035em; }
+.font-mono-code, .apex-mono { font-family: var(--font-code); font-variant-numeric: tabular-nums; }
+.apex-metric, .apex-revenue, .apex-number { font-family: var(--font-ui); font-variant-numeric: tabular-nums; letter-spacing: -0.035em; }
+.apex-system-state, .apex-id, .apex-timestamp, .apex-log { font-family: var(--font-code); font-size: 0.75rem; line-height: 1.25; letter-spacing: 0.02em; font-variant-numeric: tabular-nums; }
+.surface-card { background: var(--surface); }
+.surface-elevated { background: var(--surface-elevated); }
+.surface-hover { background: var(--surface-3); }
+.surface-sunken { background: var(--background); }
+.apex-accent { color: var(--bg-brand); }
+.apex-accent-bright { color: var(--bg-brand-hover); }
+.apex-success { color: var(--success); }
+.apex-warning { color: var(--warning); }
+.apex-error { color: var(--error); }
+.apex-info { color: var(--info); }
+.apex-ai { color: var(--text-primary); }
+.apex-neutral-data { color: var(--neutral-data); }
+.apex-accent-bg { background: var(--bg-brand); color: var(--text-on-brand); }
+.apex-success-bg { background: var(--success-bg); color: var(--success); }
+.apex-warning-bg { background: var(--warning-bg); color: var(--warning); }
+.apex-error-bg { background: var(--error-bg); color: var(--error); }
+.apex-info-bg { background: var(--info-bg); color: var(--info); }
+.apex-ai-bg { background: var(--surface-elevated); color: var(--text-primary); }
+
+/* Light theme compatibility for legacy utility classes. */
+[data-theme="light"] .bg-black { background-color: var(--surface) !important; }
+[data-theme="light"] .text-white { color: var(--text-primary) !important; }
+[data-theme="light"] .text-zinc-100, [data-theme="light"] .text-zinc-200, [data-theme="light"] .text-zinc-300 { color: var(--text-primary) !important; }
+[data-theme="light"] .text-zinc-400, [data-theme="light"] .text-zinc-500 { color: var(--text-secondary) !important; }
+[data-theme="light"] .text-zinc-600, [data-theme="light"] .text-zinc-700 { color: var(--text-muted) !important; }
+[data-theme="light"] [class*="border-white/"] { border-color: var(--border-subtle) !important; }
+[data-theme="light"] [class*="bg-white/"] { background-color: var(--surface-2) !important; }
+[data-theme="light"] [class*="hover:bg-white/"]:hover { background-color: var(--surface-3) !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
