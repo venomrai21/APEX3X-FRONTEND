@@ -1,7 +1,6 @@
 import React from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { AppShell } from './components/layout/AppShell';
-
 import { DashboardView } from './views/DashboardView';
 import { BrainView } from './views/BrainView';
 import { BusinessInsightsView } from './views/BusinessInsightsView';
@@ -20,7 +19,6 @@ import { TeamSecurityView } from './views/TeamSecurityView';
 import { BillingView } from './views/BillingView';
 import { SettingsView } from './views/SettingsView';
 import { ModuleSurfaceView } from './views/ModuleSurfaceView';
-import { DisconnectedWorkspaceView } from './views/DisconnectedWorkspaceView';
 
 const GUIDED_SURFACES = new Set([
   'unified_inbox','campaigns','advertising','creatives','social','growth','qualified_leads',
@@ -29,9 +27,6 @@ const GUIDED_SURFACES = new Set([
 
 const MainViewRouter: React.FC = () => {
   const { activeNav } = useApp();
-  const apiConfigured = Boolean(import.meta.env.VITE_APEX3X_API_BASE_URL);
-
-  if (!apiConfigured) return <DisconnectedWorkspaceView />;
   if (GUIDED_SURFACES.has(activeNav)) return <ModuleSurfaceView />;
   switch (activeNav) {
     case 'dashboard': return <DashboardView />;
