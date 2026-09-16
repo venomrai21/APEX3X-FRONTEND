@@ -2,7 +2,7 @@ import React from 'react';
 
 export interface BadgeProps {
   children: React.ReactNode;
-  variant?: 'gold' | 'amber' | 'emerald' | 'rose' | 'slate' | 'outline' | 'success' | 'warning' | 'danger' | 'neutral';
+  variant?: 'brand' | 'neutral' | 'success' | 'danger' | 'slate' | 'outline';
   size?: 'sm' | 'md';
   className?: string;
 }
@@ -14,16 +14,12 @@ export const Badge: React.FC<BadgeProps> = ({
   className = '',
 }) => {
   const variantStyles: Record<string, string> = {
-    gold: 'bg-black text-white border-white/[0.12]',
-    amber: 'bg-black text-white border-white/[0.12]',
-    warning: 'bg-black text-white border-white/[0.12]',
-    emerald: 'bg-black text-white border-white/[0.12]',
-    success: 'bg-black text-white border-white/[0.12]',
-    rose: 'bg-black text-white border-white/[0.12]',
-    danger: 'bg-black text-white border-white/[0.12]',
-    slate: 'bg-black text-zinc-300 border-white/[0.08]',
-    neutral: 'bg-black text-zinc-300 border-white/[0.08]',
-    outline: 'bg-transparent text-zinc-300 border-white/[0.12]',
+    brand: 'bg-[var(--surface-2)] text-[var(--text-primary)] border-[var(--border-subtle)]',
+    success: 'bg-[var(--success-bg)] text-[var(--success)] border-[var(--border-subtle)]',
+    danger: 'bg-[var(--error-bg)] text-[var(--error)] border-[var(--border-subtle)]',
+    slate: 'bg-[var(--surface)] text-[var(--text-secondary)] border-[var(--border-subtle)]',
+    neutral: 'bg-[var(--surface)] text-[var(--text-secondary)] border-[var(--border-subtle)]',
+    outline: 'bg-transparent text-[var(--text-secondary)] border-[var(--border)]',
   };
 
   const sizeStyles = {
