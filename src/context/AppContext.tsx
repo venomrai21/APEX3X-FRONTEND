@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Workspace, User, NavItemKey } from '../types';
 import { api, setActiveWorkspaceId } from '../api/client';
 
+export type ThemeMode = 'dark' | 'light' | 'system';
+
 export interface ToastMessage {
   id: string;
   type: 'success' | 'warning' | 'error' | 'info';
@@ -18,6 +20,8 @@ interface AppContextType {
   setActiveNav: (nav: NavItemKey) => void;
   switchWorkspace: (workspaceId: string) => Promise<void>;
   refreshWorkspaces: () => Promise<void>;
+  themeMode: ThemeMode;
+  setThemeMode: (mode: ThemeMode) => void;
   commandPaletteOpen: boolean;
   setCommandPaletteOpen: (open: boolean) => void;
   connectDrawerOpen: boolean;
@@ -37,12 +41,28 @@ interface AppContextType {
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
+const THEME_STORAGE_KEY = 'apex3x-theme-mode';
+
+const getStoredTheme = (): ThemeMode => {
+  if (typeof window === 'undefined') return 'dark';
+  const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
+  return stored === 'light' || stored === 'system' ? stored : 'dark';
+};
+
+const applyTheme = (mode: ThemeMode) => {
+  if (typeof document === 'undefined') return;
+  document.documentElement.dataset.theme = mode;
+  document.documentElement.style.colorScheme = mode === 'system'
+    ? (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+    : mode;
+};
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentWorkspace, setCurrentWorkspace] = useState<Workspace | null>(null);
   const [availableWorkspaces, setAvailableWorkspaces] = useState<Workspace[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [activeNav, setActiveNav] = useState<NavItemKey>('dashboard');
+  const [themeMode, setThemeModeState] = useState<ThemeMode>(getStoredTheme);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [connectDrawerOpen, setConnectDrawerOpen] = useState(false);
   const [notificationDrawerOpen, setNotificationDrawerOpen] = useState(false);
@@ -51,6 +71,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
   const [isLoadingSession, setIsLoadingSession] = useState(true);
+
+  const setThemeMode = (mode: ThemeMode) => {
+    setThemeModeState(mode);
+    window.localStorage.setItem(THEME_STORAGE_KEY, mode);
+    applyTheme(mode);
+  };
 
   const triggerRefresh = () => setRefreshKey(prev => prev + 1);
 
@@ -108,6 +134,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
+  useEffect(() => {
+    applyTheme(themeMode);
+  }, [themeMode]);
+
+  useEffect(() => {
+    if (themeMode !== 'system') return;
+    const media = window.matchMedia('(prefers-color-scheme: light)');
+    const handleChange = () => applyTheme('system');
+    media.addEventListener('change', handleChange);
+    return () => media.removeEventListener('change', handleChange);
+  }, [themeMode]);
+
   useEffect(() => { loadSession(); }, []);
 
   useEffect(() => {
@@ -131,6 +169,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setActiveNav,
       switchWorkspace,
       refreshWorkspaces,
+      themeMode,
+      setThemeMode,
       commandPaletteOpen,
       setCommandPaletteOpen,
       connectDrawerOpen,
