@@ -2,7 +2,7 @@ import React from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'elevated' | 'sunken' | 'gold-accent';
+  variant?: 'default' | 'elevated' | 'sunken' | 'brand-accent';
   padding?: 'none' | 'sm' | 'md' | 'lg';
   spotlight?: boolean;
   interactive?: boolean;
@@ -27,8 +27,7 @@ export const Card: React.FC<CardProps> = ({
     default: 'bg-[var(--surface)] border border-[var(--border)] shadow-[0_8px_24px_-18px_rgba(0,0,0,0.9)]',
     elevated: 'bg-[var(--surface-elevated)] border border-[var(--border)] shadow-[0_12px_28px_-20px_rgba(0,0,0,0.95)]',
     sunken: 'bg-[var(--background)] border border-[var(--border)]',
-    /* Kept for source compatibility; APEX accent is applied only by explicit content. */
-    'gold-accent': 'bg-[var(--surface)] border border-[var(--border)] shadow-[0_8px_24px_-18px_rgba(0,0,0,0.9)]',
+    'brand-accent': 'bg-[var(--surface)] border border-[var(--border)] shadow-[0_8px_24px_-18px_rgba(0,0,0,0.9)]',
   };
   const paddingStyles = { none: '', sm: 'p-4', md: 'p-5', lg: 'p-6' };
 
@@ -75,7 +74,7 @@ export const Card: React.FC<CardProps> = ({
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
-          style={{ background: 'radial-gradient(240px circle at var(--apex-spot-x) var(--apex-spot-y), color-mix(in srgb, var(--accent) 7%, transparent), transparent 72%)' }}
+          style={{ background: 'radial-gradient(240px circle at var(--apex-spot-x) var(--apex-spot-y), color-mix(in srgb, rgba(255,255,255,0.7) 7%, transparent), transparent 72%)' }}
         />
       )}
       <div className="relative z-[1]">{children}</div>
