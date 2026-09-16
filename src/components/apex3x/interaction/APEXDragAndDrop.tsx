@@ -12,7 +12,7 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from '@dnd-kit/core';
-import { SortableContext, arrayMove, horizontalListSortingStrategy, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
+import { SortableContext, arrayMove, horizontalListSortingStrategy, verticalListSortingStrategy, useSortable, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
 
@@ -25,7 +25,7 @@ export interface APEXDragProviderProps {
 
 export function APEXDragProvider({ children, onDragStart, onDragEnd, onDragCancel }: APEXDragProviderProps) {
   const pointer = useSensor(PointerSensor, { activationConstraint: { distance: 8 } });
-  const keyboard = useSensor(KeyboardSensor);
+  const keyboard = useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates });
   const sensors = useSensors(pointer, keyboard);
 
   return (
