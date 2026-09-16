@@ -32,11 +32,11 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     };
 
     const variantStyles = {
-      primary: 'bg-[var(--accent)] hover:bg-[var(--accent-bright)] active:bg-[var(--accent-dark)] text-[var(--background)] font-semibold border border-[var(--accent)] transition-colors duration-150',
-      secondary: 'bg-[var(--surface)] hover:bg-[var(--surface-2)] active:bg-[var(--surface)] text-[var(--text-primary)] font-medium border border-[var(--border)] hover:border-[#383F45] transition-colors duration-150',
-      outline: 'bg-transparent hover:bg-[var(--surface)] active:bg-[var(--surface-2)] text-[var(--text-primary)] font-medium border border-[var(--border)] hover:border-[#383F45] transition-colors duration-150',
+      primary: 'bg-[var(--bg-brand)] hover:bg-[var(--bg-brand-hover)] active:bg-[var(--accent-dark)] text-[var(--text-on-brand)] font-semibold border border-[var(--bg-brand)] transition-colors duration-150',
+      secondary: 'bg-[var(--surface)] hover:bg-[var(--surface-2)] active:bg-[var(--surface)] text-[var(--text-primary)] font-medium border border-[var(--border)] hover:border-[var(--border-strong)] transition-colors duration-150',
+      outline: 'bg-transparent hover:bg-[var(--surface)] active:bg-[var(--surface-2)] text-[var(--text-primary)] font-medium border border-[var(--border)] hover:border-[var(--border-strong)] transition-colors duration-150',
       ghost: 'bg-transparent hover:bg-[var(--surface)] active:bg-[var(--surface-2)] text-[var(--text-primary)] font-medium transition-colors duration-150',
-      danger: 'bg-[var(--error)] hover:brightness-110 active:brightness-95 text-white font-semibold border border-[var(--error)] transition-colors duration-150',
+      danger: 'bg-[var(--error)] hover:brightness-110 active:brightness-95 text-black font-semibold border border-[var(--error)] transition-colors duration-150',
     };
 
     return (
@@ -46,7 +46,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         whileHover={reducedMotion || disabled || isLoading ? undefined : { y: -1 }}
         whileTap={reducedMotion || disabled || isLoading ? undefined : { scale: 0.985 }}
         transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-        className={`inline-flex items-center justify-center cursor-pointer select-none font-sans whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/70 focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--background)] disabled:opacity-45 disabled:cursor-not-allowed disabled:pointer-events-none ${sizeStyles[size]} ${variantStyles[variant]} ${className}`}
+        className={`inline-flex items-center justify-center cursor-pointer select-none font-sans whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-brand)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--background)] disabled:opacity-45 disabled:cursor-not-allowed disabled:pointer-events-none ${sizeStyles[size]} ${variantStyles[variant]} ${className}`}
         {...props}
       >
         {isLoading && (
