@@ -34,9 +34,8 @@ export const APEX3X_SOURCE_REGISTRY: APEX3XSourceMapping[] = [
 export const APEX3X_SOURCE_RULES = {
   preserve: ['interaction behavior','motion physics','composition pattern','accessibility behavior'],
   replace: ['colors','typography','spacing tokens','radius tokens','shadows','branding'],
-  boundary: 'APEX3X-owned components, adapters and interaction primitives',
-  runtime: 'Motion for animation; dnd-kit behind APEX DnD contracts; TanStack Virtual behind APEX virtualization contracts',
+  boundary: 'APEX3X-owned components, adapters and agent surfaces',
+  runtime: 'existing Motion dependency; no additional animation engine',
   policy: 'source components are adapted or recreated; product views never import source-library components directly',
-  interactionPolicy: 'feature code consumes APEX contracts; underlying DnD, virtualization and gesture implementations remain replaceable',
   completion: 'registry + implementation + real product use + verification; documentation alone never counts as ingestion',
 } as const;
