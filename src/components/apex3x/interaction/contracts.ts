@@ -39,6 +39,7 @@ export interface APEXPointerGesture {
   startY: number;
   lastX: number;
   lastTime: number;
+  startTime: number;
   axis: 'horizontal' | 'vertical' | null;
   active: boolean;
 }
