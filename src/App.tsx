@@ -20,6 +20,7 @@ import { TeamSecurityView } from './views/TeamSecurityView';
 import { BillingView } from './views/BillingView';
 import { SettingsView } from './views/SettingsView';
 import { ModuleSurfaceView } from './views/ModuleSurfaceView';
+import { DisconnectedWorkspaceView } from './views/DisconnectedWorkspaceView';
 
 const GUIDED_SURFACES = new Set([
   'unified_inbox','campaigns','advertising','creatives','social','growth','qualified_leads',
@@ -28,6 +29,9 @@ const GUIDED_SURFACES = new Set([
 
 const MainViewRouter: React.FC = () => {
   const { activeNav } = useApp();
+  const apiConfigured = Boolean(import.meta.env.VITE_APEX3X_API_BASE_URL);
+
+  if (!apiConfigured) return <DisconnectedWorkspaceView />;
   if (GUIDED_SURFACES.has(activeNav)) return <ModuleSurfaceView />;
   switch (activeNav) {
     case 'dashboard': return <DashboardView />;
@@ -36,6 +40,7 @@ const MainViewRouter: React.FC = () => {
     case 'leads': return <LeadsView />;
     case 'customers': return <CustomersView />;
     case 'conversations': return <ConversationsView />;
+    case 'unified_inbox': return <ModuleSurfaceView />;
     case 'bookings': return <BookingsView />;
     case 'pipeline': return <PipelineView />;
     case 'invoices': return <InvoicesView />;
