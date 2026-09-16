@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LayoutDashboard, Bot, FileText, TrendingUp, Users, Building, MessageSquare, Calendar, GitPullRequest, CreditCard, Zap, Plug, Sparkles, Shield, Search, Bell, ChevronDown, Menu, X, CheckCircle2, AlertCircle, Command, PanelLeft, Sun } from 'lucide-react';
+import { LayoutDashboard, Bot, FileText, TrendingUp, Users, Building, MessageSquare, Calendar, GitPullRequest, CreditCard, Zap, Plug, Sparkles, Shield, Search, Bell, ChevronDown, Menu, X, CheckCircle2, AlertCircle, Command, PanelLeft } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { NavItemKey } from '../../types';
 import { APEXReveal, NavigationMenu, Sidebar } from '../apex3x';
@@ -16,22 +16,7 @@ interface NavSection { title: string; items: { key: NavItemKey; label: string; i
 export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { currentWorkspace, availableWorkspaces, currentUser, activeNav, setActiveNav, switchWorkspace, setCommandPaletteOpen, setNotificationDrawerOpen, setOnboardingOpen, setSubWorkspaceOpen, toasts, removeToast } = useApp();
   const [workspaceMenuOpen, setWorkspaceMenuOpen] = useState(false);
-  const {
-    collapsed,
-    mobileOpen,
-    dragX,
-    drawerRef,
-    mobileTriggerRef,
-    toggleCollapsed,
-    openMobile,
-    closeMobile,
-    handlePointerDown,
-    handlePointerMove,
-    handlePointerUp,
-    handlePointerCancel,
-    edgeWidth,
-  } = useSidebarInteraction();
-
+  const { collapsed, mobileOpen, dragX, drawerRef, mobileTriggerRef, toggleCollapsed, openMobile, closeMobile, handlePointerDown, handlePointerMove, handlePointerUp, handlePointerCancel, edgeWidth } = useSidebarInteraction();
   const navSections: NavSection[] = [
     { title: 'Operational command', items: [{ key: 'dashboard', label: 'Command Center', icon: <LayoutDashboard className="w-4 h-4" /> }, { key: 'brain', label: 'Autonomous Brain', icon: <Bot className="w-4 h-4" /> }, { key: 'insights', label: 'Business Insights', icon: <Sparkles className="w-4 h-4" /> }] },
     { title: 'Attract and capture', items: [{ key: 'forms', label: 'Forms and Web Capture', icon: <FileText className="w-4 h-4" /> }, { key: 'marketing', label: 'Growth and Ad Intelligence', icon: <TrendingUp className="w-4 h-4" /> }] },
@@ -61,25 +46,15 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
       </div>
       <div className="flex items-center gap-2 sm:gap-3 shrink-0"><div className="hidden lg:block"><NavigationMenu sections={navSections} activeKey={activeNav} onSelect={selectNav} /></div><button onClick={() => setCommandPaletteOpen(true)} className="flex items-center gap-2 px-3 py-1.5 rounded-[var(--radius-sm)] bg-[var(--surface)] border border-[var(--border)] hover:border-[var(--border-strong)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-xs transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-brand)]" aria-label="Search commands"><Search className="w-3.5 h-3.5 text-[var(--text-muted)]" /><span className="hidden sm:inline">Search commands...</span><kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-mono text-[var(--text-secondary)] bg-[var(--surface-elevated)] border border-[var(--border)] rounded-[var(--radius-sm)]"><Command className="w-2.5 h-2.5" /> K</kbd></button><button onClick={() => setNotificationDrawerOpen(true)} className="relative p-2 rounded-[var(--radius-sm)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-brand)]" title="Decision feed" aria-label="Open decision feed"><Bell className="w-4 h-4" /></button><button onClick={() => setOnboardingOpen(true)} className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--radius-sm)] text-[11px] font-medium border bg-[var(--surface)] text-[var(--text-secondary)] border-[var(--border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-brand)]"><Building className="w-3 h-3" /><span>Business profile</span></button></div>
     </header>
-
     <div className="min-h-0 flex-1 flex overflow-hidden">
       <aside className={`${collapsed ? 'w-16' : 'w-[280px]'} hidden lg:flex min-h-0 flex-col bg-[var(--sidebar)] border-r border-[var(--border)] shrink-0 select-none overflow-hidden transition-[width] duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]`} aria-label="Primary navigation">
-        <div className={`h-12 shrink-0 border-b border-[var(--border)] flex items-center ${collapsed ? 'justify-center px-2' : 'justify-between px-3'}`}>
-          {!collapsed && <p className="text-[10px] font-medium text-[var(--text-muted)]">Navigation</p>}
-          <button type="button" onClick={toggleCollapsed} className="inline-flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-brand)]" aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'} aria-expanded={!collapsed} title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}><PanelLeft className="w-4 h-4" /></button>
-        </div>
+        <div className={`h-12 shrink-0 border-b border-[var(--border)] flex items-center ${collapsed ? 'justify-center px-2' : 'justify-between px-3'}`}>{!collapsed && <p className="text-[10px] font-medium text-[var(--text-muted)]">Navigation</p>}<button type="button" onClick={toggleCollapsed} className="inline-flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-brand)]" aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'} aria-expanded={!collapsed} title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}><PanelLeft className="w-4 h-4" /></button></div>
         <Sidebar sections={navSections} activeKey={activeNav} onSelect={selectNav} collapsed={collapsed} />
-        <div className={`shrink-0 border-t border-[var(--border)] bg-[var(--sidebar)] ${collapsed ? 'p-2 flex justify-center' : 'p-3'}`}>
-          <button type="button" className={`flex items-center ${collapsed ? 'justify-center h-9 w-9' : 'w-full'} gap-2 rounded-[var(--radius-sm)] text-left hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-brand)]`} aria-label="Open account menu" title={collapsed ? userName : undefined}>
-            <div className="w-7 h-7 rounded-full bg-[var(--surface)] text-[var(--text-primary)] border border-[var(--border)] flex items-center justify-center text-[10px] font-semibold shrink-0">{currentUser?.name ? currentUser.name.charAt(0) : '—'}</div>
-            {!collapsed && <div className="truncate"><p className="text-[11px] font-medium text-[var(--text-secondary)] truncate">{userName}</p>{currentUser?.role && <p className="text-[9px] text-[var(--text-muted)] capitalize">{currentUser.role}</p>}</div>}
-          </button>
-        </div>
+        <div className={`shrink-0 border-t border-[var(--border)] bg-[var(--sidebar)] ${collapsed ? 'p-2 flex justify-center' : 'p-3'}`}><button type="button" className={`flex items-center ${collapsed ? 'justify-center h-9 w-9' : 'w-full'} gap-2 rounded-[var(--radius-sm)] text-left hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-brand)]`} aria-label="Open account menu" title={collapsed ? userName : undefined}><div className="w-7 h-7 rounded-full bg-[var(--surface)] text-[var(--text-primary)] border border-[var(--border)] flex items-center justify-center text-[10px] font-semibold shrink-0">{currentUser?.name ? currentUser.name.charAt(0) : '—'}</div>{!collapsed && <div className="truncate"><p className="text-[11px] font-medium text-[var(--text-secondary)] truncate">{userName}</p>{currentUser?.role && <p className="text-[9px] text-[var(--text-muted)] capitalize">{currentUser.role}</p>}</div>}</button></div>
       </aside>
       <main className="min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain bg-[var(--background)] p-4 sm:p-6 lg:p-8"><div className="max-w-7xl mx-auto w-full"><APEXReveal>{children}</APEXReveal></div></main>
     </div>
-
-    <div className={`fixed inset-0 z-[60] lg:hidden ${mobileOpen || dragX !== null ? 'pointer-events-auto' : 'pointer-events-none'}`} aria-hidden={!mobileOpen}>
+    <div className={`fixed inset-0 z-[60] lg:hidden ${mobileOpen || dragX !== null ? 'pointer-events-auto' : 'pointer-events-none'}`} aria-hidden={!mobileOpen && dragX === null}>
       <div className={`absolute inset-0 bg-black/80 transition-opacity duration-280 ${mobileOpen ? 'opacity-100' : 'opacity-0'}`} onClick={() => closeMobile()} />
       <aside ref={drawerRef} className="absolute left-0 top-0 bottom-0 w-[min(19rem,88vw)] bg-[var(--sidebar)] border-r border-[var(--border)] flex flex-col overflow-hidden shadow-[16px_0_48px_-32px_rgba(0,0,0,0.95)] touch-pan-y" style={{ transform: drawerTransform, transition: drawerTransition }} onPointerDown={event => handlePointerDown(event, 'close-drawer')} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp} onPointerCancel={handlePointerCancel}>
         <div className="h-14 shrink-0 flex items-center justify-between px-4 border-b border-[var(--border)]"><WorkspaceBrand workspace={currentWorkspace} compact /><button type="button" onClick={() => closeMobile()} className="inline-flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-brand)]" aria-label="Close navigation" title="Close navigation"><X className="w-5 h-5" /></button></div>
@@ -87,8 +62,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
         <div className="shrink-0 border-t border-[var(--border)] p-3"><div className="flex items-center gap-2"><div className="w-7 h-7 rounded-full bg-[var(--surface)] text-[var(--text-primary)] border border-[var(--border)] flex items-center justify-center text-[10px] font-semibold">{currentUser?.name ? currentUser.name.charAt(0) : '—'}</div><div className="truncate"><p className="text-[11px] font-medium text-[var(--text-secondary)] truncate">{userName}</p>{currentUser?.role && <p className="text-[9px] text-[var(--text-muted)] capitalize">{currentUser.role}</p>}</div></div></div>
       </aside>
     </div>
-    {!mobileOpen && <div className="fixed left-0 top-14 bottom-0 z-[55] w-7 lg:hidden touch-pan-y" style={{ width: edgeWidth }} onPointerDown={event => handlePointerDown(event, 'open-edge')} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp} onPointerCancel={handlePointerCancel} aria-hidden="true" />}
-
+    {!mobileOpen && <div className="fixed left-0 top-14 bottom-0 z-[55] lg:hidden touch-pan-y" style={{ width: edgeWidth }} onPointerDown={event => handlePointerDown(event, 'open-edge')} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp} onPointerCancel={handlePointerCancel} aria-hidden="true" />}
     <CommandPalette /><ConnectDrawer /><NotificationDrawer /><OnboardingModal /><SubWorkspaceModal />
     <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none max-w-sm w-full">{toasts.map(toast => <div key={toast.id} className="pointer-events-auto p-3.5 rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface-elevated)] shadow-[0_12px_28px_-20px_rgba(0,0,0,0.95)] flex items-start gap-3"><div className="shrink-0 mt-0.5">{toast.type === 'success' && <CheckCircle2 className="w-4 h-4 text-[var(--success)]" />}{toast.type === 'warning' && <AlertCircle className="w-4 h-4 text-[var(--warning)]" />}{toast.type === 'error' && <AlertCircle className="w-4 h-4 text-[var(--error)]" />}{toast.type === 'info' && <Bot className="w-4 h-4 text-[var(--info)]" />}</div><div className="flex-1 min-w-0"><p className="text-xs font-semibold">{toast.title}</p>{toast.description && <p className="text-[11px] text-[var(--text-secondary)] mt-0.5 leading-snug">{toast.description}</p>}</div><button onClick={() => removeToast(toast.id)} className="text-[var(--text-muted)] p-0.5 shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-brand)]" aria-label="Dismiss notification"><X className="w-3 h-3" /></button></div>)}</div>
   </div>;
