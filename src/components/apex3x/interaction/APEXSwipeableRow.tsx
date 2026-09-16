@@ -21,7 +21,6 @@ const AXIS_LOCK_PX = 8;
 const COMMIT_RATIO = 0.5;
 const VELOCITY_PX_MS = 0.55;
 
-/** Reveal-actions pattern. Gesture is an accelerator; actions remain exposed to keyboard/pointer users. */
 export function APEXSwipeableRow({ children, actions, primaryAction, className = '', maxReveal = 180 }: APEXSwipeableRowProps) {
   const reducedMotion = useReducedMotion();
   const [offset, setOffset] = React.useState(0);
@@ -32,7 +31,8 @@ export function APEXSwipeableRow({ children, actions, primaryAction, className =
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     if (event.pointerType === 'mouse' && event.button !== 0) return;
     if ((event.target as HTMLElement).closest('button,a,input,textarea,select,[data-no-swipe]')) return;
-    gesture.current = { startX: event.clientX, startY: event.clientY, lastX: event.clientX, lastTime: performance.now(), axis: null, active: true };
+    const now = performance.now();
+    gesture.current = { startX: event.clientX, startY: event.clientY, lastX: event.clientX, lastTime: now, startTime: now, axis: null, active: true };
     startOffset.current = open ? -maxReveal : 0;
     event.currentTarget.setPointerCapture(event.pointerId);
   };
@@ -56,7 +56,7 @@ export function APEXSwipeableRow({ children, actions, primaryAction, className =
     const g = gesture.current;
     if (!g) return;
     const dx = event.clientX - g.startX;
-    const elapsed = Math.max(1, performance.now() - g.lastTime);
+    const elapsed = Math.max(1, performance.now() - g.startTime);
     const velocity = dx / elapsed;
     const commit = Math.abs(offset) >= maxReveal * COMMIT_RATIO || Math.abs(velocity) >= VELOCITY_PX_MS;
     if (g.axis === 'horizontal') {
@@ -67,7 +67,7 @@ export function APEXSwipeableRow({ children, actions, primaryAction, className =
     gesture.current = null;
   };
 
-  const close = () => { setOpen(false); setOffset(0); };
+  const close = () => { setOpen(false); setOffset(0); gesture.current = null; };
 
   return (
     <div className={`relative overflow-hidden ${className}`}>
@@ -79,7 +79,6 @@ export function APEXSwipeableRow({ children, actions, primaryAction, className =
         ))}
       </div>
       <motion.div
-        drag={false}
         animate={{ x: offset }}
         transition={reducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 520, damping: 38 }}
         onPointerDown={onPointerDown}
