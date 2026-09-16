@@ -1,6 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Workspace, User, NavItemKey } from '../types';
-import { api, setActiveWorkspaceId } from '../api/client';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { NavItemKey, User, Workspace } from '../types';
 
 export type ThemeMode = 'dark' | 'light' | 'system';
 
@@ -42,6 +41,27 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 const THEME_STORAGE_KEY = 'apex3x-theme-mode';
+const PREVIEW_WORKSPACE_ID = 'ui-preview-workspace';
+
+const PREVIEW_WORKSPACE: Workspace = {
+  id: PREVIEW_WORKSPACE_ID,
+  name: 'APEX3X UI Preview',
+  slug: 'apex3x-ui-preview',
+  industry: 'UI preview',
+  website: '',
+  currency: 'INR',
+  timezone: 'Asia/Kolkata',
+  verificationStatus: 'unverified',
+  createdAt: '2026-01-01T00:00:00.000Z',
+};
+
+const PREVIEW_USER: User = {
+  id: 'ui-preview-user',
+  email: 'ui-preview@apex3x.local',
+  name: 'APEX3X UI Preview',
+  role: 'owner',
+  workspaceId: PREVIEW_WORKSPACE_ID,
+};
 
 const getStoredTheme = (): ThemeMode => {
   if (typeof window === 'undefined') return 'dark';
@@ -58,9 +78,9 @@ const applyTheme = (mode: ThemeMode) => {
 };
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentWorkspace, setCurrentWorkspace] = useState<Workspace | null>(null);
-  const [availableWorkspaces, setAvailableWorkspaces] = useState<Workspace[]>([]);
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [currentWorkspace, setCurrentWorkspace] = useState<Workspace | null>(PREVIEW_WORKSPACE);
+  const [availableWorkspaces, setAvailableWorkspaces] = useState<Workspace[]>([PREVIEW_WORKSPACE]);
+  const [currentUser, setCurrentUser] = useState<User | null>(PREVIEW_USER);
   const [activeNav, setActiveNav] = useState<NavItemKey>('dashboard');
   const [themeMode, setThemeModeState] = useState<ThemeMode>(getStoredTheme);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
@@ -70,7 +90,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [subWorkspaceOpen, setSubWorkspaceOpen] = useState(false);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [isLoadingSession, setIsLoadingSession] = useState(true);
 
   const setThemeMode = (mode: ThemeMode) => {
     setThemeModeState(mode);
@@ -83,55 +102,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const addToast = (toast: Omit<ToastMessage, 'id'>) => {
     const id = Math.random().toString(36).substring(2, 9);
     setToasts(prev => [...prev, { ...toast, id }]);
-    setTimeout(() => removeToast(id), 4000);
+    window.setTimeout(() => removeToast(id), 4000);
   };
 
   const removeToast = (id: string) => setToasts(prev => prev.filter(t => t.id !== id));
 
-  const loadSession = async () => {
-    setIsLoadingSession(true);
-    try {
-      const [meRes, wsList] = await Promise.all([api.getMe(), api.getWorkspaces()]);
-      setCurrentUser(meRes.user);
-      setCurrentWorkspace(meRes.workspace);
-      setAvailableWorkspaces(wsList);
-      setActiveWorkspaceId(meRes.workspace.id);
-    } catch (err) {
-      console.error('Failed to load session:', err);
-      setCurrentUser(null);
-      setCurrentWorkspace(null);
-      setAvailableWorkspaces([]);
-    } finally {
-      setIsLoadingSession(false);
-    }
-  };
-
   const switchWorkspace = async (workspaceId: string) => {
-    try {
-      setActiveWorkspaceId(workspaceId);
-      const target = availableWorkspaces.find(w => w.id === workspaceId);
-      if (target) {
-        setCurrentWorkspace(target);
-      } else {
-        const wsList = await api.getWorkspaces();
-        setAvailableWorkspaces(wsList);
-        const match = wsList.find(w => w.id === workspaceId);
-        if (match) setCurrentWorkspace(match);
-      }
-      triggerRefresh();
-      if (target) addToast({ type: 'info', title: 'Workspace Switched', description: `Now operating in ${target.name}.` });
-    } catch (err) {
-      console.error('Failed switching workspace:', err);
-    }
+    const target = availableWorkspaces.find(workspace => workspace.id === workspaceId);
+    if (!target) return;
+    setCurrentWorkspace(target);
+    setCurrentUser({ ...PREVIEW_USER, workspaceId: target.id });
+    triggerRefresh();
+    addToast({ type: 'info', title: 'Workspace switched', description: `Now previewing ${target.name}.` });
   };
 
   const refreshWorkspaces = async () => {
-    try {
-      const wsList = await api.getWorkspaces();
-      setAvailableWorkspaces(wsList);
-    } catch (err) {
-      console.error('Failed refreshing workspaces:', err);
-    }
+    setAvailableWorkspaces(previous => previous.length ? previous : [PREVIEW_WORKSPACE]);
   };
 
   useEffect(() => {
@@ -146,13 +132,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return () => media.removeEventListener('change', handleChange);
   }, [themeMode]);
 
-  useEffect(() => { loadSession(); }, []);
-
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        setCommandPaletteOpen(prev => !prev);
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
+        event.preventDefault();
+        setCommandPaletteOpen(previous => !previous);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -186,7 +170,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       removeToast,
       refreshKey,
       triggerRefresh,
-      isLoadingSession,
+      isLoadingSession: false,
     }}>
       {children}
     </AppContext.Provider>
