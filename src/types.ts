@@ -1,5 +1,7 @@
 export type NavItemKey =
-  | 'dashboard' | 'brain' | 'insights' | 'forms' | 'marketing' | 'leads' | 'customers' | 'conversations' | 'bookings' | 'pipeline' | 'invoices' | 'workflows' | 'integrations' | 'ai_hub' | 'team' | 'billing' | 'settings';
+  | 'dashboard' | 'conversations' | 'campaigns' | 'advertising' | 'creative_library' | 'social_publishing' | 'forms' | 'growth_intelligence'
+  | 'leads' | 'customers' | 'bookings' | 'pipeline' | 'invoices' | 'workflows' | 'integrations' | 'ai_hub' | 'team' | 'billing' | 'settings'
+  | 'brain' | 'insights' | 'marketing';
 
 export interface Workspace { id: string; name: string; slug: string; industry: string; website: string; currency: string; timezone: string; verificationStatus: 'verified' | 'in_review' | 'unverified'; taxId?: string; registeredAddress?: string; createdAt: string; }
 export interface User { id: string; email: string; name: string; role: 'platform_owner' | 'owner' | 'admin' | 'manager' | 'operator' | 'specialist' | 'marketing' | 'sales' | 'finance' | 'support' | 'viewer'; workspaceId: string; avatarUrl?: string; }
