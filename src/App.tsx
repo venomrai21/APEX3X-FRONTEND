@@ -19,6 +19,7 @@ import { AiProviderHubView } from './views/AiProviderHubView';
 import { TeamSecurityView } from './views/TeamSecurityView';
 import { BillingView } from './views/BillingView';
 import { SettingsView } from './views/SettingsView';
+import { ModuleSurfaceView } from './views/ModuleSurfaceView';
 
 const MainViewRouter: React.FC = () => {
   const { activeNav } = useApp();
@@ -26,20 +27,25 @@ const MainViewRouter: React.FC = () => {
     case 'dashboard': return <DashboardView />;
     case 'brain': return <BrainView />;
     case 'insights': return <BusinessInsightsView />;
+    case 'conversations': return <ConversationsView />;
+    case 'campaigns': return <ModuleSurfaceView module="campaigns" />;
+    case 'advertising': return <ModuleSurfaceView module="advertising" />;
+    case 'creative_library': return <ModuleSurfaceView module="creative_library" />;
+    case 'social_publishing': return <ModuleSurfaceView module="social_publishing" />;
+    case 'forms': return <FormsView />;
+    case 'growth_intelligence': return <ModuleSurfaceView module="growth_intelligence" />;
     case 'leads': return <LeadsView />;
     case 'customers': return <CustomersView />;
-    case 'conversations': return <ConversationsView />;
     case 'bookings': return <BookingsView />;
     case 'pipeline': return <PipelineView />;
     case 'invoices': return <InvoicesView />;
-    case 'forms': return <FormsView />;
-    case 'marketing': return <MarketingView />;
     case 'workflows': return <WorkflowsView />;
     case 'integrations': return <ConnectorKernelView />;
     case 'ai_hub': return <AiProviderHubView />;
     case 'team': return <TeamSecurityView />;
     case 'billing': return <BillingView />;
     case 'settings': return <SettingsView />;
+    case 'marketing': return <MarketingView />;
     default: return <DashboardView />;
   }
 };
