@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LayoutDashboard, Bot, FileText, TrendingUp, Users, Building, MessageSquare, Calendar, GitPullRequest, CreditCard, Zap, Plug, Sparkles, Shield, Search, Bell, ChevronDown, Menu, X, CheckCircle2, AlertCircle, Command, PanelLeft } from 'lucide-react';
+import { LayoutDashboard, Bot, FileText, Users, Building, MessageSquare, Calendar, GitPullRequest, CreditCard, Zap, Plug, Sparkles, Shield, Search, Bell, ChevronDown, Menu, X, CheckCircle2, AlertCircle, Command, PanelLeft, Target, Megaphone, FolderOpen, Activity, Workflow, Settings2 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { NavItemKey } from '../../types';
 import { APEXReveal, NavigationMenu, Sidebar } from '../apex3x';
@@ -18,15 +18,14 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
   const [workspaceMenuOpen, setWorkspaceMenuOpen] = useState(false);
   const { collapsed, mobileOpen, dragX, drawerRef, mobileTriggerRef, toggleCollapsed, openMobile, closeMobile, handlePointerDown, handlePointerMove, handlePointerUp, handlePointerCancel, edgeWidth } = useSidebarInteraction();
   const navSections: NavSection[] = [
-    { title: 'Operational command', items: [{ key: 'dashboard', label: 'Command Center', icon: <LayoutDashboard className="w-4 h-4" /> }, { key: 'brain', label: 'Autonomous Brain', icon: <Bot className="w-4 h-4" /> }, { key: 'insights', label: 'Business Insights', icon: <Sparkles className="w-4 h-4" /> }] },
-    { title: 'Attract and capture', items: [{ key: 'forms', label: 'Forms and Web Capture', icon: <FileText className="w-4 h-4" /> }, { key: 'marketing', label: 'Growth and Ad Intelligence', icon: <TrendingUp className="w-4 h-4" /> }] },
-    { title: 'Qualify and convert', items: [{ key: 'leads', label: 'CRM and Qualified Leads', icon: <Users className="w-4 h-4" /> }, { key: 'customers', label: 'Customer Directory', icon: <Building className="w-4 h-4" /> }] },
-    { title: 'Communicate', items: [{ key: 'conversations', label: 'Unified Inbox', icon: <MessageSquare className="w-4 h-4" /> }] },
-    { title: 'Book and schedule', items: [{ key: 'bookings', label: 'Bookings and Calendar', icon: <Calendar className="w-4 h-4" /> }] },
-    { title: 'Sell and revenue', items: [{ key: 'pipeline', label: 'Sales Pipeline', icon: <GitPullRequest className="w-4 h-4" /> }, { key: 'invoices', label: 'Invoices and Payments', icon: <CreditCard className="w-4 h-4" /> }] },
-    { title: 'Automate', items: [{ key: 'workflows', label: 'Workflows and Rules', icon: <Zap className="w-4 h-4" /> }] },
-    { title: 'Connected ecosystem', items: [{ key: 'integrations', label: 'Integrations Hub', icon: <Plug className="w-4 h-4" /> }, { key: 'ai_hub', label: 'AI Provider Hub (BYOK)', icon: <Sparkles className="w-4 h-4" /> }] },
-    { title: 'Governance', items: [{ key: 'team', label: 'Team and Security Audit', icon: <Shield className="w-4 h-4" /> }, { key: 'billing', label: 'Billing and Entitlements', icon: <CreditCard className="w-4 h-4" /> }] },
+    { title: 'Core', items: [{ key: 'dashboard', label: 'Command Center', icon: <LayoutDashboard className="w-4 h-4" /> }, { key: 'conversations', label: 'Unified Inbox', icon: <MessageSquare className="w-4 h-4" /> }] },
+    { title: 'Attract & Capture', items: [{ key: 'campaigns', label: 'Campaigns', icon: <Target className="w-4 h-4" /> }, { key: 'advertising', label: 'Advertising', icon: <Megaphone className="w-4 h-4" /> }, { key: 'creative_library', label: 'Creative Library', icon: <FolderOpen className="w-4 h-4" /> }, { key: 'social_publishing', label: 'Social Publishing', icon: <MessageSquare className="w-4 h-4" /> }, { key: 'forms', label: 'Forms & Web Capture', icon: <FileText className="w-4 h-4" /> }, { key: 'growth_intelligence', label: 'Growth Intelligence', icon: <Activity className="w-4 h-4" /> }] },
+    { title: 'Qualify & Convert', items: [{ key: 'leads', label: 'Leads', icon: <Users className="w-4 h-4" /> }, { key: 'customers', label: 'Customers', icon: <Building className="w-4 h-4" /> }] },
+    { title: 'Book & Schedule', items: [{ key: 'bookings', label: 'Bookings & Calendar', icon: <Calendar className="w-4 h-4" /> }] },
+    { title: 'Sell & Revenue', items: [{ key: 'pipeline', label: 'Sales Pipeline', icon: <GitPullRequest className="w-4 h-4" /> }, { key: 'invoices', label: 'Invoices & Payments', icon: <CreditCard className="w-4 h-4" /> }] },
+    { title: 'Automation', items: [{ key: 'workflows', label: 'Automate', icon: <Workflow className="w-4 h-4" /> }] },
+    { title: 'Connected Ecosystem', items: [{ key: 'integrations', label: 'Integrations Hub', icon: <Plug className="w-4 h-4" /> }, { key: 'ai_hub', label: 'AI Provider Hub', icon: <Bot className="w-4 h-4" /> }] },
+    { title: 'Governance', items: [{ key: 'team', label: 'Team & Security', icon: <Shield className="w-4 h-4" /> }, { key: 'billing', label: 'Billing & Entitlements', icon: <CreditCard className="w-4 h-4" /> }, { key: 'settings', label: 'Workspace Settings', icon: <Settings2 className="w-4 h-4" /> }] },
   ];
   const userName = currentUser?.name || 'Account unavailable';
   const selectNav = (key: string) => setActiveNav(key as NavItemKey);
