@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Command, ArrowRight, Bot, Plug, FileText, UserPlus, CalendarDays, Target, Megaphone, FolderOpen, MessageSquare, Activity, Workflow, Shield, CreditCard, Settings2 } from 'lucide-react';
+import { Search, Command, ArrowRight, Bot, Plug, FileText, UserPlus, CalendarDays } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { NavItemKey } from '../../types';
 
