@@ -1,5 +1,5 @@
 import React from 'react';
-import { Activity, Bot, Building2, CalendarDays, CreditCard, FileText, FolderOpen, Gauge, GitBranch, Globe2, Inbox, Megaphone, MessageSquare, Plug, ReceiptText, Settings2, Shield, Sparkles, Target, Users, Workflow, Zap } from 'lucide-react';
+import { Activity, Bot, Building2, CalendarDays, CreditCard, FileText, FolderOpen, Gauge, GitBranch, Inbox, Megaphone, MessageSquare, Plug, ReceiptText, Settings2, Shield, Target, Users, Workflow } from 'lucide-react';
 import { ChevronDown } from 'lucide-react';
 import { motion, useReducedMotion } from 'motion/react';
 
