@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LayoutDashboard, Bot, FileText, Users, Building, MessageSquare, Calendar, GitPullRequest, CreditCard, Zap, Plug, Sparkles, Shield, Search, Bell, ChevronDown, Menu, X, CheckCircle2, AlertCircle, Command, PanelLeft, Target, Megaphone, FolderOpen, Activity, Workflow, Settings2 } from 'lucide-react';
+import { LayoutDashboard, Bot, FileText, Users, Building, MessageSquare, Calendar, GitPullRequest, CreditCard, Plug, Shield, Search, Bell, ChevronDown, Menu, X, CheckCircle2, AlertCircle, Command, PanelLeft, Target, Megaphone, FolderOpen, Activity, Workflow, Settings2 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { NavItemKey } from '../../types';
 import { APEXReveal, NavigationMenu, Sidebar } from '../apex3x';
