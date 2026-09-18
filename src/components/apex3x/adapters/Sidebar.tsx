@@ -59,7 +59,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ sections, activeKey, onSelect,
           <span className="truncate">{section.title}</span>
           <ChevronDown className={`size-3 shrink-0 transition-transform duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] ${expanded ? '' : '-rotate-90'}`} aria-hidden="true" />
         </button>}
-        {iconOnly ? <div id={contentId} className="space-y-0.5">{section.items.map(renderItem)}</div> : <div id={contentId} className={`apex-sidebar-accordion ${expanded ? 'is-open' : ''}`} aria-hidden={!expanded}>
+        {iconOnly ? <div id={contentId} className="space-y-0.5">{section.items.map(renderItem)}</div> : <div id={contentId} className={`apex-sidebar-accordion ${expanded ? 'is-open' : ''}`} aria-hidden={!expanded} inert={!expanded}>
           <div className="apex-sidebar-accordion__inner"><div className="space-y-0.5">{section.items.map(renderItem)}</div></div>
         </div>}
       </div>;
