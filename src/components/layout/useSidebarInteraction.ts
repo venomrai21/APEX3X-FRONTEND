@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 const STORAGE_KEY = 'apex3x-sidebar-collapsed';
 const MOBILE_QUERY = '(max-width: 1023px)';
@@ -149,7 +149,8 @@ export const useSidebarInteraction = () => {
         return;
       }
       if (event.key === 'Tab' && mobileOpen && drawerRef.current) {
-        const focusable = Array.from(drawerRef.current.querySelectorAll<HTMLElement>('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')).filter(el => !el.hasAttribute('disabled'));
+        const focusable = (Array.from(drawerRef.current.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')) as HTMLElement[])
+          .filter(el => !el.hasAttribute('disabled'));
         if (!focusable.length) return;
         const first = focusable[0];
         const last = focusable[focusable.length - 1];

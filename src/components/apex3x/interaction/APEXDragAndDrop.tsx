@@ -70,7 +70,7 @@ export interface APEXSortableListProps<T extends { id: string }> {
   direction?: 'vertical' | 'horizontal';
 }
 
-function SortableItem<T extends { id: string }>({ item, index, renderItem }: { item: T; index: number; renderItem: APEXSortableListProps<T>['renderItem'] }) {
+function SortableItem<T extends { id: string }>({ item, index, renderItem }: { key?: React.Key; item: T; index: number; renderItem: APEXSortableListProps<T>['renderItem'] }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id });
   const handle = <button type="button" {...attributes} {...listeners} className="inline-flex size-8 shrink-0 cursor-grab items-center justify-center rounded-md text-[var(--text-muted)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-brand)] active:cursor-grabbing" aria-label={`Drag ${item.id}`}><GripVertical className="size-4" aria-hidden="true" /></button>;
   return <div ref={setNodeRef} style={{ transform: CSS.Transform.toString(transform), transition }} className={isDragging ? 'z-10 opacity-60' : ''}>{renderItem(item, index, handle)}</div>;
