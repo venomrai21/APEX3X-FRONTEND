@@ -13,7 +13,7 @@ interface NavigationMenuProps {
   onSelect: (key: string) => void;
 }
 
-export const NavigationMenu: React.FC<NavigationMenuProps> = ({ activeKey, onSelect }) => {
+export const NavigationMenu: React.FC<NavigationMenuProps> = ({ sections, activeKey, onSelect }) => {
   const [open, setOpen] = useState(false);
   const reducedMotion = useReducedMotion();
   const rootRef = useRef<HTMLDivElement>(null);
