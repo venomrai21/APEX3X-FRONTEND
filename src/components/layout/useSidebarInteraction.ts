@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 const STORAGE_KEY = 'apex3x-sidebar-collapsed';
 const MOBILE_QUERY = '(max-width: 1023px)';
