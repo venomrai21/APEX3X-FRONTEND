@@ -117,14 +117,17 @@ export const APEXHoverCard: React.FC<MotionProps & { maxTilt?: number }> = ({ ch
 };
 
 /** SmoothUI-style shimmer/shine feedback, deliberately monochrome. */
-export const APEXShimmer: React.FC<MotionProps> = ({ children, className = '' }) => (
+export const APEXShimmer: React.FC<MotionProps> = ({ children, className = '' }) => {
+  const reducedMotion = useReducedMotion();
+  return (
   <div className={`relative overflow-hidden ${className}`}>
-    <motion.div
+    {!reducedMotion && <motion.div
       aria-hidden="true"
       className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 skew-x-[-18deg] bg-gradient-to-r from-transparent via-white/[0.08] to-transparent"
       animate={{ x: ['0%', '420%'] }}
       transition={{ duration: 2.8, repeat: Infinity, repeatDelay: 3.5, ease: 'easeInOut' }}
-    />
+    />}
     <div className="relative z-[1]">{children}</div>
   </div>
-);
+  );
+};
