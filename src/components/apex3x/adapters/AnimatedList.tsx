@@ -20,7 +20,7 @@ export const AnimatedList: React.FC<AnimatedListProps> = ({ children, className 
             initial={reducedMotion ? undefined : { opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={reducedMotion ? undefined : { opacity: 0, y: -6 }}
-            transition={reducedMotion ? { duration: 0 } : { duration: 0.18, ease: 'easeOut' }}
+            transition={reducedMotion ? { duration: 0 } : { duration: APEXMOTION.duration.standard / 1000, ease: APEXMOTION.ease.standard }}
             className={itemClassName}
           >
             {child}
