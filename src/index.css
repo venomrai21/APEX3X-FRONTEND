@@ -175,3 +175,50 @@
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
+
+
+/* APEX spatial continuity: native View Transitions when supported, static fallback otherwise. */
+@supports (view-transition-name: none) {
+  ::view-transition-old(apex3x-view),
+  ::view-transition-new(apex3x-view) {
+    animation-duration: 220ms;
+    animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  ::view-transition-group(apex3x-view) {
+    animation-duration: 220ms;
+  }
+
+  [style*="view-transition-name: apex3x-entity-"] {
+    contain: paint;
+  }
+}
+
+/* Progressive enhancement: scroll itself drives subtle reveal only where this class is opted in. */
+.apex-scroll-reveal {
+  animation: apex-scroll-reveal linear both;
+  animation-timeline: view();
+  animation-range: entry 0% cover 28%;
+}
+
+@keyframes apex-scroll-reveal {
+  from { opacity: 0.55; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@supports not (animation-timeline: view()) {
+  .apex-scroll-reveal { animation: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .apex-scroll-reveal { animation: none !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @supports (view-transition-name: none) {
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+      animation-duration: 0.01ms !important;
+    }
+  }
+}
