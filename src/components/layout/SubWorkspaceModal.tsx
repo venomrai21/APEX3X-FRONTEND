@@ -43,7 +43,7 @@ export const SubWorkspaceModal: React.FC = () => {
       <div className="space-y-5">
         <div className="p-4 rounded-xl bg-[#08080c] border border-white/[0.08]">
           <div className="flex items-center gap-2 text-amber-400 text-xs font-semibold uppercase tracking-wider">
-            <Building2 className="w-4 h-4" /> Multi-tenant workspace
+            <Building2 className="w-4 h-4" /> Multi-business workspace
           </div>
           <p className="mt-2 text-xs text-zinc-400 leading-relaxed">
             Each Sub Workspace can represent a separate business or business unit. Additional Sub Workspaces can be created as needed.
