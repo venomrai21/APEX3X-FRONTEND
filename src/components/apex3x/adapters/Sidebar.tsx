@@ -12,7 +12,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ sections, activeKey, onSelect,
   const iconOnly = collapsed && !mobile;
   const sectionTitles = React.useMemo(() => sections.map(section => section.title), [sections]);
   const [expandedSections, setExpandedSections] = React.useState<Record<string, boolean>>(() =>
-    Object.fromEntries(sectionTitles.map(title => [title, false])),
+    Object.fromEntries(sectionTitles.map(title => [title, true])),
   );
 
   React.useEffect(() => {
@@ -20,7 +20,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ sections, activeKey, onSelect,
       const next = { ...current };
       let changed = false;
       for (const title of sectionTitles) {
-        if (!(title in next)) { next[title] = false; changed = true; }
+        if (!(title in next)) { next[title] = true; changed = true; }
       }
       for (const title of Object.keys(next)) {
         if (!sectionTitles.includes(title)) { delete next[title]; changed = true; }
