@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { flushSync, useState } from 'react';
 import { LayoutDashboard, Bot, FileText, Users, Building, MessageSquare, Calendar, GitPullRequest, CreditCard, Plug, Shield, Search, Bell, ChevronDown, Menu, X, CheckCircle2, AlertCircle, Command, PanelLeft, Target, Megaphone, FolderOpen, Activity, Workflow, Settings2 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { NavItemKey } from '../../types';
-import { APEXReveal, NavigationMenu, Sidebar } from '../apex3x';
+import { APEXReveal, NavigationMenu, Sidebar, getEntityTransitionName, runAPEXViewTransition } from '../apex3x';
 import { WorkspaceBrand } from '../workspace/WorkspaceBrand';
 import { CommandPalette } from './CommandPalette';
 import { ConnectDrawer } from './ConnectDrawer';
@@ -28,7 +28,10 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
     { title: 'Governance', items: [{ key: 'team', label: 'Team & Security', icon: <Shield className="w-4 h-4" /> }, { key: 'billing', label: 'Billing & Entitlements', icon: <CreditCard className="w-4 h-4" /> }, { key: 'settings', label: 'Workspace Settings', icon: <Settings2 className="w-4 h-4" /> }] },
   ];
   const userName = currentUser?.name || 'Account unavailable';
-  const selectNav = (key: string) => setActiveNav(key as NavItemKey);
+  const selectNav = (key: string) => {
+    if (key === activeNav) return;
+    void runAPEXViewTransition(() => flushSync(() => setActiveNav(key as NavItemKey)));
+  };
   const drawerTransform = dragX !== null ? `translateX(${dragX}px)` : mobileOpen ? 'translateX(0)' : 'translateX(-100%)';
   const drawerTransition = dragX === null ? 'transform 280ms cubic-bezier(0.4, 0, 0.2, 1)' : 'none';
 
@@ -39,7 +42,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
         <div className="flex items-center gap-2 shrink-0"><div className="w-7 h-7 rounded-[var(--radius-sm)] bg-[var(--text-primary)] flex items-center justify-center text-[var(--background)] font-semibold text-sm">A</div><span className="font-brand font-semibold text-xs tracking-wider text-[var(--text-primary)]">APEX3X</span><span className="text-[9px] px-1 py-0.5 rounded-[var(--radius-sm)] bg-[var(--surface)] text-[var(--text-secondary)] border border-[var(--border)] font-mono font-semibold">OS</span></div>
         <div className="hidden sm:block h-5 w-px bg-[var(--border)]" />
         <div className="relative min-w-0">
-          <button onClick={() => setWorkspaceMenuOpen(v => !v)} className="flex max-w-[240px] items-center gap-2 rounded-[var(--radius-sm)] px-2 py-1.5 hover:bg-[var(--surface)] text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-brand)]" aria-label="Select workspace" aria-expanded={workspaceMenuOpen}><WorkspaceBrand workspace={currentWorkspace} compact /><ChevronDown className="w-3.5 h-3.5 shrink-0 text-[var(--text-muted)]" /></button>
+          <button onClick={() => setWorkspaceMenuOpen(v => !v)} className="flex max-w-[240px] items-center gap-2 rounded-[var(--radius-sm)] px-2 py-1.5 hover:bg-[var(--surface)] text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-brand)]" aria-label="Select workspace" aria-expanded={workspaceMenuOpen}><span style={currentWorkspace ? { viewTransitionName: getEntityTransitionName('workspace', currentWorkspace.id) } as React.CSSProperties : undefined}><WorkspaceBrand workspace={currentWorkspace} compact /></span><ChevronDown className="w-3.5 h-3.5 shrink-0 text-[var(--text-muted)]" /></button>
           {workspaceMenuOpen && <div className="absolute left-0 top-full mt-1.5 w-64 p-1.5 bg-[var(--surface-elevated)] border border-[var(--border)] rounded-[var(--radius-sm)] shadow-[0_16px_32px_-20px_rgba(0,0,0,0.95)] z-50"><div className="px-2 py-1 text-[10px] font-medium text-[var(--text-muted)]">Workspaces</div>{availableWorkspaces.length === 0 ? <div className="px-2 py-2 text-[11px] text-[var(--text-muted)]">No workspaces available.</div> : availableWorkspaces.map(ws => <button key={ws.id} onClick={() => { switchWorkspace(ws.id); setWorkspaceMenuOpen(false); }} className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-[var(--radius-sm)] text-xs text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-brand)] ${ws.id === currentWorkspace?.id ? 'bg-[var(--surface-2)] text-[var(--text-primary)] font-semibold' : 'text-[var(--text-secondary)] hover:bg-[var(--surface-2)]'}`}><WorkspaceBrand workspace={ws} compact />{ws.id === currentWorkspace?.id && <CheckCircle2 className="w-3 h-3 text-[var(--text-primary)] shrink-0" />}</button>)}<div className="pt-1 mt-1 border-t border-[var(--border)]"><button onClick={() => { setWorkspaceMenuOpen(false); setSubWorkspaceOpen(true); }} className="w-full px-2.5 py-1.5 rounded-[var(--radius-sm)] text-xs text-[var(--text-secondary)] hover:bg-[var(--surface-2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-brand)] text-left">Sub workspace</button></div></div>}
         </div>
       </div>
