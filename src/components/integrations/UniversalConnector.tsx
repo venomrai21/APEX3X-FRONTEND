@@ -51,9 +51,10 @@ export const UniversalConnector: React.FC<UniversalConnectorProps> = ({ open, on
       </div>
       <div className="sticky bottom-0 z-10 shrink-0 flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3 p-3 sm:p-4 border-t border-white/[0.08] bg-[#09090e]">
         <Button type="button" variant="secondary" size="md" onClick={onClose}>Cancel</Button>
-        <Button type="button" variant="secondary" size="md" className="md:hidden" onClick={() => setMobileStep('discover')}>Back to Discover</Button>
-        <Button type="button" variant="primary" size="md" className="md:hidden" onClick={() => setMobileStep('configure')}>Next: Configure</Button>
-        <Button type="submit" variant="primary" size="md" isLoading={submitting} disabled={!name.trim() || (endpointRequired && !endpointUrl.trim())}>Continue Secure Connection</Button>
+        <Button type="button" variant="secondary" size="md" className="md:hidden" onClick={() => setMobileStep('discover')} style={{ display: mobileStep === 'configure' ? undefined : 'none' }}>Back to Discover</Button>
+        <Button type="button" variant="primary" size="md" className="md:hidden" onClick={() => setMobileStep('configure')} style={{ display: mobileStep === 'discover' ? undefined : 'none' }}>Next: Configure</Button>
+        <Button type="submit" variant="primary" size="md" className="hidden md:flex" isLoading={submitting} disabled={!name.trim() || (endpointRequired && !endpointUrl.trim())}>Continue Secure Connection</Button>
+        <Button type="submit" variant="primary" size="md" className="md:hidden" style={{ display: mobileStep === 'configure' ? undefined : 'none' }} isLoading={submitting} disabled={!name.trim() || (endpointRequired && !endpointUrl.trim())}>Continue Secure Connection</Button>
       </div>
     </form>
   </div>;
