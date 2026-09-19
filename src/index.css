@@ -173,6 +173,11 @@
 [data-theme="light"] [class*="hover:bg-white/"]:hover { background-color: var(--surface-3) !important; }
 
 
+/* APEX expandable cards: the same deterministic unknown-height technique used by navigation. */
+.apex-expandable-card { display: grid; grid-template-rows: 0fr; visibility: hidden; pointer-events: none; transition: grid-template-rows var(--apex-motion-duration-accordion) var(--apex-motion-ease-standard), visibility 0s linear var(--apex-motion-duration-accordion); }
+.apex-expandable-card.is-open { grid-template-rows: 1fr; visibility: visible; pointer-events: auto; transition: grid-template-rows var(--apex-motion-duration-accordion) var(--apex-motion-ease-standard), visibility 0s linear 0s; }
+.apex-expandable-card__inner { min-height: 0; overflow: hidden; }
+
 /* APEX sidebar accordion: deterministic layout animation without JS height measurement. */
 .apex-sidebar-accordion { display: grid; grid-template-rows: 0fr; visibility: hidden; pointer-events: none; transition: grid-template-rows var(--apex-motion-duration-accordion) var(--apex-motion-ease-standard), visibility 0s linear var(--apex-motion-duration-accordion); }
 .apex-sidebar-accordion.is-open { grid-template-rows: 1fr; visibility: visible; pointer-events: auto; transition: grid-template-rows var(--apex-motion-duration-accordion) var(--apex-motion-ease-standard), visibility 0s linear 0s; }
