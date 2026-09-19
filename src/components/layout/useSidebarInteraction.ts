@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-const STORAGE_KEY = 'apex3x-sidebar-collapsed';
 const MOBILE_QUERY = '(max-width: 1023px)';
 const EDGE_WIDTH = 28;
 const DISTANCE_RATIO = 0.45;
@@ -9,10 +8,7 @@ const VELOCITY_THRESHOLD = 0.5;
 type GestureMode = 'open-edge' | 'close-drawer' | null;
 
 export const useSidebarInteraction = () => {
-  const [collapsed, setCollapsed] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return window.localStorage.getItem(STORAGE_KEY) === 'true';
-  });
+  const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dragX, setDragX] = useState<number | null>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
@@ -26,11 +22,7 @@ export const useSidebarInteraction = () => {
   const axisLockedRef = useRef(false);
   const cancelledRef = useRef(false);
 
-  const toggleCollapsed = useCallback(() => setCollapsed(value => {
-    const next = !value;
-    window.localStorage.setItem(STORAGE_KEY, String(next));
-    return next;
-  }), []);
+  const toggleCollapsed = useCallback(() => setCollapsed(value => !value), []);
 
   const openMobile = useCallback(() => {
     setMobileOpen(true);
