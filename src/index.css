@@ -53,6 +53,12 @@
   --radius-md: 12px;
   --radius-lg: 16px;
 
+  --apex-motion-duration-fast: 140ms;
+  --apex-motion-duration-standard: 200ms;
+  --apex-motion-duration-accordion: 240ms;
+  --apex-motion-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --apex-motion-ease-emphasized: cubic-bezier(0.2, 0.8, 0.2, 1);
+
   --apex-black: var(--background);
   --apex-text: var(--text-primary);
   --apex-text-secondary: var(--text-secondary);
@@ -168,10 +174,57 @@
 
 
 /* APEX sidebar accordion: deterministic layout animation without JS height measurement. */
-.apex-sidebar-accordion { display: grid; grid-template-rows: 0fr; visibility: hidden; pointer-events: none; transition: grid-template-rows 220ms cubic-bezier(0.4, 0, 0.2, 1), visibility 0s linear 220ms; }
-.apex-sidebar-accordion.is-open { grid-template-rows: 1fr; visibility: visible; pointer-events: auto; transition: grid-template-rows 220ms cubic-bezier(0.4, 0, 0.2, 1), visibility 0s linear 0s; }
+.apex-sidebar-accordion { display: grid; grid-template-rows: 0fr; visibility: hidden; pointer-events: none; transition: grid-template-rows var(--apex-motion-duration-accordion) var(--apex-motion-ease-standard), visibility 0s linear var(--apex-motion-duration-accordion); }
+.apex-sidebar-accordion.is-open { grid-template-rows: 1fr; visibility: visible; pointer-events: auto; transition: grid-template-rows var(--apex-motion-duration-accordion) var(--apex-motion-ease-standard), visibility 0s linear 0s; }
 .apex-sidebar-accordion__inner { min-height: 0; overflow: hidden; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
+
+
+/* APEX spatial continuity: native View Transitions when supported, static fallback otherwise. */
+@supports (view-transition-name: none) {
+  ::view-transition-old(apex3x-view),
+  ::view-transition-new(apex3x-view) {
+    animation-duration: 220ms;
+    animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  ::view-transition-group(apex3x-view) {
+    animation-duration: 220ms;
+  }
+
+  [style*="view-transition-name: apex3x-entity-"] {
+    contain: paint;
+  }
+}
+
+/* Progressive enhancement: scroll itself drives subtle reveal only where this class is opted in. */
+.apex-scroll-reveal {
+  animation: apex-scroll-reveal linear both;
+  animation-timeline: view();
+  animation-range: entry 0% cover 28%;
+}
+
+@keyframes apex-scroll-reveal {
+  from { opacity: 0.55; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@supports not (animation-timeline: view()) {
+  .apex-scroll-reveal { animation: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .apex-scroll-reveal { animation: none !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @supports (view-transition-name: none) {
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+      animation-duration: 0.01ms !important;
+    }
+  }
 }

@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'motion/react';
+import { APEXMOTION } from '../motion';
 
 interface MotionProps {
   children: React.ReactNode;
@@ -14,7 +15,7 @@ export const APEXReveal: React.FC<MotionProps & { delay?: number }> = ({ childre
       className={className}
       initial={reducedMotion ? false : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={reducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 420, damping: 34, delay }}
+      transition={reducedMotion ? { duration: 0 } : { ...APEXMOTION.spring.spatial, delay }}
     >
       {children}
     </motion.div>
@@ -29,7 +30,7 @@ export const APEXPressable: React.FC<MotionProps & { disabled?: boolean }> = ({ 
       className={className}
       whileHover={reducedMotion || disabled ? undefined : { y: -1 }}
       whileTap={reducedMotion || disabled ? undefined : { scale: 0.985 }}
-      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+      transition={APEXMOTION.spring.press}
     >
       {children}
     </motion.div>
@@ -75,7 +76,7 @@ export const APEXMetric: React.FC<{ value: number; prefix?: string; suffix?: str
       className={className}
       initial={reducedMotion ? false : { opacity: 0, y: 5 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: reducedMotion ? 0 : 0.22, ease: 'easeOut' }}
+      transition={{ duration: reducedMotion ? 0 : APEXMOTION.duration.fast / 1000, ease: APEXMOTION.ease.standard }}
     >
       {prefix}{value.toLocaleString()}{suffix}
     </motion.span>
@@ -109,7 +110,7 @@ export const APEXHoverCard: React.FC<MotionProps & { maxTilt?: number }> = ({ ch
       onPointerLeave={reset}
       className={className}
       style={{ '--apex-tilt-x': '0deg', '--apex-tilt-y': '0deg', transform: 'perspective(900px) rotateX(var(--apex-tilt-x)) rotateY(var(--apex-tilt-y))' } as React.CSSProperties}
-      transition={{ type: 'spring', stiffness: 380, damping: 28 }}
+      transition={APEXMOTION.spring.spatial}
     >
       {children}
     </motion.div>
@@ -125,7 +126,7 @@ export const APEXShimmer: React.FC<MotionProps> = ({ children, className = '' })
       aria-hidden="true"
       className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 skew-x-[-18deg] bg-gradient-to-r from-transparent via-white/[0.08] to-transparent"
       animate={{ x: ['0%', '420%'] }}
-      transition={{ duration: 2.8, repeat: Infinity, repeatDelay: 3.5, ease: 'easeInOut' }}
+      transition={{ duration: 2.8, repeat: Infinity, repeatDelay: 3.5, ease: APEXMOTION.ease.standard }}
     />}
     <div className="relative z-[1]">{children}</div>
   </div>

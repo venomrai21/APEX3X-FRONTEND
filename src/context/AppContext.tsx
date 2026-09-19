@@ -40,7 +40,6 @@ interface AppContextType {
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
-const THEME_STORAGE_KEY = 'apex3x-theme-mode';
 const PREVIEW_WORKSPACE_ID = 'ui-preview-workspace';
 
 const PREVIEW_WORKSPACE: Workspace = {
@@ -63,11 +62,7 @@ const PREVIEW_USER: User = {
   workspaceId: PREVIEW_WORKSPACE_ID,
 };
 
-const getStoredTheme = (): ThemeMode => {
-  if (typeof window === 'undefined') return 'dark';
-  const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
-  return stored === 'light' || stored === 'system' ? stored : 'dark';
-};
+const getStoredTheme = (): ThemeMode => 'dark';
 
 const applyTheme = (mode: ThemeMode) => {
   if (typeof document === 'undefined') return;
@@ -93,7 +88,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const setThemeMode = (mode: ThemeMode) => {
     setThemeModeState(mode);
-    window.localStorage.setItem(THEME_STORAGE_KEY, mode);
     applyTheme(mode);
   };
 
