@@ -60,7 +60,7 @@ const INITIAL_WORKSPACE: Workspace = {
   timezone: 'Asia/Kolkata',
   verificationStatus: 'unverified',
   organisationId: INITIAL_ORGANISATION.id,
-  createdAt: '2026-01-01T00:00:00.000Z',
+  createdAt: '',
 };
 
 const getStoredTheme = (): ThemeMode => 'dark';
@@ -93,12 +93,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const updateWorkspaceIdentity = (data: Partial<Workspace>) => {
-    setCurrentWorkspace(previous => {
-      if (!previous) return previous;
-      const updated = { ...previous, ...data };
-      setAvailableWorkspaces(workspaces => workspaces.map(workspace => workspace.id === updated.id ? updated : workspace));
-      return updated;
-    });
+    if (!currentWorkspace) return;
+    const updated = { ...currentWorkspace, ...data };
+    setCurrentWorkspace(updated);
+    setAvailableWorkspaces(workspaces => workspaces.map(workspace => workspace.id === updated.id ? updated : workspace));
   };
 
   const setThemeMode = (mode: ThemeMode) => {
