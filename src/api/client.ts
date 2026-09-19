@@ -9,7 +9,7 @@ export function getActiveWorkspaceId(): string { return currentActiveWorkspaceId
 
 async function request<T>(_endpoint: string, _options: RequestInit = {}): Promise<T> {
   void currentActiveWorkspaceId;
-  throw new Error('APEX3X UI preview mode: SaaS API access is disabled.');
+  throw new Error('SaaS API access is unavailable in this UI environment.');
 }
 
 export const api = {
