@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { NavItemKey, User, Workspace } from '../types';
+import { NavItemKey, Organisation, User, Workspace } from '../types';
 
 export type ThemeMode = 'dark' | 'light' | 'system';
 
@@ -11,10 +11,13 @@ export interface ToastMessage {
 }
 
 interface AppContextType {
+  organisation: Organisation;
+  updateOrganisation: (data: Partial<Organisation>) => void;
   currentWorkspace: Workspace | null;
   availableWorkspaces: Workspace[];
   currentUser: User | null;
   setCurrentWorkspace: (workspace: Workspace | null) => void;
+  updateWorkspaceIdentity: (data: Partial<Workspace>) => void;
   activeNav: NavItemKey;
   setActiveNav: (nav: NavItemKey) => void;
   switchWorkspace: (workspaceId: string) => Promise<void>;
@@ -40,26 +43,24 @@ interface AppContextType {
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
-const PREVIEW_WORKSPACE_ID = 'ui-preview-workspace';
 
-const PREVIEW_WORKSPACE: Workspace = {
-  id: PREVIEW_WORKSPACE_ID,
-  name: 'APEX3X UI Preview',
-  slug: 'apex3x-ui-preview',
-  industry: 'UI preview',
+const INITIAL_ORGANISATION: Organisation = {
+  id: 'apex-organisation',
+  name: 'APEX',
+  shortName: 'APEX',
+};
+
+const INITIAL_WORKSPACE: Workspace = {
+  id: 'apex-workspace',
+  name: 'APEX',
+  slug: 'apex',
+  industry: '',
   website: '',
   currency: 'INR',
   timezone: 'Asia/Kolkata',
   verificationStatus: 'unverified',
-  createdAt: '2026-01-01T00:00:00.000Z',
-};
-
-const PREVIEW_USER: User = {
-  id: 'ui-preview-user',
-  email: 'ui-preview@apex3x.local',
-  name: 'APEX3X UI Preview',
-  role: 'owner',
-  workspaceId: PREVIEW_WORKSPACE_ID,
+  organisationId: INITIAL_ORGANISATION.id,
+  createdAt: '',
 };
 
 const getStoredTheme = (): ThemeMode => 'dark';
@@ -73,9 +74,10 @@ const applyTheme = (mode: ThemeMode) => {
 };
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentWorkspace, setCurrentWorkspace] = useState<Workspace | null>(PREVIEW_WORKSPACE);
-  const [availableWorkspaces, setAvailableWorkspaces] = useState<Workspace[]>([PREVIEW_WORKSPACE]);
-  const [currentUser, setCurrentUser] = useState<User | null>(PREVIEW_USER);
+  const [organisation, setOrganisation] = useState<Organisation>(INITIAL_ORGANISATION);
+  const [currentWorkspace, setCurrentWorkspace] = useState<Workspace | null>(INITIAL_WORKSPACE);
+  const [availableWorkspaces, setAvailableWorkspaces] = useState<Workspace[]>([INITIAL_WORKSPACE]);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [activeNav, setActiveNav] = useState<NavItemKey>('dashboard');
   const [themeMode, setThemeModeState] = useState<ThemeMode>(getStoredTheme);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
@@ -85,6 +87,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [subWorkspaceOpen, setSubWorkspaceOpen] = useState(false);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
+
+  const updateOrganisation = (data: Partial<Organisation>) => {
+    setOrganisation(previous => ({ ...previous, ...data }));
+  };
+
+  const updateWorkspaceIdentity = (data: Partial<Workspace>) => {
+    if (!currentWorkspace) return;
+    const updated = { ...currentWorkspace, ...data };
+    setCurrentWorkspace(updated);
+    setAvailableWorkspaces(workspaces => workspaces.map(workspace => workspace.id === updated.id ? updated : workspace));
+  };
 
   const setThemeMode = (mode: ThemeMode) => {
     setThemeModeState(mode);
@@ -105,13 +118,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const target = availableWorkspaces.find(workspace => workspace.id === workspaceId);
     if (!target) return;
     setCurrentWorkspace(target);
-    setCurrentUser({ ...PREVIEW_USER, workspaceId: target.id });
+    setCurrentUser(previous => previous ? { ...previous, workspaceId: target.id } : previous);
     triggerRefresh();
-    addToast({ type: 'info', title: 'Workspace switched', description: `Now previewing ${target.name}.` });
+    addToast({ type: 'info', title: 'Workspace switched', description: `Now operating in ${target.name}.` });
   };
 
   const refreshWorkspaces = async () => {
-    setAvailableWorkspaces(previous => previous.length ? previous : [PREVIEW_WORKSPACE]);
+    setAvailableWorkspaces(previous => previous);
   };
 
   useEffect(() => {
@@ -139,10 +152,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   return (
     <AppContext.Provider value={{
+      organisation,
+      updateOrganisation,
       currentWorkspace,
       availableWorkspaces,
       currentUser,
       setCurrentWorkspace,
+      updateWorkspaceIdentity,
       activeNav,
       setActiveNav,
       switchWorkspace,
