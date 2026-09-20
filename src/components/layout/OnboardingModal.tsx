@@ -128,7 +128,7 @@ export const OnboardingModal: React.FC = () => {
           {[['1', 'Identity'], ['2', 'Financial & Currency'], ['3', 'Compliance']].map(([number, label], index) => (
             <React.Fragment key={number}>
               <div className="flex items-center gap-2">
-                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold ${step >= index + 1 ? 'bg-amber-500 text-black' : 'bg-white/[0.06] text-zinc-400'}`}>{number}</span>
+                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold ${step >= index + 1 ? 'bg-white text-black' : 'bg-white/[0.06] text-zinc-400'}`}>{number}</span>
                 <span className="text-xs font-medium text-zinc-200">{label}</span>
               </div>
               {index < 2 && <div className="w-8 h-px bg-white/[0.1]" />}
@@ -189,8 +189,8 @@ export const OnboardingModal: React.FC = () => {
         </div>}
 
         {step === 3 && <div className="space-y-4">
-          <div className="p-4 rounded-xl bg-[#08080c] border border-amber-500/20 space-y-3">
-            <div className="flex items-center gap-2 text-amber-400 font-semibold text-xs uppercase tracking-wider"><ShieldCheck className="w-4 h-4" /> Business Verification</div>
+          <div className="p-4 rounded-xl bg-[#08080c] border border-white/20 space-y-3">
+            <div className="flex items-center gap-2 text-zinc-200 font-semibold text-xs uppercase tracking-wider"><ShieldCheck className="w-4 h-4" /> Business Verification</div>
             <p className="text-xs text-zinc-300 leading-relaxed">Review the organisation and workspace information before submitting it to the connected platform.</p>
             <div className="grid grid-cols-2 gap-2 pt-1 text-[11px] text-zinc-400 font-mono">
               <div>Organisation: <span className="text-zinc-200">{organisationName || '—'}</span></div>
