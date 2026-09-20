@@ -42,7 +42,7 @@ export const SubWorkspaceModal: React.FC = () => {
     <Modal isOpen={subWorkspaceOpen} onClose={() => setSubWorkspaceOpen(false)} title="Create Sub Workspace" subtitle="Create a separate operating space for another business or business unit." maxWidth="md">
       <div className="space-y-5">
         <div className="p-4 rounded-xl bg-[#08080c] border border-white/[0.08]">
-          <div className="flex items-center gap-2 text-amber-400 text-xs font-semibold uppercase tracking-wider">
+          <div className="flex items-center gap-2 text-zinc-200 text-xs font-semibold uppercase tracking-wider">
             <Building2 className="w-4 h-4" /> Multi-business workspace
           </div>
           <p className="mt-2 text-xs text-zinc-400 leading-relaxed">
