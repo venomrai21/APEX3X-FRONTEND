@@ -29,6 +29,33 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
   ];
   const userName = currentUser?.name || 'Account unavailable';
   const selectNav = (key: string) => setActiveNav(key as NavItemKey);
+  React.useEffect(() => {
+    const labels: Record<string, string> = {
+      dashboard: 'Command Center',
+      brain: 'APEX Brain',
+      insights: 'Business Insights',
+      conversations: 'Unified Inbox',
+      campaigns: 'Campaigns',
+      advertising: 'Advertising',
+      creative_library: 'Creative Library',
+      social_publishing: 'Social Publishing',
+      forms: 'Forms & Web Capture',
+      growth_intelligence: 'Growth Intelligence',
+      leads: 'Leads',
+      customers: 'Customers',
+      bookings: 'Bookings & Calendar',
+      pipeline: 'Sales Pipeline',
+      invoices: 'Invoices & Payments',
+      workflows: 'Automate',
+      integrations: 'Integrations Hub',
+      ai_hub: 'AI Provider Hub',
+      team: 'Team & Security',
+      billing: 'Billing & Entitlements',
+      settings: 'Workspace Settings',
+      marketing: 'Marketing',
+    };
+    document.title = `${labels[activeNav] || 'APEX3X'} — APEX3X`;
+  }, [activeNav]);
   const drawerTransform = dragX !== null ? `translateX(${dragX}px)` : mobileOpen ? 'translateX(0)' : 'translateX(-100%)';
   const drawerTransition = dragX === null ? 'transform 280ms cubic-bezier(0.4, 0, 0.2, 1)' : 'none';
 
