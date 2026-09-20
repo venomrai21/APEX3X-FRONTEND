@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { AppShell } from './components/layout/AppShell';
 
@@ -50,6 +50,9 @@ const MainViewRouter: React.FC = () => {
   }
 };
 
+const VIEW_TITLES: Record<string, string> = { dashboard: "Command Center", conversations: "Unified Inbox", campaigns: "Campaigns", advertising: "Advertising", creative_library: "Creative Library", social_publishing: "Social Publishing", forms: "Forms & Web Capture", growth_intelligence: "Growth Intelligence", leads: "Leads", customers: "Customers", bookings: "Bookings & Calendar", pipeline: "Sales Pipeline", invoices: "Invoices & Payments", workflows: "Automate", integrations: "Integrations Hub", ai_hub: "AI Provider Hub", team: "Team & Security", billing: "Billing & Entitlements", settings: "Workspace Settings" };
+const DocumentTitle: React.FC = () => { const { activeNav } = useApp(); useEffect(() => { document.title = VIEW_TITLES[activeNav] ? VIEW_TITLES[activeNav] + " · APEX3X" : "APEX3X"; }, [activeNav]); return null; };
+
 export default function App() {
-  return <AppProvider><AppShell><MainViewRouter /></AppShell></AppProvider>;
+  return <AppProvider><DocumentTitle /><AppShell><MainViewRouter /></AppShell></AppProvider>;
 }

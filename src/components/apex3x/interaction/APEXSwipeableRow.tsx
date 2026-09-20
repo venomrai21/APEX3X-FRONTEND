@@ -71,7 +71,7 @@ export function APEXSwipeableRow({ children, actions, primaryAction, className =
 
   return (
     <div className={`relative overflow-hidden ${className}`}>
-      <div className="absolute inset-y-0 right-0 flex items-stretch" aria-label="Row actions">
+      <div className="absolute inset-y-0 right-0 flex items-stretch" role="group" aria-label="Row actions">
         {actions.map((action) => (
           <button key={action.id} type="button" onClick={() => { action.onAction(); close(); }} className={`min-w-14 px-3 text-xs outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--ring-brand)] ${action.destructive ? 'text-[var(--error)]' : 'text-[var(--text-primary)]'} bg-[var(--surface-2)]`}>
             {action.label}
@@ -89,7 +89,7 @@ export function APEXSwipeableRow({ children, actions, primaryAction, className =
         className="relative z-[1]"
       >
         {children}
-        {open && <button type="button" data-no-swipe onClick={close} className="sr-only">Close row actions</button>}
+        {open && <button type="button" data-no-swipe onClick={close} className="absolute right-0 top-0 z-20 rounded p-1 text-sm focus:not-sr-only focus-visible:ring-2" aria-label="Close row actions">×</button>}
       </motion.div>
     </div>
   );
