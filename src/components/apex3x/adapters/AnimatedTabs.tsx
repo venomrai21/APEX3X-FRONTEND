@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 
-export interface AnimatedTabItem { id: string; label: string; count?: number; icon?: React.ReactNode; }
+export interface AnimatedTabItem { id: string; label: string; count?: number; icon?: React.ReactNode; panelId?: string; }
 export interface AnimatedTabsProps { tabs: AnimatedTabItem[]; activeTab: string; onChange: (id: string) => void; className?: string; }
 
 export const AnimatedTabs: React.FC<AnimatedTabsProps> = ({ tabs, activeTab, onChange, className = '' }) => {
@@ -29,7 +29,7 @@ export const AnimatedTabs: React.FC<AnimatedTabsProps> = ({ tabs, activeTab, onC
     {tabs.map((tab, index) => {
       const isActive = tab.id === activeTab;
       const tabId = `apex3x-tab-${tab.id}`;
-      const panelId = `apex3x-tabpanel-${tab.id}`;
+      const panelId = tab.panelId;
       return <button
         key={tab.id}
         ref={element => { tabRefs.current[index] = element; }}
