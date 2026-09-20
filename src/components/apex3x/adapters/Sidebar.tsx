@@ -64,10 +64,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ sections, activeKey, onSelect,
       const contentId = `apex3x-nav-${index}`;
       return <div key={section.title} className="space-y-0.5" role="group" aria-label={section.title}>
         {!iconOnly && <button type="button" onClick={() => toggleSection(section.title)} aria-expanded={expanded} aria-controls={contentId} className="flex w-full items-center justify-between rounded-md px-2.5 py-1 text-left text-[10px] font-medium tracking-wide text-[var(--text-muted)] outline-none transition-colors hover:text-[var(--text-secondary)] focus-visible:ring-2 focus-visible:ring-[var(--ring-brand)]">
-          <span className="truncate">{section.title}</span>
+          <span id={`${contentId}-heading`} className="truncate">{section.title}</span>
           <ChevronDown className={`size-3 shrink-0 transition-transform ${reduceMotion ? '' : 'duration-200'} ease-[var(--apex-motion-ease-standard)] ${expanded ? '' : '-rotate-90'}`} aria-hidden="true" />
         </button>}
-        {iconOnly ? <div id={contentId} className="space-y-0.5">{section.items.map(renderItem)}</div> : <div id={contentId} className={`apex-sidebar-accordion ${expanded ? 'is-open' : ''}`} aria-hidden={!expanded} inert={!expanded}>
+        {iconOnly ? <div id={contentId} className="space-y-0.5">{section.items.map(renderItem)}</div> : <div id={contentId} className={`apex-sidebar-accordion ${expanded ? 'is-open' : ''}`} aria-hidden={!expanded} inert={!expanded} role="region" aria-labelledby={`${contentId}-heading`}>
           <div className="apex-sidebar-accordion__inner"><div className="space-y-0.5">{section.items.map(renderItem)}</div></div>
         </div>}
       </div>;
