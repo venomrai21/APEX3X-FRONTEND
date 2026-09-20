@@ -50,7 +50,7 @@ export function APEXDragProvider({ children, onDragStart, onDragEnd, onDragCance
 }
 
 export function APEXDragHandle({ label = 'Drag item' }: { label?: string }) {
-  return <button type="button" className="inline-flex size-8 shrink-0 cursor-grab items-center justify-center rounded-md text-[var(--text-muted)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-brand)] active:cursor-grabbing" aria-label={label} title={label}>><GripVertical className="size-4" aria-hidden="true" /></button>;
+  return <button type="button" className="inline-flex size-8 shrink-0 cursor-grab items-center justify-center rounded-md text-[var(--text-muted)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-brand)] active:cursor-grabbing" aria-label={label} title={label}><GripVertical className="size-4" aria-hidden="true" /></button>;
 }
 
 export function APEXDraggable({ id, children }: { id: string; children: React.ReactNode }) {
