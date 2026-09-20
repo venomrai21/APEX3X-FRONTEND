@@ -9,6 +9,7 @@ export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElemen
 export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
   ({ label, error, options, className = '', id, ...props }, ref) => {
     const selectId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
+    const errorId = error ? `${selectId}-error` : undefined;
 
     return (
       <div className="w-full space-y-1.5">
@@ -21,6 +22,8 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           <select
             id={selectId}
             ref={ref}
+            aria-invalid={error ? true : undefined}
+            aria-describedby={errorId}
             className={`w-full appearance-none bg-[#0a0a0f] border ${
               error
                 ? 'border-rose-500/60 focus:border-rose-500'
@@ -34,13 +37,13 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
               </option>
             ))}
           </select>
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-500">
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-500" aria-hidden="true">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
             </svg>
           </div>
         </div>
-        {error && <p className="text-xs text-rose-400 font-medium">{error}</p>}
+        {error && <p id={errorId} role="alert" className="text-xs text-rose-400 font-medium">{error}</p>}
       </div>
     );
   }
