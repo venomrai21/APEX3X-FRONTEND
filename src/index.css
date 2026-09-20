@@ -8,6 +8,16 @@
 }
 
 :root {
+  --type-xs: 0.75rem;
+  --type-sm: 0.875rem;
+  --type-md: 1rem;
+  --type-lg: 1.125rem;
+  --type-xl: 1.25rem;
+  --type-2xl: 1.5rem;
+  --type-3xl: 1.875rem;
+  --type-4xl: 2.25rem;
+  --focus-width: 2px;
+  --focus-offset: 2px;
   --theme-mode: dark;
   --font-ui: "Inter Variable", Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-display: "ABC Favorit", "Favorit", "Resend Favorit", Inter, system-ui, sans-serif;
@@ -126,6 +136,7 @@
 }
 
 @layer base {
+  html { font-size: 100%; scroll-padding-top: 4rem; }
   html, body, #root { height: 100%; min-height: 100%; }
   html { background: var(--background); color-scheme: dark; }
   html[data-theme="light"] { color-scheme: light; }
@@ -231,5 +242,54 @@
     ::view-transition-new(*) {
       animation-duration: 0.01ms !important;
     }
+  }
+}
+
+
+/* APEX3X accessibility foundation: semantic focus, reflow, viewport and high-contrast resilience. */
+:where(a, button, input, textarea, select, summary, [tabindex]):focus-visible {
+  outline: var(--focus-width) solid var(--ring-brand);
+  outline-offset: var(--focus-offset);
+}
+
+:where(button, [role="button"], a, input, textarea, select, summary) {
+  touch-action: manipulation;
+}
+
+:where(h1, h2, h3, h4, h5, h6, [id]) {
+  scroll-margin-top: 4.5rem;
+}
+
+@media (max-width: 430px) {
+  :root {
+    --radius-sm: 7px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+  }
+
+  body {
+    overflow: hidden;
+  }
+}
+
+@media (forced-colors: active) {
+  :where(a, button, input, textarea, select, summary, [tabindex]):focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+
+  :where(button, input, textarea, select) {
+    forced-color-adjust: auto;
+  }
+
+  :where([aria-current="page"], [aria-selected="true"]) {
+    outline: 1px solid Highlight;
+    outline-offset: -1px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
   }
 }
