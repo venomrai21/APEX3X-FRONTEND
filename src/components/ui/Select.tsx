@@ -27,8 +27,8 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
             className={`w-full appearance-none bg-[#0a0a0f] border ${
               error
                 ? 'border-rose-500/60 focus:border-rose-500'
-                : 'border-white/[0.09] focus:border-amber-500/60'
-            } text-zinc-200 text-sm rounded-lg px-3.5 py-2 pr-9 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-amber-500/20 ${className}`}
+                : 'border-white/[0.09] focus:border-white/60'
+            } text-zinc-200 text-sm rounded-lg px-3.5 py-2 pr-9 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-white/20 ${className}`}
             {...props}
           >
             {options.map(opt => (
