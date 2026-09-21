@@ -524,6 +524,25 @@ export const BusinessProfile: React.FC<{
             <ToggleChips values={businessModels} selected={draft.businessModels} onChange={values => update('businessModels', values)} ariaLabel="Business models" />
           </Section>
 
+          <Section title="Operating Defaults" description="Set the business-wide currency and operating timezone APEX should use as defaults. These can be refined later without blocking Stage 1 activation.">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <Select
+                id="bp-operating-currency"
+                label="Operating Currency"
+                value={draft.acceptedCurrencies[0] || ''}
+                onChange={event => update('acceptedCurrencies', event.target.value ? [event.target.value, ...draft.acceptedCurrencies.filter(value => value !== event.target.value)] : draft.acceptedCurrencies)}
+                options={[{ value: '', label: 'Select currency' }, ...currencyOptions]}
+              />
+              <Select
+                id="bp-operating-timezone"
+                label="Operating Timezone"
+                value={draft.timezone}
+                onChange={event => update('timezone', event.target.value)}
+                options={[{ value: '', label: 'Select timezone' }, ...timezoneOptions]}
+              />
+            </div>
+          </Section>
+
           <Section title="Location & Market" description="Physical headquarters and customer market are separate concepts. Provide either or both as applicable.">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <Input id="bp-location" label="Primary Business Location" value={draft.location} onChange={event => update('location', event.target.value)} placeholder="Business address or primary operating location" />
