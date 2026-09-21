@@ -24,7 +24,7 @@ const providers = [
   { name: 'Google Calendar', category: 'Calendar', method: 'oauth2' as const, icon: CalendarDays, description: 'Appointments, availability and scheduling.' },
   { name: 'Shopify', category: 'Commerce', method: 'api_key' as const, icon: ShoppingBag, description: 'Orders, customers, products and commerce events.' },
   { name: 'Custom CRM / ERP', category: 'Business Systems', method: 'custom_http' as const, icon: Database, description: 'Internal or proprietary systems over HTTP.' },
-  { name: 'Email / SMTP', category: 'Communication', method: 'basic_auth' as const, icon: Mail, description: 'Customer-owned email infrastructure.' },
+  { name: 'Email / SMTP', category: 'Communication', method: 'basic_auth' as const, icon: Mail, description: 'Email service.' },
   { name: 'External MCP Server', category: 'AI / Tools', method: 'mcp' as const, icon: Code2, description: 'Connect an external MCP server with the access you choose.' },
 ];
 const categories = ['All', ...Array.from(new Set(providers.map(p => p.category)))];
