@@ -2,7 +2,7 @@ import React from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label?: string;
+  label?: React.ReactNode;
   error?: string;
   hint?: string;
   leftIcon?: React.ReactNode;
@@ -12,7 +12,7 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ label, error, hint, leftIcon, rightIcon, className = '', id, ...props }, ref) => {
     const reducedMotion = useReducedMotion();
-    const inputId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
+    const inputId = id || (typeof label === 'string' ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
     const hintId = hint ? `${inputId}-hint` : undefined;
     const errorId = error ? `${inputId}-error` : undefined;
     const describedBy = [errorId, !error ? hintId : undefined].filter(Boolean).join(' ') || undefined;
