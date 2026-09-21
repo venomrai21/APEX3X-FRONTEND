@@ -193,10 +193,10 @@ export const OnboardingModal: React.FC = () => {
             <div className="flex items-center gap-2 text-zinc-200 font-semibold text-xs uppercase tracking-wider"><ShieldCheck className="w-4 h-4" /> Business Verification</div>
             <p className="text-xs text-zinc-300 leading-relaxed">Review your business and workspace information before saving it.</p>
             <div className="grid grid-cols-2 gap-2 pt-1 text-[11px] text-zinc-400 font-mono">
-              <div>Organisation: <span className="text-zinc-200">{organisationName || '—'}</span></div>
-              <div>Workspace: <span className="text-zinc-200">{workspaceName || '—'}</span></div>
-              <div>Tax ID: <span className="text-zinc-200">{taxId || '—'}</span></div>
-              <div>Currency: <span className="text-zinc-200">{currency || '—'}</span></div>
+              <div>Organisation: <span className="text-zinc-200">{organisationName || ''}</span></div>
+              <div>Workspace: <span className="text-zinc-200">{workspaceName || ''}</span></div>
+              <div>Tax ID: <span className="text-zinc-200">{taxId || ''}</span></div>
+              <div>Currency: <span className="text-zinc-200">{currency || ''}</span></div>
             </div>
           </div>
           <div className="flex justify-between pt-2">
