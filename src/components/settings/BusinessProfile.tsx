@@ -6,6 +6,7 @@ import {
 import { api } from '../../api/client';
 import { Workspace } from '../../types';
 import { Badge, Button, Card, Input, Select } from '../apex3x';
+import { BUSINESS_PROFILE_CURRENCIES, BUSINESS_PROFILE_TIMEZONES } from '../../data/businessProfileOptions';
 
 type StageId = 1 | 2 | 3;
 type Source = 'user_declared' | 'connected' | 'observed' | 'calculated' | 'inferred';
@@ -264,16 +265,9 @@ const businessModels = ['Product sales', 'Service business', 'Subscription', 'Me
 const acquisitionChannels = ['Website', 'Google Search', 'Google Business Profile', 'WhatsApp', 'Facebook', 'Instagram', 'LinkedIn', 'YouTube', 'Referrals', 'Email', 'Paid advertising', 'Marketplace', 'Partners', 'Walk-in', 'Phone', 'Other'];
 const goalOptions = ['Increase leads', 'Improve lead quality', 'Increase conversion', 'Increase sales', 'Increase average transaction value', 'Recover abandoned leads', 'Reduce appointment no-shows', 'Collect outstanding payments', 'Increase repeat purchases', 'Reactivate inactive customers', 'Increase referrals', 'Improve customer experience', 'Launch a new product', 'Expand geographically', 'Improve operational efficiency'];
 const paymentOptions = ['Cash', 'Bank transfer', 'Credit/debit card', 'UPI', 'Digital wallet', 'Payment link', 'Direct debit', 'Other'];
-const currencyOptions = typeof Intl !== 'undefined' && Intl.supportedValuesOf
-  ? Intl.supportedValuesOf('currency').sort().map(code => ({ value: code, label: code }))
-  : [
-      'INR', 'USD', 'EUR', 'GBP', 'AED', 'AUD', 'CAD', 'SGD', 'JPY', 'CNY',
-      'CHF', 'HKD', 'NZD', 'SEK', 'NOK', 'DKK', 'ZAR', 'BRL', 'MXN', 'SAR', 'QAR', 'KWD', 'BHD', 'THB', 'MYR', 'IDR', 'PHP', 'KRW', 'TWD'
-    ].map(code => ({ value: code, label: code }));
+const currencyOptions = BUSINESS_PROFILE_CURRENCIES;
 
-const timezoneOptions = typeof Intl !== 'undefined' && Intl.supportedValuesOf
-  ? Intl.supportedValuesOf('timeZone').sort().map(zone => ({ value: zone, label: zone }))
-  : [{ value: 'Asia/Kolkata', label: 'Asia/Kolkata' }, { value: 'UTC', label: 'UTC' }];
+const timezoneOptions = BUSINESS_PROFILE_TIMEZONES.map(zone => ({ value: zone, label: zone }));
 
 const ToggleChips: React.FC<{
   values: string[];
