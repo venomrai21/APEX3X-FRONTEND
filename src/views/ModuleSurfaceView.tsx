@@ -38,7 +38,7 @@ export const ModuleSurfaceView: React.FC<{ module: NavItemKey }> = ({ module }) 
         <CircleDashed className="mt-0.5 h-5 w-5 shrink-0 text-[var(--text-muted)]" aria-hidden="true" />
         <div>
           <h2 className="text-sm font-semibold text-[var(--text-primary)]">Workspace surface is ready</h2>
-          <p className="mt-1 max-w-2xl text-xs leading-5 text-[var(--text-secondary)]">This frontend establishes the product workspace without inventing operational data or claiming an unavailable backend capability is active.</p>
+          <p className="mt-1 max-w-2xl text-xs leading-5 text-[var(--text-secondary)]">This area is ready for your business data and actions.</p>
         </div>
       </div>
       <div className="mt-5 flex flex-wrap gap-2">
@@ -49,7 +49,7 @@ export const ModuleSurfaceView: React.FC<{ module: NavItemKey }> = ({ module }) 
 
     <div className="grid gap-3 md:grid-cols-2">
       <Card padding="md"><div className="flex items-start gap-3"><CheckCircle2 className="h-4 w-4 text-[var(--text-secondary)]" aria-hidden="true" /><div><h2 className="text-xs font-semibold text-[var(--text-primary)]">Next action</h2><p className="mt-1 text-xs leading-5 text-[var(--text-secondary)]">{definition.nextAction}</p></div></div></Card>
-      <Card padding="md"><div className="flex items-start gap-3"><LockKeyhole className="h-4 w-4 text-[var(--text-secondary)]" aria-hidden="true" /><div><h2 className="text-xs font-semibold text-[var(--text-primary)]">Operational truth</h2><p className="mt-1 text-xs leading-5 text-[var(--text-secondary)]">Only connected platform data and confirmed actions should appear as business state.</p></div></div></Card>
+      <Card padding="md"><div className="flex items-start gap-3"><LockKeyhole className="h-4 w-4 text-[var(--text-secondary)]" aria-hidden="true" /><div><h2 className="text-xs font-semibold text-[var(--text-primary)]">Your business data</h2><p className="mt-1 text-xs leading-5 text-[var(--text-secondary)]">Your workspace shows business information from connected services and actions you have confirmed.</p></div></div></Card>
     </div>
   </div>;
 };
