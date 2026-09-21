@@ -18,7 +18,7 @@ export const CommandPalette: React.FC = () => {
   ];
   const navigationTargets: { label: string; key: NavItemKey; category: string }[] = [
     { label: 'Command Center', key: 'dashboard', category: 'Core' },
-    { label: 'Unified Inbox', key: 'conversations', category: 'Core' },
+    { label: 'Conversations', key: 'conversations', category: 'Core' },
     { label: 'Campaigns', key: 'campaigns', category: 'Attract & Capture' },
     { label: 'Advertising', key: 'advertising', category: 'Attract & Capture' },
     { label: 'Creative Library', key: 'creative_library', category: 'Attract & Capture' },

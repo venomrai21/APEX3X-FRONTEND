@@ -6,13 +6,13 @@ export const APEXConversation: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
   <div className={`space-y-3 ${className}`} {...props}>{children}</div>
 );
 
-export const APEXReasoning: React.FC<{ title?: string; children: React.ReactNode; defaultOpen?: boolean }> = ({ title = 'Reasoning', children, defaultOpen = true }) => {
+export const APEXReasoning: React.FC<{ title?: string; children: React.ReactNode; defaultOpen?: boolean }> = ({ title = 'Details', children, defaultOpen = true }) => {
   const [open, setOpen] = React.useState(defaultOpen);
   return (
     <div className="rounded-xl border border-white/[0.08] bg-black">
       <button type="button" onClick={() => setOpen(v => !v)} className="flex w-full items-center justify-between gap-3 p-3 text-left text-xs font-semibold text-zinc-200">
         <span className="flex items-center gap-2"><ChevronRight className={`h-3.5 w-3.5 transition-transform ${open ? 'rotate-90' : ''}`} />{title}</span>
-        <span className="text-[10px] font-mono text-zinc-500">TRACE</span>
+        <span className="text-[10px] font-mono text-zinc-500">DETAILS</span>
       </button>
       {open && <div className="border-t border-white/[0.06] p-3 text-xs leading-relaxed text-zinc-400">{children}</div>}
     </div>
@@ -25,7 +25,7 @@ export const APEXToolCall: React.FC<{ tool: string; status?: 'queued' | 'running
   return (
     <div className="rounded-xl border border-white/[0.08] bg-[#08080c] p-3">
       <div className="flex items-center justify-between gap-3">
-        <span className="flex items-center gap-2 text-xs font-semibold text-zinc-200"><Wrench className="h-3.5 w-3.5 text-zinc-400" />{tool}</span>
+        <span className="flex items-center gap-2 text-xs font-semibold text-zinc-200"><Wrench className="h-3.5 w-3.5 text-zinc-400" />Action</span>
         <motion.span animate={status === 'running' && !reducedMotion ? { rotate: 360 } : { rotate: 0 }} transition={{ duration: 1, repeat: status === 'running' && !reducedMotion ? Infinity : 0, ease: 'linear' }} className="text-zinc-400">{icon}</motion.span>
       </div>
       {children && <div className="mt-2 text-[11px] text-zinc-500">{children}</div>}
