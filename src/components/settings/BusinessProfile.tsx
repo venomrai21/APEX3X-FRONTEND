@@ -264,7 +264,12 @@ const businessModels = ['Product sales', 'Service business', 'Subscription', 'Me
 const acquisitionChannels = ['Website', 'Google Search', 'Google Business Profile', 'WhatsApp', 'Facebook', 'Instagram', 'LinkedIn', 'YouTube', 'Referrals', 'Email', 'Paid advertising', 'Marketplace', 'Partners', 'Walk-in', 'Phone', 'Other'];
 const goalOptions = ['Increase leads', 'Improve lead quality', 'Increase conversion', 'Increase sales', 'Increase average transaction value', 'Recover abandoned leads', 'Reduce appointment no-shows', 'Collect outstanding payments', 'Increase repeat purchases', 'Reactivate inactive customers', 'Increase referrals', 'Improve customer experience', 'Launch a new product', 'Expand geographically', 'Improve operational efficiency'];
 const paymentOptions = ['Cash', 'Bank transfer', 'Credit/debit card', 'UPI', 'Digital wallet', 'Payment link', 'Direct debit', 'Other'];
-const currencies = ['INR', 'USD', 'EUR', 'GBP', 'AED', 'AUD', 'CAD', 'SGD', 'JPY', 'CNY', 'Other'];
+const currencyOptions = typeof Intl !== 'undefined' && Intl.supportedValuesOf
+  ? Intl.supportedValuesOf('currency').sort().map(code => ({ value: code, label: code }))
+  : [
+      'INR', 'USD', 'EUR', 'GBP', 'AED', 'AUD', 'CAD', 'SGD', 'JPY', 'CNY',
+      'CHF', 'HKD', 'NZD', 'SEK', 'NOK', 'DKK', 'ZAR', 'BRL', 'MXN', 'SAR', 'QAR', 'KWD', 'BHD', 'THB', 'MYR', 'IDR', 'PHP', 'KRW', 'TWD'
+    ].map(code => ({ value: code, label: code }));
 
 const timezoneOptions = typeof Intl !== 'undefined' && Intl.supportedValuesOf
   ? Intl.supportedValuesOf('timeZone').sort().map(zone => ({ value: zone, label: zone }))
@@ -736,7 +741,7 @@ export const BusinessProfile: React.FC<{
           <Section title="Payments & Commercial" description="Keep sensitive financial detail minimal. Prefer connected payment/accounting data for authoritative metrics.">
             <div className="space-y-4">
               <div><div className="mb-2 text-xs font-medium text-[var(--text-secondary)]">Accepted payment methods</div><ToggleChips values={paymentOptions} selected={draft.acceptedPayments} onChange={values => update('acceptedPayments', values)} ariaLabel="Payment methods" /></div>
-              <div><div className="mb-2 text-xs font-medium text-[var(--text-secondary)]">Accepted currencies</div><ToggleChips values={currencies} selected={draft.acceptedCurrencies} onChange={values => update('acceptedCurrencies', values)} ariaLabel="Accepted currencies" /></div>
+              <div><div className="mb-2 text-xs font-medium text-[var(--text-secondary)]">Accepted currencies</div><ToggleChips values={currencyOptions.map(option => option.value)} selected={draft.acceptedCurrencies} onChange={values => update('acceptedCurrencies', values)} ariaLabel="Accepted currencies" /></div>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 <Input id="bp-payment-terms" label="Payment terms" value={draft.paymentTerms} onChange={event => update('paymentTerms', event.target.value)} placeholder="Due on receipt, Net 30…" />
                 <Input id="bp-credit-terms" label="Credit terms" value={draft.creditTerms} onChange={event => update('creditTerms', event.target.value)} />
