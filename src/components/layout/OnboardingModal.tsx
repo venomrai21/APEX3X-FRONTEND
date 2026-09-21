@@ -191,7 +191,7 @@ export const OnboardingModal: React.FC = () => {
         {step === 3 && <div className="space-y-4">
           <div className="p-4 rounded-xl bg-[#08080c] border border-white/20 space-y-3">
             <div className="flex items-center gap-2 text-zinc-200 font-semibold text-xs uppercase tracking-wider"><ShieldCheck className="w-4 h-4" /> Business Verification</div>
-            <p className="text-xs text-zinc-300 leading-relaxed">Review the organisation and workspace information before submitting it to the connected platform.</p>
+            <p className="text-xs text-zinc-300 leading-relaxed">Review your business and workspace information before saving it.</p>
             <div className="grid grid-cols-2 gap-2 pt-1 text-[11px] text-zinc-400 font-mono">
               <div>Organisation: <span className="text-zinc-200">{organisationName || '—'}</span></div>
               <div>Workspace: <span className="text-zinc-200">{workspaceName || '—'}</span></div>
