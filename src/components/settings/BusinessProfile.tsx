@@ -6,7 +6,6 @@ import {
 import { api } from '../../api/client';
 import { Workspace } from '../../types';
 import { Badge, Button, Card, Input, Select } from '../apex3x';
-import { BUSINESS_PROFILE_CURRENCIES, BUSINESS_PROFILE_TIMEZONES } from '../../data/businessProfileOptions';
 
 type StageId = 1 | 2 | 3;
 type Source = 'user_declared' | 'connected' | 'observed' | 'calculated' | 'inferred';
@@ -108,7 +107,6 @@ type BusinessProfileDraft = {
   branches: string;
   businessHours: string;
   holidaySchedule: string;
-  timezone: string;
   languages: string;
   serviceArea: string;
   capacity: string;
@@ -118,7 +116,6 @@ type BusinessProfileDraft = {
   inventory: string;
   shipping: string;
   acceptedPayments: string[];
-  acceptedCurrencies: string[];
   paymentTerms: string;
   creditTerms: string;
   depositRequirements: string;
@@ -229,7 +226,6 @@ const createDraft = (workspace: Workspace | null): BusinessProfileDraft => ({
   branches: '',
   businessHours: '',
   holidaySchedule: '',
-  timezone: workspace?.timezone ?? 'Asia/Kolkata',
   languages: '',
   serviceArea: '',
   capacity: '',
@@ -239,7 +235,6 @@ const createDraft = (workspace: Workspace | null): BusinessProfileDraft => ({
   inventory: '',
   shipping: '',
   acceptedPayments: [],
-  acceptedCurrencies: workspace?.currency ? [workspace.currency] : ['INR'],
   paymentTerms: '',
   creditTerms: '',
   depositRequirements: '',
@@ -265,10 +260,6 @@ const businessModels = ['Product sales', 'Service business', 'Subscription', 'Me
 const acquisitionChannels = ['Website', 'Google Search', 'Google Business Profile', 'WhatsApp', 'Facebook', 'Instagram', 'LinkedIn', 'YouTube', 'Referrals', 'Email', 'Paid advertising', 'Marketplace', 'Partners', 'Walk-in', 'Phone', 'Other'];
 const goalOptions = ['Increase leads', 'Improve lead quality', 'Increase conversion', 'Increase sales', 'Increase average transaction value', 'Recover abandoned leads', 'Reduce appointment no-shows', 'Collect outstanding payments', 'Increase repeat purchases', 'Reactivate inactive customers', 'Increase referrals', 'Improve customer experience', 'Launch a new product', 'Expand geographically', 'Improve operational efficiency'];
 const paymentOptions = ['Cash', 'Bank transfer', 'Credit/debit card', 'UPI', 'Digital wallet', 'Payment link', 'Direct debit', 'Other'];
-const currencyOptions = BUSINESS_PROFILE_CURRENCIES;
-
-const timezoneOptions = BUSINESS_PROFILE_TIMEZONES.map(zone => ({ value: zone, label: zone }));
-
 const ToggleChips: React.FC<{
   values: string[];
   selected: string[];
@@ -365,7 +356,7 @@ export const BusinessProfile: React.FC<{
   }, [draft]);
 
   const stage3Complete = useMemo(() => {
-    const checks = [draft.legalName || draft.tradingName, draft.entityType, draft.employeeRange, draft.timezone, draft.serviceArea, draft.acceptedPayments.length, draft.acceptedCurrencies.length, draft.paymentTerms || draft.averageTransactionValue];
+    const checks = [draft.legalName || draft.tradingName, draft.entityType, draft.employeeRange, draft.serviceArea, draft.acceptedPayments.length, draft.paymentTerms || draft.averageTransactionValue];
     return Math.round((checks.filter(value => Boolean(value)).length / checks.length) * 100);
   }, [draft]);
 
@@ -384,8 +375,6 @@ export const BusinessProfile: React.FC<{
           website: draft.website,
           registeredAddress: draft.location,
           taxId: draft.taxId,
-          currency: draft.acceptedCurrencies[0] || workspace.currency,
-          timezone: draft.timezone || workspace.timezone,
         });
         onWorkspaceUpdated(updated);
       }
@@ -516,25 +505,6 @@ export const BusinessProfile: React.FC<{
 
           <Section title="Business Model" description="Select every revenue model that genuinely applies. This helps APEX reason about acquisition, conversion and retention.">
             <ToggleChips values={businessModels} selected={draft.businessModels} onChange={values => update('businessModels', values)} ariaLabel="Business models" />
-          </Section>
-
-          <Section title="Operating Defaults" description="Set the business-wide currency and operating timezone APEX should use as defaults. These can be refined later without blocking Stage 1 activation.">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <Select
-                id="bp-operating-currency"
-                label="Operating Currency"
-                value={draft.acceptedCurrencies[0] || ''}
-                onChange={event => update('acceptedCurrencies', event.target.value ? [event.target.value, ...draft.acceptedCurrencies.filter(value => value !== event.target.value)] : draft.acceptedCurrencies)}
-                options={[{ value: '', label: 'Select currency' }, ...currencyOptions]}
-              />
-              <Select
-                id="bp-operating-timezone"
-                label="Operating Timezone"
-                value={draft.timezone}
-                onChange={event => update('timezone', event.target.value)}
-                options={[{ value: '', label: 'Select timezone' }, ...timezoneOptions]}
-              />
-            </div>
           </Section>
 
           <Section title="Location & Market" description="Physical headquarters and customer market are separate concepts. Provide either or both as applicable.">
@@ -724,7 +694,6 @@ export const BusinessProfile: React.FC<{
               <Input id="bp-branches" label="Branches / locations" value={draft.branches} onChange={event => update('branches', event.target.value)} />
               <TextAreaField id="bp-business-hours" label="Business hours" value={draft.businessHours} onChange={value => update('businessHours', value)} placeholder="e.g. Mon–Sat 09:00–18:00" />
               <TextAreaField id="bp-holidays" label="Holiday schedule" value={draft.holidaySchedule} onChange={value => update('holidaySchedule', value)} />
-              <Select id="bp-timezone" label="Operating timezone" value={draft.timezone} onChange={event => update('timezone', event.target.value)} options={[{ value: '', label: 'Select timezone' }, ...timezoneOptions]} />
               <Input id="bp-languages" label="Languages supported" value={draft.languages} onChange={event => update('languages', event.target.value)} placeholder="English, Hindi…" />
               <Input id="bp-service-area" label="Service area" value={draft.serviceArea} onChange={event => update('serviceArea', event.target.value)} />
               <Input id="bp-capacity" label="Operational capacity" value={draft.capacity} onChange={event => update('capacity', event.target.value)} placeholder="Bookings/day, units/day, seats…" />
@@ -754,7 +723,6 @@ export const BusinessProfile: React.FC<{
           <Section title="Payments & Commercial" description="Keep sensitive financial detail minimal. Prefer connected payment/accounting data for authoritative metrics.">
             <div className="space-y-4">
               <div><div className="mb-2 text-xs font-medium text-[var(--text-secondary)]">Accepted payment methods</div><ToggleChips values={paymentOptions} selected={draft.acceptedPayments} onChange={values => update('acceptedPayments', values)} ariaLabel="Payment methods" /></div>
-              <div><div className="mb-2 text-xs font-medium text-[var(--text-secondary)]">Accepted currencies</div><ToggleChips values={currencyOptions.map(option => option.value)} selected={draft.acceptedCurrencies} onChange={values => update('acceptedCurrencies', values)} ariaLabel="Accepted currencies" /></div>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 <Input id="bp-payment-terms" label="Payment terms" value={draft.paymentTerms} onChange={event => update('paymentTerms', event.target.value)} placeholder="Due on receipt, Net 30…" />
                 <Input id="bp-credit-terms" label="Credit terms" value={draft.creditTerms} onChange={event => update('creditTerms', event.target.value)} />
