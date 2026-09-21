@@ -17,7 +17,7 @@ const providers = [
   { name: 'WhatsApp Business', category: 'Communication', method: 'oauth2' as const, icon: MessageCircle, description: 'Conversations, inbound messages and outbound communication.' },
   { name: 'Facebook', category: 'Social', method: 'oauth2' as const, icon: Facebook, description: 'Pages, messages, publishing and business data.' },
   { name: 'Instagram', category: 'Social', method: 'oauth2' as const, icon: Instagram, description: 'Professional accounts, messages, publishing and insights.' },
-  { name: 'Google', category: 'Google', method: 'oauth2' as const, icon: Chrome, description: 'Google services with explicit workspace-scoped permissions.' },
+  { name: 'Google', category: 'Google', method: 'oauth2' as const, icon: Chrome, description: 'Google services using the permissions you approve.' },
   { name: 'Google Ads', category: 'Advertising', method: 'oauth2' as const, icon: Megaphone, description: 'Ad accounts, campaigns, performance and spend.' },
   { name: 'Meta Ads', category: 'Advertising', method: 'oauth2' as const, icon: Megaphone, description: 'Ad accounts, campaigns, audiences and performance.' },
   { name: 'Stripe', category: 'Payments', method: 'api_key' as const, icon: CreditCard, description: 'Customers, invoices, payments and revenue events.' },
@@ -25,7 +25,7 @@ const providers = [
   { name: 'Shopify', category: 'Commerce', method: 'api_key' as const, icon: ShoppingBag, description: 'Orders, customers, products and commerce events.' },
   { name: 'Custom CRM / ERP', category: 'Business Systems', method: 'custom_http' as const, icon: Database, description: 'Internal or proprietary systems over HTTP.' },
   { name: 'Email / SMTP', category: 'Communication', method: 'basic_auth' as const, icon: Mail, description: 'Customer-owned email infrastructure.' },
-  { name: 'External MCP Server', category: 'AI / Tools', method: 'mcp' as const, icon: Code2, description: 'Governed access to an external MCP server.' },
+  { name: 'External MCP Server', category: 'AI / Tools', method: 'mcp' as const, icon: Code2, description: 'Connect an external MCP server with the access you choose.' },
 ];
 const categories = ['All', ...Array.from(new Set(providers.map(p => p.category)))];
 
