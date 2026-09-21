@@ -23,16 +23,16 @@ export const ConnectDrawer: React.FC = () => {
     try {
       await api.connectUniversalIntegration(draft);
       setUniversalOpen(false);
-      addToast({ type: 'success', title: `${draft.name} Connection Accepted`, description: 'The connected APEX3X platform confirmed the universal connection.' });
+      addToast({ type: 'success', title: `${draft.name} Connection Accepted`, description: 'Connection completed.' });
       await fetchConnections();
       triggerRefresh();
     } catch (err) {
-      addToast({ type: 'error', title: 'Universal Connection Not Completed', description: (err as Error).message });
+      addToast({ type: 'error', title: 'Connection not completed', description: (err as Error).message });
     }
   };
 
   const handleToggleConnection = async (item: IntegrationConnection) => {
-    try { setConnectingProvider(item.provider); if (item.status === 'connected') { await api.disconnectIntegration(item.provider); addToast({ type: 'info', title: `${item.name} Disconnected`, description: 'Provider synchronization paused.' }); } else { setUniversalOpen(true); return; } await fetchConnections(); triggerRefresh(); }
+    try { setConnectingProvider(item.provider); if (item.status === 'connected') { await api.disconnectIntegration(item.provider); addToast({ type: 'info', title: `${item.name} Disconnected`, description: 'Sync paused.' }); } else { setUniversalOpen(true); return; } await fetchConnections(); triggerRefresh(); }
     catch (err) { addToast({ type: 'error', title: 'Connection Failed', description: (err as Error).message }); } finally { setConnectingProvider(null); }
   };
   const handleSync = async (provider: string, name: string) => { try { setConnectingProvider(provider); await api.syncIntegration(provider); addToast({ type: 'success', title: `${name} Synchronized`, description: 'Synchronization completed.' }); await fetchConnections(); triggerRefresh(); } catch (err) { addToast({ type: 'error', title: 'Sync Failed', description: (err as Error).message }); } finally { setConnectingProvider(null); } };
