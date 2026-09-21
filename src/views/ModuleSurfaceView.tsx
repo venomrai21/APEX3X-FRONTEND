@@ -37,7 +37,7 @@ export const ModuleSurfaceView: React.FC<{ module: NavItemKey }> = ({ module }) 
       <div className="flex items-start gap-3">
         <CircleDashed className="mt-0.5 h-5 w-5 shrink-0 text-[var(--text-muted)]" aria-hidden="true" />
         <div>
-          <h2 className="text-sm font-semibold text-[var(--text-primary)]">Workspace surface is ready</h2>
+          <h2 className="text-sm font-semibold text-[var(--text-primary)]">This area is ready</h2>
           <p className="mt-1 max-w-2xl text-xs leading-5 text-[var(--text-secondary)]">This area is ready for your business data and actions.</p>
         </div>
       </div>
