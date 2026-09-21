@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, CheckCircle2, CircleDashed, LockKeyhole } from 'lucide-react';
+import { ArrowRight, CheckCircle2, LockKeyhole } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { Card, Button } from '../components/apex3x';
 import { NavItemKey } from '../types';
@@ -33,22 +33,8 @@ export const ModuleSurfaceView: React.FC<{ module: NavItemKey }> = ({ module }) 
       <p className="max-w-3xl text-sm leading-6 text-[var(--text-secondary)]">{definition.purpose}</p>
     </header>
 
-    <Card padding="lg" className="border-dashed">
-      <div className="flex items-start gap-3">
-        <CircleDashed className="mt-0.5 h-5 w-5 shrink-0 text-[var(--text-muted)]" aria-hidden="true" />
-        <div>
-          <h2 className="text-sm font-semibold text-[var(--text-primary)]">This area is ready</h2>
-          <p className="mt-1 max-w-2xl text-xs leading-5 text-[var(--text-secondary)]">This area is ready for your business data and actions.</p>
-        </div>
-      </div>
-      <div className="mt-5 flex flex-wrap gap-2">
-        <Button variant="primary" size="sm" onClick={() => setConnectDrawerOpen(true)} leftIcon={<ArrowRight className="h-3.5 w-3.5" />}>Connect a system</Button>
-        {definition.related.map(item => <Button key={item.key} variant="secondary" size="sm" onClick={() => setActiveNav(item.key)}>{item.label}</Button>)}
-      </div>
-    </Card>
-
     <div className="grid gap-3 md:grid-cols-2">
-      <Card padding="md"><div className="flex items-start gap-3"><CheckCircle2 className="h-4 w-4 text-[var(--text-secondary)]" aria-hidden="true" /><div><h2 className="text-xs font-semibold text-[var(--text-primary)]">Next action</h2><p className="mt-1 text-xs leading-5 text-[var(--text-secondary)]">{definition.nextAction}</p></div></div></Card>
+      <Card padding="md"><div className="flex items-start gap-3"><CheckCircle2 className="h-4 w-4 text-[var(--text-secondary)]" aria-hidden="true" /><div className="min-w-0"><h2 className="text-xs font-semibold text-[var(--text-primary)]">Next action</h2><p className="mt-1 text-xs leading-5 text-[var(--text-secondary)]">{definition.nextAction}</p><div className="mt-3 flex flex-wrap gap-2"><Button variant="primary" size="sm" onClick={() => setConnectDrawerOpen(true)} leftIcon={<ArrowRight className="h-3.5 w-3.5" />}>Connect a service</Button>{definition.related.map(item => <Button key={item.key} variant="secondary" size="sm" onClick={() => setActiveNav(item.key)}>{item.label}</Button>)}</div></div></div></Card>
       <Card padding="md"><div className="flex items-start gap-3"><LockKeyhole className="h-4 w-4 text-[var(--text-secondary)]" aria-hidden="true" /><div><h2 className="text-xs font-semibold text-[var(--text-primary)]">Your business data</h2><p className="mt-1 text-xs leading-5 text-[var(--text-secondary)]">Your workspace shows business information from connected services and actions you have confirmed.</p></div></div></Card>
     </div>
   </div>;
