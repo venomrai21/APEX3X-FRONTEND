@@ -61,6 +61,11 @@ type BusinessProfileDraft = {
   location: string;
   market: string;
   story: string;
+  beliefs: string;
+  evidence: string;
+  uncertainty: string;
+  motivation: string;
+  constraints: string;
   mission: string;
   vision: string;
   differentiators: string;
@@ -180,6 +185,11 @@ const createDraft = (workspace: Workspace | null): BusinessProfileDraft => ({
   location: workspace?.registeredAddress ?? '',
   market: '',
   story: '',
+  beliefs: '',
+  evidence: '',
+  uncertainty: '',
+  motivation: '',
+  constraints: '',
   mission: '',
   vision: '',
   differentiators: '',
@@ -340,9 +350,7 @@ export const BusinessProfile: React.FC<{
     return Math.round((required.filter(Boolean).length / required.length) * 100);
   }, [draft]);
 
-  const stage2Complete = useMemo(() => {
-    const checks = [draft.story, draft.customerSegments.length, draft.acquisitionChannels.length, draft.salesJourney, draft.currentCondition, draft.goals.length, draft.growthPriorities.length, draft.valueProposition];
-    return Math.round((checks.filter(value => Boolean(value)).length / checks.length) * 100);
+  const stage2Complete = useMemo(() => [draft.beliefs, draft.evidence, draft.uncertainty, draft.motivation, draft.constraints, draft.customerSegments.length, draft.salesJourney, draft.goals.length].filter(Boolean).length;
   }, [draft]);
 
   const stage3Complete = useMemo(() => {
@@ -563,8 +571,8 @@ export const BusinessProfile: React.FC<{
 
           <div className="flex flex-col gap-3 border-t border-[var(--border-subtle)] pt-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <div className="text-xs font-semibold text-[var(--text-primary)]">Stage 1 score: {stage1Complete}%</div>
-              <p className="mt-1 text-[10px] text-[var(--text-muted)]">Once this reaches 100%, Stage 2 and Stage 3 remain completely optional.</p>
+              <div className="text-xs font-semibold text-[var(--text-primary)]">Foundation status: {stageReady ? 'Complete' : 'In progress'}</div>
+              <p className="mt-1 text-[10px] text-[var(--text-muted)]">Complete the Foundation to unlock the path into APEX. Discovery and Precision remain optional.</p>
             </div>
             <Button variant="primary" size="md" isLoading={savingStage === 1} onClick={() => saveStage(1)} disabled={!stageReady} leftIcon={<Save className="h-4 w-4" />}>Save Foundation</Button>
           </div>
@@ -576,11 +584,22 @@ export const BusinessProfile: React.FC<{
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">Stage 02 · Optional</div>
-              <h3 className="mt-1 text-lg font-semibold text-[var(--text-primary)]">Business Intelligence</h3>
-              <p className="mt-1 max-w-2xl text-xs leading-relaxed text-[var(--text-secondary)]">Add depth when you have time. More context lets APEX make more specific growth recommendations, but no field here is required to use APEX.</p>
+              <h3 className="mt-1 text-lg font-semibold text-[var(--text-primary)]">Business Discovery</h3>
+              <p className="mt-1 max-w-2xl text-xs leading-relaxed text-[var(--text-secondary)]">Capture how the business sees reality: facts, beliefs, evidence, uncertainty, motivation and constraints. APEX keeps these perspectives attributable so later observations can corroborate or challenge them.</p>
             </div>
-            <Badge variant="neutral" size="sm">OPTIONAL · {stage2Complete}%</Badge>
+            <Badge variant="neutral" size="sm">OPTIONAL · {stage2Complete}/8 discovery signals</Badge>
           </div>
+
+          <Section title="Discovery Signals" description="These six inputs intentionally capture different kinds of knowledge. APEX treats them as distinct signals rather than blending them into one business score.">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <TextAreaField id="bp-beliefs" label="Beliefs" value={draft.beliefs} onChange={value => update('beliefs', value)} placeholder="What do you believe is true about your customers, market, offer or growth?" />
+              <TextAreaField id="bp-evidence" label="Evidence" value={draft.evidence} onChange={value => update('evidence', value)} placeholder="What data, customer feedback, transactions, experiments or other evidence supports those beliefs?" />
+              <TextAreaField id="bp-uncertainty" label="Uncertainty" value={draft.uncertainty} onChange={value => update('uncertainty', value)} placeholder="What are you unsure about, unable to explain, or currently testing?" />
+              <TextAreaField id="bp-motivation" label="Motivation" value={draft.motivation} onChange={value => update('motivation', value)} placeholder="What outcome matters most right now, and why?" />
+              <TextAreaField id="bp-constraints" label="Constraints" value={draft.constraints} onChange={value => update('constraints', value)} placeholder="What limits decisions or execution: budget, capacity, people, timing, geography, policy or risk?" />
+              <TextAreaField id="bp-story" label="Business facts & context" value={draft.story} onChange={value => update('story', value)} placeholder="What should APEX know about how the business works today that is not captured elsewhere?" />
+            </div>
+          </Section>
 
           <Section title="Business Story" description="Give APEX the context that normally takes a human advisor months to learn.">
             <TextAreaField id="bp-story" label="Business overview" value={draft.story} onChange={value => update('story', value)} placeholder="How did the business start, what does it do today, and what matters most?" />
@@ -713,7 +732,7 @@ export const BusinessProfile: React.FC<{
               <h3 className="mt-1 text-lg font-semibold text-[var(--text-primary)]">Operations & Verification</h3>
               <p className="mt-1 max-w-2xl text-xs leading-relaxed text-[var(--text-secondary)]">Add deeper business infrastructure only where it applies. Legal/compliance facts remain separate from growth intelligence; operational rules become execution context.</p>
             </div>
-            <Badge variant="neutral" size="sm">OPTIONAL · {stage3Complete}%</Badge>
+            <Badge variant="neutral" size="sm">OPTIONAL · CONDITIONAL</Badge>
           </div>
 
           <Section title="Legal & Registration" description="Formal business facts. These should be treated as legal/compliance context, not as marketing or growth assumptions.">
@@ -801,10 +820,9 @@ export const BusinessProfile: React.FC<{
 
       <Card padding="md">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <div className="flex gap-3"><Gauge className="mt-0.5 h-4 w-4 shrink-0 text-[var(--text-secondary)]" /><div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <div className="flex gap-3"><Gauge className="mt-0.5 h-4 w-4 shrink-0 text-[var(--text-secondary)]" /><div><div className="text-xs font-semibold text-[var(--text-primary)]">Coverage is contextual</div><p className="mt-1 text-[10px] leading-relaxed text-[var(--text-muted)]">APEX tracks which business dimensions have usable context instead of presenting a single business-wide score.</p></div></div>
-          <div className="flex gap-3"><FileCheck2 className="mt-0.5 h-4 w-4 shrink-0 text-[var(--text-secondary)]" /><div><div className="text-xs font-semibold text-[var(--text-primary)]">Declared facts stay attributable</div><p className="mt-1 text-[10px] leading-relaxed text-[var(--text-muted)]">User-provided facts remain distinct from connected, observed, calculated and inferred context.</p></div></div>
-          <div className="flex gap-3"><Target className="mt-0.5 h-4 w-4 shrink-0 text-[var(--text-secondary)]" /><div><div className="text-xs font-semibold text-[var(--text-primary)]">Goals do not equal permission</div><p className="mt-1 text-[10px] leading-relaxed text-[var(--text-muted)]">Goals can guide recommendations; execution still belongs to the separate autonomy and permission layer.</p></div></div>
+          <div className="flex gap-3"><Gauge className="mt-0.5 h-4 w-4 shrink-0 text-[var(--text-secondary)]" /><div><div className="text-xs font-semibold text-[var(--text-primary)]">Coverage is contextual</div><p className="mt-1 text-[10px] leading-relaxed text-[var(--text-muted)]">APEX tracks usable context by business dimension instead of reducing the business to one score.</p></div></div>
+          <div className="flex gap-3"><FileCheck2 className="mt-0.5 h-4 w-4 shrink-0 text-[var(--text-secondary)]" /><div><div className="text-xs font-semibold text-[var(--text-primary)]">Knowledge stays attributable</div><p className="mt-1 text-[10px] leading-relaxed text-[var(--text-muted)]">Declared facts, beliefs, observations, calculations and later inferences remain distinguishable.</p></div></div>
+          <div className="flex gap-3"><Target className="mt-0.5 h-4 w-4 shrink-0 text-[var(--text-secondary)]" /><div><div className="text-xs font-semibold text-[var(--text-primary)]">Understanding is not action</div><p className="mt-1 text-[10px] leading-relaxed text-[var(--text-muted)]">Profile context informs the intelligence layer; recommendations and execution remain separate surfaces.</p></div></div>
         </div>
       </Card>
     </div>
