@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { LayoutDashboard, Bot, FileText, Users, Building, MessageSquare, Calendar, GitPullRequest, CreditCard, Plug, Shield, Search, Bell, ChevronDown, Menu, X, CheckCircle2, AlertCircle , PanelLeft, Target, Megaphone, FolderOpen, Activity, Workflow, Settings2 } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { LayoutDashboard, Bot, FileText, Users, Building, MessageSquare, Calendar, GitPullRequest, CreditCard, Plug, Shield, Search, Bell, ChevronDown, Menu, X, CheckCircle2, AlertCircle, PanelLeft, Target, Megaphone, FolderOpen, Activity, Workflow, Settings2, Trash2 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { NavItemKey } from '../../types';
 import { APEXReveal, NavigationMenu, Sidebar } from '../apex3x';
@@ -14,8 +14,9 @@ import { useSidebarInteraction } from './useSidebarInteraction';
 interface NavSection { title: string; items: { key: NavItemKey; label: string; icon: React.ReactNode; badge?: string }[]; }
 
 export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { organisation, currentWorkspace, availableWorkspaces, currentUser, activeNav, setActiveNav, switchWorkspace, setCommandPaletteOpen, setNotificationDrawerOpen, setOnboardingOpen, setSubWorkspaceOpen, toasts, removeToast } = useApp();
+  const { organisation, currentWorkspace, availableWorkspaces, currentUser, activeNav, setActiveNav, switchWorkspace, deleteWorkspace, setCommandPaletteOpen, setNotificationDrawerOpen, setSubWorkspaceOpen, toasts, removeToast } = useApp();
   const [workspaceMenuOpen, setWorkspaceMenuOpen] = useState(false);
+  const workspaceMenuRef = useRef<HTMLDivElement>(null);
   const { collapsed, mobileOpen, dragX, drawerRef, mobileTriggerRef, toggleCollapsed, openMobile, closeMobile, handlePointerDown, handlePointerMove, handlePointerUp, handlePointerCancel, edgeWidth } = useSidebarInteraction();
   const navSections: NavSection[] = [
     { title: 'Core', items: [{ key: 'dashboard', label: 'Command Center', icon: <LayoutDashboard className="w-4 h-4" /> }, { key: 'conversations', label: 'Conversations', icon: <MessageSquare className="w-4 h-4" /> }] },
@@ -29,7 +30,8 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
   ];
   const userName = currentUser?.name || 'Account unavailable';
   const selectNav = (key: string) => setActiveNav(key as NavItemKey);
-  React.useEffect(() => {
+
+  useEffect(() => {
     const labels: Record<string, string> = {
       dashboard: 'Command Center',
       brain: 'APEX Brain',
@@ -56,6 +58,44 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
     };
     document.title = `${labels[activeNav] || 'APEX3X'} — APEX3X`;
   }, [activeNav]);
+
+  useEffect(() => {
+    if (!workspaceMenuOpen) return;
+
+    const handlePointerDown = (event: MouseEvent | PointerEvent) => {
+      const target = event.target as Node | null;
+      if (workspaceMenuRef.current && target && !workspaceMenuRef.current.contains(target)) {
+        setWorkspaceMenuOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setWorkspaceMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('pointerdown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('pointerdown', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [workspaceMenuOpen]);
+
+  const handleDeleteWorkspace = async (event: React.MouseEvent, workspaceId: string) => {
+    event.stopPropagation();
+    event.preventDefault();
+    if (availableWorkspaces.length <= 1) return;
+    const confirmed = window.confirm('Delete this workspace? This cannot be undone in the current session.');
+    if (!confirmed) return;
+    await deleteWorkspace(workspaceId);
+    setWorkspaceMenuOpen(false);
+  };
+
   const drawerTransform = dragX !== null ? `translateX(${dragX}px)` : mobileOpen ? 'translateX(0)' : 'translateX(-100%)';
   const drawerTransition = dragX === null ? 'transform 280ms cubic-bezier(0.4, 0, 0.2, 1)' : 'none';
 
@@ -64,7 +104,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
     <header role="banner" className="h-14 shrink-0 border-b border-[var(--border)] bg-[var(--background)] flex items-center justify-between px-3 sm:px-5 lg:px-6 z-40">
       <div className="flex min-w-0 items-center">
         <button ref={mobileTriggerRef} onClick={() => mobileOpen ? closeMobile() : openMobile()} className="lg:hidden inline-flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-brand)]" aria-label={mobileOpen ? 'Close navigation' : 'Open navigation'} aria-expanded={mobileOpen} title={mobileOpen ? 'Close navigation' : 'Open navigation'}>{mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}</button>
-        <div className="relative min-w-0">
+        <div className="relative min-w-0" ref={workspaceMenuRef}>
           <button onClick={() => setWorkspaceMenuOpen(v => !v)} className="flex items-center gap-2 rounded-[var(--radius-sm)] px-1.5 py-1.5 hover:bg-[var(--surface)] text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-brand)]" aria-label="Open organisation and workspace menu" aria-expanded={workspaceMenuOpen} title="Organisation and workspace">
             <div className="flex items-center gap-2 shrink-0">
               <div className="w-7 h-7 rounded-[var(--radius-sm)] bg-[var(--text-primary)] flex items-center justify-center overflow-hidden text-[var(--background)] font-semibold text-sm">{organisation.logoUrl ? <img src={organisation.logoUrl} alt={`${organisation.name} logo`} className="h-full w-full object-cover" /> : organisation.shortName.trim().charAt(0).toUpperCase() || 'A'}</div>
@@ -73,11 +113,68 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
             </div>
             <ChevronDown className="w-3.5 h-3.5 shrink-0 text-[var(--text-muted)]" />
           </button>
-          {workspaceMenuOpen && <div className="absolute left-0 top-full mt-1.5 w-64 p-1.5 bg-[var(--surface-elevated)] border border-[var(--border)] rounded-[var(--radius-sm)] shadow-[0_16px_32px_-20px_rgba(0,0,0,0.95)] z-50"><div className="px-2 py-1 text-[10px] font-medium text-[var(--text-muted)]">Workspaces</div>{availableWorkspaces.length === 0 ? <div className="px-2 py-2 text-[11px] text-[var(--text-muted)]">No workspaces available.</div> : availableWorkspaces.map(ws => <button key={ws.id} onClick={() => { switchWorkspace(ws.id); setWorkspaceMenuOpen(false); }} className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-[var(--radius-sm)] text-xs text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-brand)] ${ws.id === currentWorkspace?.id ? 'bg-[var(--surface-2)] text-[var(--text-primary)] font-semibold' : 'text-[var(--text-secondary)] hover:bg-[var(--surface-2)]'}`}><WorkspaceBrand workspace={ws} organisation={organisation} compact />{ws.id === currentWorkspace?.id && <CheckCircle2 className="w-3 h-3 text-[var(--text-primary)] shrink-0" />}</button>)}<div className="pt-1 mt-1 border-t border-[var(--border)]"><button onClick={() => { setWorkspaceMenuOpen(false); setSubWorkspaceOpen(true); }} className="w-full px-2.5 py-1.5 rounded-[var(--radius-sm)] text-xs text-[var(--text-secondary)] hover:bg-[var(--surface-2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-brand)] text-left">Sub workspace</button></div></div>}
+          {workspaceMenuOpen && (
+            <div className="absolute left-0 top-full mt-1.5 w-64 p-1.5 bg-[var(--surface-elevated)] border border-[var(--border)] rounded-[var(--radius-sm)] shadow-[0_16px_32px_-20px_rgba(0,0,0,0.95)] z-50" role="menu" aria-label="Workspaces">
+              <div className="px-2 py-1 text-[10px] font-medium text-[var(--text-muted)]">Workspaces</div>
+              {availableWorkspaces.length === 0 ? (
+                <div className="px-2 py-2 text-[11px] text-[var(--text-muted)]">No workspaces available.</div>
+              ) : (
+                availableWorkspaces.map(ws => (
+                  <div
+                    key={ws.id}
+                    className={`group flex items-center gap-1 rounded-[var(--radius-sm)] ${ws.id === currentWorkspace?.id ? 'bg-[var(--surface-2)]' : 'hover:bg-[var(--surface-2)]'}`}
+                  >
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => { switchWorkspace(ws.id); setWorkspaceMenuOpen(false); }}
+                      className={`min-w-0 flex-1 flex items-center justify-between px-2.5 py-1.5 rounded-[var(--radius-sm)] text-xs text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-brand)] ${ws.id === currentWorkspace?.id ? 'text-[var(--text-primary)] font-semibold' : 'text-[var(--text-secondary)]'}`}
+                    >
+                      <WorkspaceBrand workspace={ws} organisation={organisation} compact />
+                      {ws.id === currentWorkspace?.id && <CheckCircle2 className="w-3 h-3 text-[var(--text-primary)] shrink-0" />}
+                    </button>
+                    {availableWorkspaces.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={(e) => handleDeleteWorkspace(e, ws.id)}
+                        className="shrink-0 mr-1 inline-flex h-7 w-7 items-center justify-center rounded-[var(--radius-sm)] text-[var(--text-muted)] opacity-70 hover:opacity-100 hover:text-[var(--error)] hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-brand)]"
+                        aria-label={`Delete workspace ${ws.name}`}
+                        title={`Delete ${ws.name}`}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
+                ))
+              )}
+              <div className="pt-1 mt-1 border-t border-[var(--border)]">
+                <button
+                  type="button"
+                  onClick={() => { setWorkspaceMenuOpen(false); setSubWorkspaceOpen(true); }}
+                  className="w-full px-2.5 py-1.5 rounded-[var(--radius-sm)] text-xs text-[var(--text-secondary)] hover:bg-[var(--surface-2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-brand)] text-left"
+                >
+                  Sub workspace
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
-      <div className="flex items-center gap-2 sm:gap-3 shrink-0"><div className="hidden lg:block"><NavigationMenu sections={navSections} activeKey={activeNav} onSelect={selectNav} /></div><button onClick={() => setCommandPaletteOpen(true)} className="inline-flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--surface)] border border-[var(--border)] hover:border-[var(--border-strong)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-brand)]" aria-label="Open search" title="Search"><Search className="w-3.5 h-3.5" /></button><button onClick={() => setNotificationDrawerOpen(true)} className="relative p-2 rounded-[var(--radius-sm)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-brand)]" title="Decision feed" aria-label="Open decision feed"><Bell className="w-4 h-4" /></button><button onClick={() => setOnboardingOpen(true)} className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--radius-sm)] text-[11px] font-medium border bg-[var(--surface)] text-[var(--text-secondary)] border-[var(--border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-brand)]"><Building className="w-3 h-3" /><span>Business profile</span></button></div>
-    </header> <div className="min-h-0 flex-1 flex overflow-hidden">
+      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+        <div className="hidden lg:block"><NavigationMenu sections={navSections} activeKey={activeNav} onSelect={selectNav} /></div>
+        <button onClick={() => setCommandPaletteOpen(true)} className="inline-flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--surface)] border border-[var(--border)] hover:border-[var(--border-strong)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-brand)]" aria-label="Open search" title="Search"><Search className="w-3.5 h-3.5" /></button>
+        <button onClick={() => setNotificationDrawerOpen(true)} className="relative p-2 rounded-[var(--radius-sm)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-brand)]" title="Decision feed" aria-label="Open decision feed"><Bell className="w-4 h-4" /></button>
+        <button
+          onClick={() => { setWorkspaceMenuOpen(false); setActiveNav('settings'); }}
+          className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--radius-sm)] text-[11px] font-medium border bg-[var(--surface)] text-[var(--text-secondary)] border-[var(--border)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-brand)]"
+          aria-label="Open Business profile"
+          title="Business profile"
+        >
+          <Building className="w-3 h-3" /><span>Business profile</span>
+        </button>
+      </div>
+    </header>
+    <div className="min-h-0 flex-1 flex overflow-hidden">
       <aside role="navigation" aria-label="Primary navigation" className={`${collapsed ? 'w-16' : 'w-[280px]'} hidden lg:flex min-h-0 flex-col bg-[var(--sidebar)] border-r border-[var(--border)] shrink-0 select-none overflow-hidden transition-[width] duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]`}>
         <div className={`h-12 shrink-0 border-b border-[var(--border)] flex items-center ${collapsed ? 'justify-center px-2' : 'justify-between px-3'}`}>{!collapsed && <p className="text-[10px] font-medium text-[var(--text-muted)]">Navigation</p>}<button type="button" onClick={toggleCollapsed} className="inline-flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-brand)]" aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'} aria-expanded={!collapsed} title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}><PanelLeft className="w-4 h-4" /></button></div>
         <Sidebar sections={navSections} activeKey={activeNav} onSelect={selectNav} collapsed={collapsed} />
