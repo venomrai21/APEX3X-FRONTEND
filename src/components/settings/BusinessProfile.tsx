@@ -350,8 +350,7 @@ export const BusinessProfile: React.FC<{
     return Math.round((required.filter(Boolean).length / required.length) * 100);
   }, [draft]);
 
-  const stage2Complete = useMemo(() => [draft.beliefs, draft.evidence, draft.uncertainty, draft.motivation, draft.constraints, draft.customerSegments.length, draft.salesJourney, draft.goals.length].filter(Boolean).length;
-  }, [draft]);
+  const stage2Complete = useMemo(() => [draft.beliefs, draft.evidence, draft.uncertainty, draft.motivation, draft.constraints, draft.customerSegments.length, draft.salesJourney, draft.goals.length].filter(Boolean).length, [draft]);
 
   const stage3Complete = useMemo(() => {
     const checks = [draft.legalName || draft.tradingName, draft.entityType, draft.employeeRange, draft.serviceArea, draft.acceptedPayments.length, draft.paymentTerms || draft.averageTransactionValue];
