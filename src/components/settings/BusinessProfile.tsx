@@ -448,6 +448,8 @@ export const BusinessProfile: React.FC<{
 
   const removeById = <T extends { id: string }>(items: T[], id: string) => items.filter(item => item.id !== id);
 
+  if (!profileLoaded) return <div className="space-y-5"><Card padding="lg"><div className="text-sm text-[var(--text-secondary)]">Loading your cloud business context…</div></Card></div>;
+
   return (
     <div className="space-y-5">
       <Card padding="lg" className="space-y-5">
