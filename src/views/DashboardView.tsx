@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { AlertTriangle, Bot, CheckCircle2, DollarSign, TrendingUp, ShieldCheck, Zap, ChevronRight, Sparkles } from 'lucide-react';
+import { AlertTriangle, Bot, CheckCircle2, DollarSign, TrendingUp, ShieldCheck, Zap, ChevronRight, Sparkles, Building2, Users, Target, Settings2 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { api } from '../api/client';
-import { DashboardSummary } from '../types';
+import { DashboardSummary, BusinessProfileData } from '../types';
 import { Badge, Button, Card, Skeleton, APEXMetric, APEXReveal, APEXSpotlight, AnimatedList, AnimatedProgress, ExpandableCard, PinnedList } from '../components/apex3x';
 
 export const DashboardView: React.FC = () => {
@@ -10,7 +10,7 @@ export const DashboardView: React.FC = () => {
   const [data, setData] = useState<DashboardSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [executingId, setExecutingId] = useState<string | null>(null);
-  const [pinnedDealIds, setPinnedDealIds] = useState<string[]>([]);
+  const [pinnedDealIds, setPinnedDealIds] = useState<string[]>([]);\n  const [businessProfile, setBusinessProfile] = useState<BusinessProfileData | null>(null);
 
   const fetchDashboard = async () => {
     try { setLoading(true); setData(await api.getDashboardSummary()); }
@@ -18,7 +18,7 @@ export const DashboardView: React.FC = () => {
     finally { setLoading(false); }
   };
 
-  useEffect(() => { fetchDashboard(); }, [refreshKey]);
+  useEffect(() => { fetchDashboard(); api.getBusinessProfile().then(setBusinessProfile).catch(err => console.error('Failed fetching business profile:', err)); }, [refreshKey]);
 
   const handleExecuteAction = async (alertId: string) => {
     try {
@@ -69,6 +69,44 @@ export const DashboardView: React.FC = () => {
         <Card variant="default" padding="md" className="border-0 bg-transparent"><div className="flex items-center justify-between"><span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">System Health</span><span className="p-1.5 rounded-lg bg-white/[0.05] text-zinc-300 border border-white/[0.08]"><ShieldCheck className="w-4 h-4" /></span></div><div className="mt-3"><APEXMetric value={metrics.systemHealth} suffix="%" className="text-2xl font-serif-display font-bold text-zinc-100" /><AnimatedProgress value={metrics.systemHealth} label="Live health signal" showValue={false} className="mt-2" /><div className="text-[11px] text-zinc-400 mt-1">{metrics.connectedIntegrationsCount} connected integrations reported</div></div></Card>
       </APEXSpotlight>
     </div>
+
+    <APEXReveal delay={0.04}>
+      <Card variant="improved" padding="lg" className="border-white/[0.08]">
+        <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 pb-4 border-b border-white/[0.07]">
+          <div>
+            <h3 className="text-sm font-semibold text-zinc-100 uppercase tracking-wider flex items-center gap-2"><Building2 className="w-4 h-4 text-zinc-300" /> APEX Business Understanding</h3>
+            <p className="text-xs text-zinc-400 mt-1">What APEX currently knows about this business, backed by cloud-persisted profile context.</p>
+          </div>
+          <button onClick={() => setActiveNav('settings')} className="text-xs text-zinc-300 hover:text-white font-medium flex items-center gap-1">View complete profile <ChevronRight className="w-3 h-3" /></button>
+        </div>
+        {businessProfile ? (() => {
+          const p = businessProfile.profile || {};
+          const offers = Array.isArray(p.products) ? p.products.filter((item: any) => item?.name).length : 0;
+          const customers = Array.isArray(p.targetCustomers) ? p.targetCustomers.join(', ') : (p.targetCustomerDescription || 'Not yet defined');
+          const models = Array.isArray(p.businessModels) ? p.businessModels.join(', ') : 'Not yet defined';
+          const goals = Array.isArray(p.growthPriorities) ? p.growthPriorities.join(', ') : (Array.isArray(p.goals) ? p.goals.map((g: any) => g?.goal).filter(Boolean).join(', ') : 'Not yet defined');
+          const field = (value: any, fallback = 'Not yet defined') => String(value || '').trim() || fallback;
+          const items = [
+            { icon: Building2, label: 'Business Foundation', values: [field(p.businessName), field(p.industry), field(p.market || p.location), field(models), `${offers} offer${offers === 1 ? '' : 's'} defined`] },
+            { icon: Users, label: 'Customer Understanding', values: [customers, field(p.primaryAcquisitionChannel || p.acquisitionChannels?.[0]), field(p.biggestChallenge || p.challenges)] },
+            { icon: DollarSign, label: 'Revenue & Sales', values: [field(p.salesJourney), field(p.salesCycle || p.typicalSalesCycle), field(p.conversionDefinition), field(p.averageTransactionValue), field(p.paymentTerms)] },
+            { icon: Settings2, label: 'Operations', values: [field(p.serviceArea), field(p.businessHours), field(p.languages), field(p.capacity)] },
+            { icon: Target, label: 'Goals & Priorities', values: [field(p.currentCondition), field(p.biggestChallenge), goals] },
+          ];
+          return <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-3 pt-4">
+            {items.map(({ icon: Icon, label, values }) => <div key={label} className="rounded-lg border border-white/[0.07] bg-[#0b0b11] p-4 min-h-[150px]">
+              <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-zinc-200"><Icon className="w-3.5 h-3.5 text-zinc-400" />{label}</div>
+              <div className="mt-3 space-y-2">{values.map((value, index) => <div key={index} className={index === 0 ? 'text-xs text-zinc-200 leading-snug' : 'text-[10px] text-zinc-500 leading-snug'}>{value}</div>)}</div>
+            </div>)}
+          </div>;
+        })() : <div className="pt-4 text-xs text-zinc-500">Business understanding will appear here after the cloud profile is available.</div>}
+        {businessProfile && <div className="mt-4 flex flex-wrap items-center gap-2 text-[10px] text-zinc-500">
+          <span className="rounded-full border border-white/[0.07] px-2 py-1">Cloud source</span>
+          <span className="rounded-full border border-white/[0.07] px-2 py-1">{businessProfile.foundationCompleted ? 'Foundation confirmed' : 'Foundation incomplete'}</span>
+          <span className="rounded-full border border-white/[0.07] px-2 py-1">Updated {businessProfile.updatedAt ? new Date(businessProfile.updatedAt).toLocaleString() : 'not yet'}</span>
+        </div>}
+      </Card>
+    </APEXReveal>
 
     <APEXReveal delay={0.05}>
       <Card variant="improved" padding="lg" className="border-white/[0.08]"><div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-white/[0.07]"><div><h3 className="text-sm font-semibold text-zinc-100 uppercase tracking-wider flex items-center gap-2"><Zap className="w-4 h-4 text-zinc-300" /> Operating Cycle</h3><p className="text-xs text-zinc-400 mt-0.5">The operating cycle is represented from current workspace data.</p></div><Badge variant="default" size="sm"><CheckCircle2 className="w-3 h-3" /> Recovered ${autonomousCycleStatus.recoveredRevenueMonth.toLocaleString()} this month</Badge></div><div className="grid grid-cols-1 sm:grid-cols-5 gap-3 pt-4">{cycleSteps.map(item => <div key={item.step} className="p-3 rounded-lg border bg-[#0b0b11] border-white/[0.07] space-y-1.5"><div className="flex items-center justify-between"><span className="text-[11px] font-mono font-semibold text-zinc-200">{item.step}</span></div><p className="text-[11px] text-zinc-400 leading-snug">{item.desc}</p><p className="text-[10px] font-mono text-zinc-500 pt-1">{item.label}</p></div>)}</div></Card>
