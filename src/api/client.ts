@@ -1,19 +1,36 @@
-import { Workspace, User, Lead, Customer, ConversationThread, ConversationMessage, Appointment, PipelineDeal, Invoice, WebsiteForm, WorkflowRule, WorkflowExecutionLog, IntegrationConnection, AIProviderConfig, AutonomousAlert, SecurityAuditRecord, BillingEntitlement, DashboardSummary, BrainAuditResponse, MarketingOverview, BusinessInsightsData } from '../types';
+import { Workspace, User, Lead, Customer, ConversationThread, ConversationMessage, Appointment, PipelineDeal, Invoice, WebsiteForm, WorkflowRule, WorkflowExecutionLog, IntegrationConnection, AIProviderConfig, AutonomousAlert, SecurityAuditRecord, BillingEntitlement, DashboardSummary, BrainAuditResponse, MarketingOverview, BusinessInsightsData, BusinessProfileData } from '../types';
 import { UniversalConnectionDraft } from '../components/integrations/UniversalConnector';
 
-/** UI-only phase: this client intentionally cannot contact the SaaS backend. */
-export const UI_PREVIEW_MODE = true;
+/** Cloud-first API client. No business profile data is persisted in browser storage. */
+export const UI_PREVIEW_MODE = false;
 let currentActiveWorkspaceId = '';
 export function setActiveWorkspaceId(id: string) { currentActiveWorkspaceId = id; }
 export function getActiveWorkspaceId(): string { return currentActiveWorkspaceId; }
 
-async function request<T>(_endpoint: string, _options: RequestInit = {}): Promise<T> {
-  void currentActiveWorkspaceId;
-  throw new Error('SaaS API access is unavailable in this UI environment.');
+function getSessionToken(): string {
+  if (typeof window === 'undefined') return '';
+  return sessionStorage.getItem('apex.session.token')
+    || localStorage.getItem('apex.session.token')
+    || localStorage.getItem('apex.sessionToken')
+    || '';
+}
+
+async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+  const baseUrl = String(import.meta.env.VITE_API_BASE_URL || '').replace(/\\/$/, '');
+  const token = getSessionToken();
+  const headers = new Headers(options.headers || {});
+  if (!headers.has('Content-Type') && options.body) headers.set('Content-Type', 'application/json');
+  if (token) headers.set('Authorization', `Bearer ${token}`);
+  if (currentActiveWorkspaceId) headers.set('x-workspace-id', currentActiveWorkspaceId);
+
+  const response = await fetch(`${baseUrl}${endpoint}`, { ...options, headers, credentials: 'include' });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(payload?.error || `Request failed (${response.status})`);
+  return payload as T;
 }
 
 export const api = {
-  getMe: () => request<{ user: User; workspace: Workspace }>('/api/auth/me'),
+  getMe: () => request<{ user: User; workspace: Workspace }>('/api/auth/me'),\n  getBusinessProfile: () => request<BusinessProfileData>('/api/business-profile'),\n  updateBusinessProfile: (data: { profile: Record<string, any>; foundationCompleted: boolean; stage2CompletedCount: number; stage3Completion: number }) => request<BusinessProfileData>('/api/business-profile', { method: 'PUT', body: JSON.stringify(data) }),
   getWorkspaces: () => request<Workspace[]>('/api/workspaces'),
   createWorkspace: (data: Partial<Workspace>) => request<Workspace>('/api/workspaces', { method: 'POST', body: JSON.stringify(data) }),
   updateWorkspace: (data: Partial<Workspace> & { logoUrl?: string }) => request<Workspace>('/api/workspace', { method: 'PUT', body: JSON.stringify(data) }),
