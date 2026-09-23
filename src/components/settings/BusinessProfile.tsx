@@ -601,7 +601,7 @@ export const BusinessProfile: React.FC<{
           </Section>
 
           <Section title="Business Story" description="Give APEX the context that normally takes a human advisor months to learn.">
-            <TextAreaField id="bp-story" label="Business overview" value={draft.story} onChange={value => update('story', value)} placeholder="How did the business start, what does it do today, and what matters most?" />
+            <TextAreaField id="bp-business-overview" label="Business overview" value={draft.story} onChange={value => update('story', value)} placeholder="How did the business start, what does it do today, and what matters most?" />
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <TextAreaField id="bp-mission" label="Mission" value={draft.mission} onChange={value => update('mission', value)} />
               <TextAreaField id="bp-vision" label="Vision" value={draft.vision} onChange={value => update('vision', value)} />
