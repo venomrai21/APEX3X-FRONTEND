@@ -325,14 +325,8 @@ export const BusinessProfile: React.FC<{
   onWorkspaceUpdated: (workspace: Workspace) => void;
 }> = ({ workspace, addToast, onWorkspaceUpdated }) => {
   const [activeStage, setActiveStage] = useState<StageId>(1);
-  const [draft, setDraft] = useState<BusinessProfileDraft>(() => {
-    try {
-      const saved = localStorage.getItem('apex.businessProfile.draft');
-      return saved ? { ...createDraft(workspace), ...JSON.parse(saved) } : createDraft(workspace);
-    } catch {
-      return createDraft(workspace);
-    }
-  });
+  const [draft, setDraft] = useState<BusinessProfileDraft>(() => createDraft(workspace));
+  const [profileLoaded, setProfileLoaded] = useState(false);
   const [savingStage, setSavingStage] = useState<StageId | null>(null);
   const [expandedProduct, setExpandedProduct] = useState<string | null>(null);
   const [expandedSegment, setExpandedSegment] = useState<string | null>(null);
@@ -358,20 +352,23 @@ export const BusinessProfile: React.FC<{
   }, [draft]);
 
   const stageReady = stage1Complete === 100;
-  const [foundationCompleted, setFoundationCompleted] = useState<boolean>(() => {
-    try { return localStorage.getItem('apex.businessProfile.completion') === 'true'; } catch { return false; }
-  });
+  const [foundationCompleted, setFoundationCompleted] = useState(false);
 
   useEffect(() => {
-    try { localStorage.setItem('apex.businessProfile.draft', JSON.stringify(draft)); } catch {}
-  }, [draft]);
-
-  useEffect(() => {
-    if (stageReady && !foundationCompleted) {
-      try { localStorage.setItem('apex.businessProfile.completion', 'true'); } catch {}
-      setFoundationCompleted(true);
-    }
-  }, [stageReady, foundationCompleted]);
+    let cancelled = false;
+    api.getBusinessProfile().then(result => {
+      if (cancelled) return;
+      setDraft(previous => ({ ...previous, ...result.profile }));
+      setFoundationCompleted(result.foundationCompleted);
+      setProfileLoaded(true);
+    }).catch(error => {
+      if (!cancelled) {
+        setProfileLoaded(true);
+        addToast({ type: 'warning', title: 'Business profile unavailable', description: error instanceof Error ? error.message : 'Unable to load cloud business context.' });
+      }
+    });
+    return () => { cancelled = true; };
+  }, [addToast]);
 
   const coverage = useMemo(() => [
     { label: 'Business Foundation', ready: stageReady },
@@ -411,10 +408,18 @@ export const BusinessProfile: React.FC<{
         });
         onWorkspaceUpdated(updated);
       }
+      const saved = await api.updateBusinessProfile({
+        profile: draft as unknown as Record<string, any>,
+        foundationCompleted: stage === 1 ? stageReady : foundationCompleted,
+        stage2CompletedCount: stage2Complete,
+        stage3Completion: stage3Complete,
+      });
+      setFoundationCompleted(saved.foundationCompleted);
+      setProfileLoaded(true);
       addToast({
         type: 'success',
         title: `Stage ${stage} saved`,
-        description: stage === 1 ? 'Your business foundation is ready for APEX.' : 'Your additional business context is captured in the frontend profile.',
+        description: 'Your business context is now stored in APEX cloud storage.',
       });
     } catch (error) {
       addToast({ type: 'error', title: 'Save failed', description: error instanceof Error ? error.message : 'Unable to save the profile.' });
