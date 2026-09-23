@@ -21,6 +21,7 @@ interface AppContextType {
   activeNav: NavItemKey;
   setActiveNav: (nav: NavItemKey) => void;
   switchWorkspace: (workspaceId: string) => Promise<void>;
+  deleteWorkspace: (workspaceId: string) => Promise<void>;
   refreshWorkspaces: () => Promise<void>;
   themeMode: ThemeMode;
   setThemeMode: (mode: ThemeMode) => void;
@@ -123,6 +124,28 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     addToast({ type: 'info', title: 'Workspace switched', description: `Now operating in ${target.name}.` });
   };
 
+  const deleteWorkspace = async (workspaceId: string) => {
+    if (availableWorkspaces.length <= 1) {
+      addToast({ type: 'warning', title: 'Cannot delete', description: 'At least one workspace must remain.' });
+      return;
+    }
+    const target = availableWorkspaces.find(w => w.id === workspaceId);
+    if (!target) return;
+
+    const remaining = availableWorkspaces.filter(w => w.id !== workspaceId);
+    setAvailableWorkspaces(remaining);
+
+    if (currentWorkspace?.id === workspaceId) {
+      const next = remaining[0];
+      setCurrentWorkspace(next);
+      setCurrentUser(previous => previous ? { ...previous, workspaceId: next.id } : previous);
+      addToast({ type: 'info', title: 'Workspace deleted', description: `Switched to ${next.name}.` });
+    } else {
+      addToast({ type: 'success', title: 'Workspace deleted', description: `${target.name} removed.` });
+    }
+    triggerRefresh();
+  };
+
   const refreshWorkspaces = async () => {
     setAvailableWorkspaces(previous => previous);
   };
@@ -162,6 +185,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       activeNav,
       setActiveNav,
       switchWorkspace,
+      deleteWorkspace,
       refreshWorkspaces,
       themeMode,
       setThemeMode,
