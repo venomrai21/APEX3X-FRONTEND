@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { NavItemKey, Organisation, User, Workspace } from '../types';
+import { api, setActiveWorkspaceId } from '../api/client';
 
 export type ThemeMode = 'dark' | 'light' | 'system';
 
@@ -149,6 +150,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const refreshWorkspaces = async () => {
     setAvailableWorkspaces(previous => previous);
   };
+
+  useEffect(() => {
+    setActiveWorkspaceId(currentWorkspace?.id || '');
+  }, [currentWorkspace?.id]);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!localStorage.getItem('apex.session.token') && !sessionStorage.getItem('apex.session.token')) return;
+    api.getMe().then(result => {
+      if (cancelled) return;
+      setCurrentUser(result.user);
+      setCurrentWorkspace(result.workspace);
+      setAvailableWorkspaces([result.workspace]);
+    }).catch(() => {
+      if (!cancelled) setCurrentUser(null);
+    });
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     applyTheme(themeMode);
