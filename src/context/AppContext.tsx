@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { NavItemKey, Organisation, User, Workspace } from '../types';
 import { api, setActiveWorkspaceId } from '../api/client';
 
-export type ThemeMode = 'dark' | 'light' | 'system';
+export type ThemeMode = 'dark';
 
 export interface ToastMessage {
   id: string;
@@ -24,8 +24,6 @@ interface AppContextType {
   switchWorkspace: (workspaceId: string) => Promise<void>;
   deleteWorkspace: (workspaceId: string) => Promise<void>;
   refreshWorkspaces: () => Promise<void>;
-  themeMode: ThemeMode;
-  setThemeMode: (mode: ThemeMode) => void;
   commandPaletteOpen: boolean;
   setCommandPaletteOpen: (open: boolean) => void;
   connectDrawerOpen: boolean;
@@ -65,14 +63,10 @@ const INITIAL_WORKSPACE: Workspace = {
   createdAt: '',
 };
 
-const getStoredTheme = (): ThemeMode => 'dark';
-
-const applyTheme = (mode: ThemeMode) => {
+const applyTheme = () => {
   if (typeof document === 'undefined') return;
-  document.documentElement.dataset.theme = mode;
-  document.documentElement.style.colorScheme = mode === 'system'
-    ? (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
-    : mode;
+  document.documentElement.dataset.theme = 'dark';
+  document.documentElement.style.colorScheme = 'dark';
 };
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -81,7 +75,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [availableWorkspaces, setAvailableWorkspaces] = useState<Workspace[]>([INITIAL_WORKSPACE]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [activeNav, setActiveNav] = useState<NavItemKey>('dashboard');
-  const [themeMode, setThemeModeState] = useState<ThemeMode>(getStoredTheme);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [connectDrawerOpen, setConnectDrawerOpen] = useState(false);
   const [notificationDrawerOpen, setNotificationDrawerOpen] = useState(false);
@@ -99,11 +92,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const updated = { ...currentWorkspace, ...data };
     setCurrentWorkspace(updated);
     setAvailableWorkspaces(workspaces => workspaces.map(workspace => workspace.id === updated.id ? updated : workspace));
-  };
-
-  const setThemeMode = (mode: ThemeMode) => {
-    setThemeModeState(mode);
-    applyTheme(mode);
   };
 
   const triggerRefresh = () => setRefreshKey(prev => prev + 1);
@@ -170,16 +158,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, []);
 
   useEffect(() => {
-    applyTheme(themeMode);
-  }, [themeMode]);
-
-  useEffect(() => {
-    if (themeMode !== 'system') return;
-    const media = window.matchMedia('(prefers-color-scheme: light)');
-    const handleChange = () => applyTheme('system');
-    media.addEventListener('change', handleChange);
-    return () => media.removeEventListener('change', handleChange);
-  }, [themeMode]);
+    applyTheme();
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -206,8 +186,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       switchWorkspace,
       deleteWorkspace,
       refreshWorkspaces,
-      themeMode,
-      setThemeMode,
       commandPaletteOpen,
       setCommandPaletteOpen,
       connectDrawerOpen,
