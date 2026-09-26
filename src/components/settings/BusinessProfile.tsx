@@ -356,6 +356,7 @@ export const BusinessProfile: React.FC<{
   const [activeStage, setActiveStage] = useState<StageId>(1);
   const [draft, setDraft] = useState<BusinessProfileDraft>(() => createDraft());
   const [profileLoaded, setProfileLoaded] = useState(false);
+  const [profileLoadError, setProfileLoadError] = useState<string | null>(null);
   const [savingStage, setSavingStage] = useState<StageId | null>(null);
   const [expandedProduct, setExpandedProduct] = useState<string | null>(null);
   const [expandedSegment, setExpandedSegment] = useState<string | null>(null);
@@ -389,15 +390,16 @@ export const BusinessProfile: React.FC<{
       if (cancelled) return;
       setDraft(previous => ({ ...previous, ...result.profile }));
       setFoundationCompleted(result.foundationCompleted);
+      setProfileLoadError(null);
       setProfileLoaded(true);
     }).catch(error => {
       if (!cancelled) {
         setProfileLoaded(true);
-        addToast({ type: 'warning', title: 'Business profile unavailable', description: error instanceof Error ? error.message : 'Unable to load cloud business context.' });
+        setProfileLoadError(error instanceof Error ? error.message : 'Unable to load cloud business context.');
       }
     });
     return () => { cancelled = true; };
-  }, [addToast]);
+  }, []);
 
   const coverage = useMemo(() => [
     { label: 'Business Basics', ready: stageReady },
@@ -471,6 +473,14 @@ export const BusinessProfile: React.FC<{
 
   return (
     <div className="space-y-5">
+      {profileLoadError && (
+        <Card padding="md">
+          <div className="text-xs font-semibold text-[var(--text-primary)]">Cloud business profile not connected</div>
+          <p className="mt-1 text-[11px] leading-relaxed text-[var(--text-secondary)]">
+            The form is blank because no business profile data was returned by the connected API. No sample business data is being inserted.
+          </p>
+        </Card>
+      )}
       <Card padding="lg" className="space-y-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-2xl">
