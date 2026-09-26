@@ -23,6 +23,8 @@ jobs:
         run: npm install --no-save playwright@1.55.0
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
+      - name: Wait for Pages deployment propagation
+        run: sleep 45
       - name: Verify live UI
         run: |
           node --input-type=module <<'EOF'
