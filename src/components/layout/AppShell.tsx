@@ -19,7 +19,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
   const workspaceMenuRef = useRef<HTMLDivElement>(null);
   const { collapsed, mobileOpen, dragX, drawerRef, mobileTriggerRef, toggleCollapsed, openMobile, closeMobile, handlePointerDown, handlePointerMove, handlePointerUp, handlePointerCancel, edgeWidth } = useSidebarInteraction();
   const navSections: NavSection[] = [
-    { title: 'Core', items: [{ key: 'dashboard', label: 'Command Center', icon: <LayoutDashboard className="w-4 h-4" /> }, { key: 'conversations', label: 'Conversations', icon: <MessageSquare className="w-4 h-4" /> }] },
+    { title: 'Core', items: [{ key: 'dashboard', label: 'Command Center', icon: <LayoutDashboard className="w-4 h-4" /> }, { key: 'conversations', label: 'Conversations', icon: <MessageSquare className="w-4 h-4" /> }, { key: 'business_profile', label: 'Business Profile', icon: <Building className="w-4 h-4" /> }] },
     { title: 'Attract & Capture', items: [{ key: 'campaigns', label: 'Campaigns', icon: <Target className="w-4 h-4" /> }, { key: 'advertising', label: 'Advertising', icon: <Megaphone className="w-4 h-4" /> }, { key: 'creative_library', label: 'Creative Library', icon: <FolderOpen className="w-4 h-4" /> }, { key: 'social_publishing', label: 'Social Publishing', icon: <MessageSquare className="w-4 h-4" /> }, { key: 'forms', label: 'Forms & Web Capture', icon: <FileText className="w-4 h-4" /> }, { key: 'growth_intelligence', label: 'Growth Intelligence', icon: <Activity className="w-4 h-4" /> }] },
     { title: 'Qualify & Convert', items: [{ key: 'leads', label: 'Leads', icon: <Users className="w-4 h-4" /> }, { key: 'customers', label: 'Customers', icon: <Building className="w-4 h-4" /> }] },
     { title: 'Book & Schedule', items: [{ key: 'bookings', label: 'Bookings & Calendar', icon: <Calendar className="w-4 h-4" /> }] },
@@ -37,6 +37,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
       brain: 'APEX Brain',
       insights: 'Business Insights',
       conversations: 'Conversations',
+      business_profile: 'Business Profile',
       campaigns: 'Campaigns',
       advertising: 'Advertising',
       creative_library: 'Creative Library',
@@ -165,7 +166,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
         <button onClick={() => setCommandPaletteOpen(true)} className="inline-flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--surface)] border border-[var(--border)] hover:border-[var(--border-strong)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-brand)]" aria-label="Open search" title="Search"><Search className="w-3.5 h-3.5" /></button>
         <button onClick={() => setNotificationDrawerOpen(true)} className="relative p-2 rounded-[var(--radius-sm)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-brand)]" title="Decision feed" aria-label="Open decision feed"><Bell className="w-4 h-4" /></button>
         <button
-          onClick={() => { setWorkspaceMenuOpen(false); setActiveNav('settings'); }}
+          onClick={() => { setWorkspaceMenuOpen(false); setActiveNav('business_profile'); }}
           className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--radius-sm)] text-[11px] font-medium border bg-[var(--surface)] text-[var(--text-secondary)] border-[var(--border)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-brand)]"
           aria-label="Open Business profile"
           title="Business profile"
