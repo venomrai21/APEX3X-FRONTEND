@@ -4,7 +4,6 @@ import {
   MapPin, Plus, Save, Sparkles, Target, Trash2, Users, X
 } from 'lucide-react';
 import { api } from '../../api/client';
-import { Workspace } from '../../types';
 import { Badge, Button, Card, Input, Select } from '../apex3x';
 
 type StageId = 1 | 2 | 3;
@@ -352,9 +351,7 @@ const TextAreaField: React.FC<{ id: string; label: string; value: string; onChan
 );
 
 export const BusinessProfile: React.FC<{
-  workspace: Workspace | null;
   addToast: (toast: { type: 'success' | 'warning' | 'error' | 'info'; title: string; description?: string }) => void;
-  onWorkspaceUpdated: (workspace: Workspace) => void;
 }> = ({ addToast }) => {
   const [activeStage, setActiveStage] = useState<StageId>(1);
   const [draft, setDraft] = useState<BusinessProfileDraft>(() => createDraft());
@@ -440,7 +437,7 @@ export const BusinessProfile: React.FC<{
       setProfileLoaded(true);
       addToast({
         type: 'success',
-        title: `Stage ${stage} saved`,
+        title: `Step ${stage} saved`,
         description: 'Your business context is now stored in APEX cloud storage.',
       });
     } catch (error) {
