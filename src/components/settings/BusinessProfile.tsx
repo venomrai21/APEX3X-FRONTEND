@@ -539,7 +539,7 @@ export const BusinessProfile: React.FC<{
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">Step 1 · Required to get started</div>
-              <h3 className="mt-1 text-lg font-semibold text-[var(--text-primary)]">Business Foundation</h3>
+              <h3 className="mt-1 text-lg font-semibold text-[var(--text-primary)]">Business Basics</h3>
               <p className="mt-1 max-w-2xl text-xs leading-relaxed text-[var(--text-secondary)]">The smallest useful business context. Complete this stage and enter APEX; everything deeper can wait.</p>
             </div>
             <Badge variant={stageReady ? 'success' : 'neutral'} size="sm">{stageReady ? 'READY TO USE APEX' : 'FOUNDATION INCOMPLETE'}</Badge>
@@ -743,7 +743,7 @@ export const BusinessProfile: React.FC<{
           </Section>
 
           <div className="flex flex-col gap-3 border-t border-[var(--border-subtle)] pt-6 sm:flex-row sm:items-center sm:justify-between">
-            <div><div className="text-xs font-semibold text-[var(--text-primary)]">Business Discovery</div><p className="mt-1 text-[10px] text-[var(--text-muted)]">Save this stage whenever you are ready. You can leave and return later.</p></div>
+            <div><div className="text-xs font-semibold text-[var(--text-primary)]">How Your Business Works</div><p className="mt-1 text-[10px] text-[var(--text-muted)]">Save this stage whenever you are ready. You can leave and return later.</p></div>
             <Button variant="primary" size="md" isLoading={savingStage === 2} onClick={() => saveStage(2)} leftIcon={<Save className="h-4 w-4" />}>Save Business Details</Button>
           </div>
         </Card>
