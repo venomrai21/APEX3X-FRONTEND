@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
-  ArrowRight, Check, ChevronDown, CircleHelp, FileCheck2, Gauge,
+  ArrowRight, Check, ChevronDown, FileCheck2, Gauge,
   MapPin, Plus, Save, Sparkles, Target, Trash2, Users, X
 } from 'lucide-react';
 import { api } from '../../api/client';
@@ -305,9 +305,41 @@ const Section: React.FC<{ title: string; description: string; children: React.Re
   </section>
 );
 
+const FIELD_INFO: Record<string, string> = {
+  'Business Name': 'Enter the business name APEX should use as the workspace business identity.',
+  'Industry': 'Choose the industry that most closely describes what the business does.',
+  'What does your business do?': 'Describe what the business provides, who it serves, and the problem it solves.',
+  'Business ID': 'Enter the applicable business or government identifier for the business. The label stays jurisdiction-neutral.',
+  'Registered Headquarters Address': 'Enter the legally registered headquarters address.',
+  'Website': 'Enter the official business website URL.',
+};
+
+const FieldLabel: React.FC<{ label: string }> = ({ label }) => {
+  const details = FIELD_INFO[label] || `Enter the business-specific value for ${label.toLowerCase()}. Leave it blank when it does not apply.`;
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      <span>{label}</span>
+      <span className="group relative inline-flex h-3.5 w-3.5 items-center justify-center rounded-full border border-[var(--border-strong)] text-[9px] font-semibold leading-none text-[var(--text-muted)]">
+        <span aria-hidden="true">i</span>
+        <span role="tooltip" className="pointer-events-none invisible absolute left-0 top-full z-50 mt-2 w-64 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2 text-[11px] font-normal leading-relaxed text-[var(--text-secondary)] opacity-0 shadow-xl transition-[opacity,visibility] duration-100 group-hover:visible group-hover:opacity-100">
+          {details}
+        </span>
+      </span>
+    </span>
+  );
+};
+
+const BPInput: React.FC<React.ComponentProps<typeof Input>> = ({ label, ...props }) => (
+  <Input {...props} label={typeof label === 'string' ? <FieldLabel label={label} /> : label} />
+);
+
+const BPSelect: React.FC<React.ComponentProps<typeof Select>> = ({ label, ...props }) => (
+  <Select {...props} label={typeof label === 'string' ? <FieldLabel label={label} /> : label} />
+);
+
 const TextAreaField: React.FC<{ id: string; label: string; value: string; onChange: (value: string) => void; placeholder?: string; required?: boolean }> = ({ id, label, value, onChange, placeholder, required }) => (
   <label htmlFor={id} className="block">
-    <span className="mb-1.5 block text-xs font-medium text-[var(--text-secondary)]">{label}{required && <span className="ml-1 text-[var(--text-primary)]">*</span>}</span>
+    <span className="mb-1.5 block text-xs font-medium text-[var(--text-secondary)]"><FieldLabel label={label} />{required && <span className="ml-1 text-[var(--text-primary)]">*</span>}</span>
     <textarea
       id={id}
       value={value}
@@ -528,8 +560,8 @@ export const BusinessProfile: React.FC<{
 
           <Section title="Identity" description="Tell APEX what the business is. These are the only identity fields required at activation.">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <Input id="bp-business-name" label="Business Name" value={draft.businessName} onChange={event => update('businessName', event.target.value)} required />
-              <Input id="bp-industry" label="Industry" value={draft.industry} onChange={event => update('industry', event.target.value)} placeholder="e.g. Home Services · Cleaning" required />
+              <BPInput id="bp-business-name" label="Business Name" value={draft.businessName} onChange={event => update('businessName', event.target.value)} required />
+              <BPInput id="bp-industry" label="Industry" value={draft.industry} onChange={event => update('industry', event.target.value)} placeholder="e.g. Home Services · Cleaning" required />
             </div>
             <TextAreaField id="bp-description" label="What does your business do?" value={draft.description} onChange={value => update('description', value)} placeholder="Describe what you provide, who you help, and the problem you solve." required />
           </Section>
@@ -547,8 +579,8 @@ export const BusinessProfile: React.FC<{
                   </button>
                   {expandedProduct === product.id && (
                     <div className="grid grid-cols-1 gap-4 border-t border-[var(--border-subtle)] p-4 md:grid-cols-2">
-                      <Input id={`product-name-${product.id}`} label="Name" value={product.name} onChange={event => updateProduct(product.id, { name: event.target.value })} required />
-                      <Select id={`product-type-${product.id}`} label="Type" value={product.type} onChange={event => updateProduct(product.id, { type: event.target.value })} options={[{ value: 'product', label: 'Product' }, { value: 'service', label: 'Service' }, { value: 'subscription', label: 'Subscription' }, { value: 'membership', label: 'Membership' }, { value: 'package', label: 'Package' }, { value: 'other', label: 'Other' }]} />
+                      <BPInput id={`product-name-${product.id}`} label="Name" value={product.name} onChange={event => updateProduct(product.id, { name: event.target.value })} required />
+                      <BPSelect id={`product-type-${product.id}`} label="Type" value={product.type} onChange={event => updateProduct(product.id, { type: event.target.value })} options={[{ value: 'product', label: 'Product' }, { value: 'service', label: 'Service' }, { value: 'subscription', label: 'Subscription' }, { value: 'membership', label: 'Membership' }, { value: 'package', label: 'Package' }, { value: 'other', label: 'Other' }]} />
                       <div className="md:col-span-2"><TextAreaField id={`product-description-${product.id}`} label="Short description" value={product.description} onChange={value => updateProduct(product.id, { description: value })} /></div>
                       <div className="md:col-span-2 flex justify-end"><Button variant="ghost" size="sm" onClick={() => update('products', removeById(draft.products, product.id))} leftIcon={<Trash2 className="h-3.5 w-3.5" />}>Remove</Button></div>
                     </div>
@@ -570,8 +602,8 @@ export const BusinessProfile: React.FC<{
 
           <Section title="Location & Market" description="Physical headquarters and customer market are separate concepts. Provide either or both as applicable.">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <Input id="bp-location" label="Primary Business Location" value={draft.location} onChange={event => update('location', event.target.value)} placeholder="Business address or primary operating location" />
-              <Select id="bp-market" label="Primary Market / Service Area" value={draft.market} onChange={event => update('market', event.target.value)} options={[{ value: '', label: 'Select market' }, { value: 'local', label: 'Local' }, { value: 'city', label: 'City / metro' }, { value: 'regional', label: 'Multiple cities / region' }, { value: 'national', label: 'National' }, { value: 'international', label: 'International' }, { value: 'online', label: 'Online / global' }]} />
+              <BPInput id="bp-location" label="Primary Business Location" value={draft.location} onChange={event => update('location', event.target.value)} placeholder="Business address or primary operating location" />
+              <BPSelect id="bp-market" label="Primary Market / Service Area" value={draft.market} onChange={event => update('market', event.target.value)} options={[{ value: '', label: 'Select market' }, { value: 'local', label: 'Local' }, { value: 'city', label: 'City / metro' }, { value: 'regional', label: 'Multiple cities / region' }, { value: 'national', label: 'National' }, { value: 'international', label: 'International' }, { value: 'online', label: 'Online / global' }]} />
             </div>
           </Section>
 
@@ -628,8 +660,8 @@ export const BusinessProfile: React.FC<{
                   </button>
                   {expandedSegment === segment.id && (
                     <div className="grid grid-cols-1 gap-4 border-t border-[var(--border-subtle)] p-4 md:grid-cols-2">
-                      <Input id={`segment-name-${segment.id}`} label="Segment name" value={segment.name} onChange={event => updateSegment(segment.id, { name: event.target.value })} />
-                      <Input id={`segment-decision-${segment.id}`} label="Decision maker" value={segment.decisionMaker} onChange={event => updateSegment(segment.id, { decisionMaker: event.target.value })} />
+                      <BPInput id={`segment-name-${segment.id}`} label="Segment name" value={segment.name} onChange={event => updateSegment(segment.id, { name: event.target.value })} />
+                      <BPInput id={`segment-decision-${segment.id}`} label="Decision maker" value={segment.decisionMaker} onChange={event => updateSegment(segment.id, { decisionMaker: event.target.value })} />
                       <TextAreaField id={`segment-description-${segment.id}`} label="Description" value={segment.description} onChange={value => updateSegment(segment.id, { description: value })} />
                       <TextAreaField id={`segment-needs-${segment.id}`} label="Needs" value={segment.needs} onChange={value => updateSegment(segment.id, { needs: value })} />
                       <TextAreaField id={`segment-pain-${segment.id}`} label="Pain points" value={segment.painPoints} onChange={value => updateSegment(segment.id, { painPoints: value })} />
@@ -649,10 +681,10 @@ export const BusinessProfile: React.FC<{
             <div className="space-y-4">
               {draft.products.map(product => (
                 <div key={product.id} className="grid grid-cols-1 gap-4 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 md:grid-cols-4">
-                  <Input id={`offer-price-${product.id}`} label={`${product.name || 'Offer'} · Price / range`} value={product.price} onChange={event => updateProduct(product.id, { price: event.target.value })} />
-                  <Select id={`offer-recurring-${product.id}`} label="Revenue pattern" value={product.recurring} onChange={event => updateProduct(product.id, { recurring: event.target.value })} options={[{ value: 'one_time', label: 'One-time' }, { value: 'recurring', label: 'Recurring' }]} />
-                  <Select id={`offer-priority-${product.id}`} label="Business priority" value={product.priority} onChange={event => updateProduct(product.id, { priority: event.target.value })} options={[{ value: 'normal', label: 'Normal' }, { value: 'revenue', label: 'Revenue priority' }, { value: 'margin', label: 'Margin priority' }, { value: 'popular', label: 'Most popular' }, { value: 'strategic', label: 'Strategic' }]} />
-                  <Input id={`offer-delivery-${product.id}`} label="Delivery method" value={product.delivery} onChange={event => updateProduct(product.id, { delivery: event.target.value })} placeholder="Online, onsite, shipped…" />
+                  <BPInput id={`offer-price-${product.id}`} label={`${product.name || 'Offer'} · Price / range`} value={product.price} onChange={event => updateProduct(product.id, { price: event.target.value })} />
+                  <BPSelect id={`offer-recurring-${product.id}`} label="Revenue pattern" value={product.recurring} onChange={event => updateProduct(product.id, { recurring: event.target.value })} options={[{ value: 'one_time', label: 'One-time' }, { value: 'recurring', label: 'Recurring' }]} />
+                  <BPSelect id={`offer-priority-${product.id}`} label="Business priority" value={product.priority} onChange={event => updateProduct(product.id, { priority: event.target.value })} options={[{ value: 'normal', label: 'Normal' }, { value: 'revenue', label: 'Revenue priority' }, { value: 'margin', label: 'Margin priority' }, { value: 'popular', label: 'Most popular' }, { value: 'strategic', label: 'Strategic' }]} />
+                  <BPInput id={`offer-delivery-${product.id}`} label="Delivery method" value={product.delivery} onChange={event => updateProduct(product.id, { delivery: event.target.value })} placeholder="Online, onsite, shipped…" />
                 </div>
               ))}
               {draft.products.length === 0 && <p className="text-xs text-[var(--text-muted)]">Add products or services in Stage 1 to unlock offer-level intelligence here.</p>}
@@ -662,8 +694,8 @@ export const BusinessProfile: React.FC<{
           <Section title="Acquisition" description="Separate what currently happens from what the business wants to grow.">
             <ToggleChips values={acquisitionChannels} selected={draft.acquisitionChannels} onChange={values => update('acquisitionChannels', values)} ariaLabel="Current acquisition channels" />
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <Select id="bp-primary-channel" label="Primary current acquisition channel" value={draft.primaryAcquisitionChannel} onChange={event => update('primaryAcquisitionChannel', event.target.value)} options={[{ value: '', label: 'Select channel' }, ...acquisitionChannels.map(value => ({ value, label: value }))]} />
-              <Select id="bp-growth-channel" label="Channel you want to grow" value={draft.growthChannel} onChange={event => update('growthChannel', event.target.value)} options={[{ value: '', label: 'Select channel' }, ...acquisitionChannels.map(value => ({ value, label: value }))]} />
+              <BPSelect id="bp-primary-channel" label="Primary current acquisition channel" value={draft.primaryAcquisitionChannel} onChange={event => update('primaryAcquisitionChannel', event.target.value)} options={[{ value: '', label: 'Select channel' }, ...acquisitionChannels.map(value => ({ value, label: value }))]} />
+              <BPSelect id="bp-growth-channel" label="Channel you want to grow" value={draft.growthChannel} onChange={event => update('growthChannel', event.target.value)} options={[{ value: '', label: 'Select channel' }, ...acquisitionChannels.map(value => ({ value, label: value }))]} />
             </div>
           </Section>
 
@@ -671,15 +703,15 @@ export const BusinessProfile: React.FC<{
             <TextAreaField id="bp-sales-journey" label="Customer journey" value={draft.salesJourney} onChange={value => update('salesJourney', value)} placeholder="e.g. Ad → website → WhatsApp → qualification → quote → booking → payment" />
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <TextAreaField id="bp-qualification" label="Lead qualification criteria" value={draft.qualificationCriteria} onChange={value => update('qualificationCriteria', value)} />
-              <Select id="bp-sales-cycle" label="Typical sales cycle" value={draft.salesCycle} onChange={event => update('salesCycle', event.target.value)} options={[{ value: '', label: 'Select cycle' }, { value: 'immediate', label: 'Immediate' }, { value: 'same_day', label: 'Same day' }, { value: '1_7_days', label: '1–7 days' }, { value: '1_4_weeks', label: '1–4 weeks' }, { value: '1_3_months', label: '1–3 months' }, { value: '3_plus_months', label: '3+ months' }]} />
-              <Select id="bp-conversion" label="What counts as conversion?" value={draft.conversionDefinition} onChange={event => update('conversionDefinition', event.target.value)} options={[{ value: '', label: 'Select conversion' }, { value: 'purchase', label: 'Purchase' }, { value: 'booking', label: 'Booking' }, { value: 'contract', label: 'Contract signed' }, { value: 'subscription', label: 'Subscription started' }, { value: 'payment', label: 'Payment received' }]} />
+              <BPSelect id="bp-sales-cycle" label="Typical sales cycle" value={draft.salesCycle} onChange={event => update('salesCycle', event.target.value)} options={[{ value: '', label: 'Select cycle' }, { value: 'immediate', label: 'Immediate' }, { value: 'same_day', label: 'Same day' }, { value: '1_7_days', label: '1–7 days' }, { value: '1_4_weeks', label: '1–4 weeks' }, { value: '1_3_months', label: '1–3 months' }, { value: '3_plus_months', label: '3+ months' }]} />
+              <BPSelect id="bp-conversion" label="What counts as conversion?" value={draft.conversionDefinition} onChange={event => update('conversionDefinition', event.target.value)} options={[{ value: '', label: 'Select conversion' }, { value: 'purchase', label: 'Purchase' }, { value: 'booking', label: 'Booking' }, { value: 'contract', label: 'Contract signed' }, { value: 'subscription', label: 'Subscription started' }, { value: 'payment', label: 'Payment received' }]} />
               <TextAreaField id="bp-objections" label="Common sales objections" value={draft.objections} onChange={value => update('objections', value)} />
             </div>
           </Section>
 
           <Section title="Current Condition" description="This is the owner's current view, not an objective APEX diagnosis. Observed state can be stored separately later.">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <Select id="bp-condition" label="Current business condition" value={draft.currentCondition} onChange={event => update('currentCondition', event.target.value)} options={[{ value: '', label: 'Select condition' }, { value: 'pre_launch', label: 'Pre-launch' }, { value: 'newly_launched', label: 'Newly launched' }, { value: 'growing', label: 'Growing' }, { value: 'stable', label: 'Stable' }, { value: 'slowing', label: 'Slowing' }, { value: 'recovering', label: 'Recovering' }, { value: 'seasonal', label: 'Seasonal' }, { value: 'expanding', label: 'Expanding' }, { value: 'restructuring', label: 'Restructuring' }, { value: 'operational_challenges', label: 'Operational challenges' }, { value: 'unsure', label: 'Unsure' }]} />
+              <BPSelect id="bp-condition" label="Current business condition" value={draft.currentCondition} onChange={event => update('currentCondition', event.target.value)} options={[{ value: '', label: 'Select condition' }, { value: 'pre_launch', label: 'Pre-launch' }, { value: 'newly_launched', label: 'Newly launched' }, { value: 'growing', label: 'Growing' }, { value: 'stable', label: 'Stable' }, { value: 'slowing', label: 'Slowing' }, { value: 'recovering', label: 'Recovering' }, { value: 'seasonal', label: 'Seasonal' }, { value: 'expanding', label: 'Expanding' }, { value: 'restructuring', label: 'Restructuring' }, { value: 'operational_challenges', label: 'Operational challenges' }, { value: 'unsure', label: 'Unsure' }]} />
               <TextAreaField id="bp-biggest-challenge" label="Biggest challenge right now" value={draft.biggestChallenge} onChange={value => update('biggestChallenge', value)} />
             </div>
           </Section>
@@ -688,11 +720,11 @@ export const BusinessProfile: React.FC<{
             <div className="space-y-3">
               {draft.goals.map(goal => (
                 <div key={goal.id} className="grid grid-cols-1 gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 md:grid-cols-5">
-                  <Select id={`goal-${goal.id}`} label="Goal" value={goal.goal} onChange={event => updateGoal(goal.id, { goal: event.target.value })} options={[{ value: '', label: 'Select goal' }, ...goalOptions.map(value => ({ value, label: value }))]} />
-                  <Input id={`goal-current-${goal.id}`} label="Current value" value={goal.current} onChange={event => updateGoal(goal.id, { current: event.target.value })} />
-                  <Input id={`goal-target-${goal.id}`} label="Target" value={goal.target} onChange={event => updateGoal(goal.id, { target: event.target.value })} />
-                  <Select id={`goal-timeframe-${goal.id}`} label="Timeframe" value={goal.timeframe} onChange={event => updateGoal(goal.id, { timeframe: event.target.value })} options={[{ value: '30_days', label: '30 days' }, { value: '90_days', label: '90 days' }, { value: '6_months', label: '6 months' }, { value: '12_months', label: '12 months' }]} />
-                  <div className="flex items-end gap-2"><Select id={`goal-priority-${goal.id}`} label="Priority" value={goal.priority} onChange={event => updateGoal(goal.id, { priority: event.target.value })} options={[{ value: 'high', label: 'High' }, { value: 'medium', label: 'Medium' }, { value: 'low', label: 'Low' }]} /><Button variant="ghost" size="sm" aria-label="Remove goal" onClick={() => update('goals', removeById(draft.goals, goal.id))}><Trash2 className="h-3.5 w-3.5" /></Button></div>
+                  <BPSelect id={`goal-${goal.id}`} label="Goal" value={goal.goal} onChange={event => updateGoal(goal.id, { goal: event.target.value })} options={[{ value: '', label: 'Select goal' }, ...goalOptions.map(value => ({ value, label: value }))]} />
+                  <BPInput id={`goal-current-${goal.id}`} label="Current value" value={goal.current} onChange={event => updateGoal(goal.id, { current: event.target.value })} />
+                  <BPInput id={`goal-target-${goal.id}`} label="Target" value={goal.target} onChange={event => updateGoal(goal.id, { target: event.target.value })} />
+                  <BPSelect id={`goal-timeframe-${goal.id}`} label="Timeframe" value={goal.timeframe} onChange={event => updateGoal(goal.id, { timeframe: event.target.value })} options={[{ value: '30_days', label: '30 days' }, { value: '90_days', label: '90 days' }, { value: '6_months', label: '6 months' }, { value: '12_months', label: '12 months' }]} />
+                  <div className="flex items-end gap-2"><BPSelect id={`goal-priority-${goal.id}`} label="Priority" value={goal.priority} onChange={event => updateGoal(goal.id, { priority: event.target.value })} options={[{ value: 'high', label: 'High' }, { value: 'medium', label: 'Medium' }, { value: 'low', label: 'Low' }]} /><Button variant="ghost" size="sm" aria-label="Remove goal" onClick={() => update('goals', removeById(draft.goals, goal.id))}><Trash2 className="h-3.5 w-3.5" /></Button></div>
                 </div>
               ))}
               <Button variant="secondary" size="sm" onClick={addGoal} leftIcon={<Plus className="h-3.5 w-3.5" />}>Add goal</Button>
@@ -713,14 +745,14 @@ export const BusinessProfile: React.FC<{
 
           <Section title="Brand & Communication" description="Give APEX the language and positioning it should preserve when helping create customer-facing experiences.">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <Input id="bp-brand-personality" label="Brand personality" value={draft.brandPersonality} onChange={event => update('brandPersonality', event.target.value)} placeholder="e.g. Expert, direct, reassuring" />
-              <Input id="bp-communication-style" label="Communication style" value={draft.communicationStyle} onChange={event => update('communicationStyle', event.target.value)} placeholder="e.g. Concise and professional" />
+              <BPInput id="bp-brand-personality" label="Brand personality" value={draft.brandPersonality} onChange={event => update('brandPersonality', event.target.value)} placeholder="e.g. Expert, direct, reassuring" />
+              <BPInput id="bp-communication-style" label="Communication style" value={draft.communicationStyle} onChange={event => update('communicationStyle', event.target.value)} placeholder="e.g. Concise and professional" />
               <TextAreaField id="bp-value-proposition" label="Value proposition" value={draft.valueProposition} onChange={value => update('valueProposition', value)} />
               <TextAreaField id="bp-promises" label="Key promises" value={draft.promises} onChange={value => update('promises', value)} />
               <TextAreaField id="bp-proof-points" label="Proof points" value={draft.proofPoints} onChange={value => update('proofPoints', value)} />
               <TextAreaField id="bp-social-profiles" label="Social profiles" value={draft.socialProfiles} onChange={value => update('socialProfiles', value)} />
             </div>
-            <Input id="bp-website" label="Website" value={draft.website} onChange={event => update('website', event.target.value)} placeholder="https://example.com" />
+            <BPInput id="bp-website" label="Website" value={draft.website} onChange={event => update('website', event.target.value)} placeholder="https://example.com" />
           </Section>
 
           <div className="flex flex-col gap-3 border-t border-[var(--border-subtle)] pt-6 sm:flex-row sm:items-center sm:justify-between">
@@ -743,14 +775,14 @@ export const BusinessProfile: React.FC<{
 
           <Section title="Legal & Registration" description="Formal business facts. These should be treated as legal/compliance context, not as marketing or growth assumptions.">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <Input id="bp-legal-name" label="Legal business name" value={draft.legalName} onChange={event => update('legalName', event.target.value)} />
-              <Input id="bp-trading-name" label="Trading / brand name" value={draft.tradingName} onChange={event => update('tradingName', event.target.value)} />
-              <Select id="bp-entity-type" label="Entity type" value={draft.entityType} onChange={event => update('entityType', event.target.value)} options={[{ value: '', label: 'Select entity type' }, { value: 'sole_proprietorship', label: 'Sole proprietorship' }, { value: 'partnership', label: 'Partnership' }, { value: 'llp', label: 'LLP' }, { value: 'private_company', label: 'Private company' }, { value: 'public_company', label: 'Public company' }, { value: 'nonprofit', label: 'Nonprofit' }, { value: 'other', label: 'Other' }]} />
-              <Input id="bp-registration-number" label="Registration number" value={draft.registrationNumber} onChange={event => update('registrationNumber', event.target.value)} />
-              <Input id="bp-tax-id" label="Tax identification number" value={draft.taxId} onChange={event => update('taxId', event.target.value)} />
-              <Input id="bp-tax-jurisdiction" label="Tax jurisdiction" value={draft.taxJurisdiction} onChange={event => update('taxJurisdiction', event.target.value)} />
-              <Input id="bp-incorporation-date" label="Incorporation / registration date" type="date" value={draft.incorporationDate} onChange={event => update('incorporationDate', event.target.value)} />
-              <Input id="bp-registered-address" label="Registered address" value={draft.registeredAddress} onChange={event => update('registeredAddress', event.target.value)} />
+              <BPInput id="bp-legal-name" label="Legal business name" value={draft.legalName} onChange={event => update('legalName', event.target.value)} />
+              <BPInput id="bp-trading-name" label="Trading / brand name" value={draft.tradingName} onChange={event => update('tradingName', event.target.value)} />
+              <BPSelect id="bp-entity-type" label="Entity type" value={draft.entityType} onChange={event => update('entityType', event.target.value)} options={[{ value: '', label: 'Select entity type' }, { value: 'sole_proprietorship', label: 'Sole proprietorship' }, { value: 'partnership', label: 'Partnership' }, { value: 'llp', label: 'LLP' }, { value: 'private_company', label: 'Private company' }, { value: 'public_company', label: 'Public company' }, { value: 'nonprofit', label: 'Nonprofit' }, { value: 'other', label: 'Other' }]} />
+              <BPInput id="bp-registration-number" label="Registration number" value={draft.registrationNumber} onChange={event => update('registrationNumber', event.target.value)} />
+              <BPInput id="bp-tax-id" label="Business ID" value={draft.taxId} onChange={event => update('taxId', event.target.value)} />
+              <BPInput id="bp-tax-jurisdiction" label="Tax jurisdiction" value={draft.taxJurisdiction} onChange={event => update('taxJurisdiction', event.target.value)} />
+              <BPInput id="bp-incorporation-date" label="Incorporation / registration date" type="date" value={draft.incorporationDate} onChange={event => update('incorporationDate', event.target.value)} />
+              <BPInput id="bp-registered-address" label="Registered Headquarters Address" value={draft.registeredAddress} onChange={event => update('registeredAddress', event.target.value)} />
               <TextAreaField id="bp-licenses" label="Licenses" value={draft.licenses} onChange={value => update('licenses', value)} />
               <TextAreaField id="bp-certifications" label="Certifications" value={draft.certifications} onChange={value => update('certifications', value)} />
               <TextAreaField id="bp-regulatory" label="Regulatory requirements" value={draft.regulatoryRequirements} onChange={value => update('regulatoryRequirements', value)} />
@@ -760,24 +792,24 @@ export const BusinessProfile: React.FC<{
 
           <Section title="Operational Structure" description="Describe people, locations, hours and capacity. These values can later be enriched by connected systems.">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <Select id="bp-employees" label="Employee count / range" value={draft.employeeRange} onChange={event => update('employeeRange', event.target.value)} options={[{ value: '', label: 'Select range' }, { value: '1', label: '1' }, { value: '2_10', label: '2–10' }, { value: '11_50', label: '11–50' }, { value: '51_200', label: '51–200' }, { value: '201_500', label: '201–500' }, { value: '500_plus', label: '500+' }]} />
-              <Input id="bp-departments" label="Departments" value={draft.departments} onChange={event => update('departments', event.target.value)} placeholder="Sales, operations, finance…" />
-              <Input id="bp-roles" label="Key roles" value={draft.roles} onChange={event => update('roles', event.target.value)} />
-              <Input id="bp-branches" label="Branches / locations" value={draft.branches} onChange={event => update('branches', event.target.value)} />
+              <BPSelect id="bp-employees" label="Employee count / range" value={draft.employeeRange} onChange={event => update('employeeRange', event.target.value)} options={[{ value: '', label: 'Select range' }, { value: '1', label: '1' }, { value: '2_10', label: '2–10' }, { value: '11_50', label: '11–50' }, { value: '51_200', label: '51–200' }, { value: '201_500', label: '201–500' }, { value: '500_plus', label: '500+' }]} />
+              <BPInput id="bp-departments" label="Departments" value={draft.departments} onChange={event => update('departments', event.target.value)} placeholder="Sales, operations, finance…" />
+              <BPInput id="bp-roles" label="Key roles" value={draft.roles} onChange={event => update('roles', event.target.value)} />
+              <BPInput id="bp-branches" label="Branches / locations" value={draft.branches} onChange={event => update('branches', event.target.value)} />
               <TextAreaField id="bp-business-hours" label="Business hours" value={draft.businessHours} onChange={value => update('businessHours', value)} placeholder="e.g. Mon–Sat 09:00–18:00" />
               <TextAreaField id="bp-holidays" label="Holiday schedule" value={draft.holidaySchedule} onChange={value => update('holidaySchedule', value)} />
-              <Input id="bp-languages" label="Languages supported" value={draft.languages} onChange={event => update('languages', event.target.value)} placeholder="English, Hindi…" />
-              <Input id="bp-service-area" label="Service area" value={draft.serviceArea} onChange={event => update('serviceArea', event.target.value)} />
-              <Input id="bp-capacity" label="Operational capacity" value={draft.capacity} onChange={event => update('capacity', event.target.value)} placeholder="Bookings/day, units/day, seats…" />
+              <BPInput id="bp-languages" label="Languages supported" value={draft.languages} onChange={event => update('languages', event.target.value)} placeholder="English, Hindi…" />
+              <BPInput id="bp-service-area" label="Service area" value={draft.serviceArea} onChange={event => update('serviceArea', event.target.value)} />
+              <BPInput id="bp-capacity" label="Operational capacity" value={draft.capacity} onChange={event => update('capacity', event.target.value)} placeholder="Bookings/day, units/day, seats…" />
             </div>
           </Section>
 
           {(draft.businessModels.includes('Service business') || draft.businessModels.includes('Appointment')) && (
             <Section title="Appointments & Service Delivery" description="Shown when the business model indicates a service or appointment workflow.">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                <Input id="bp-duration" label="Typical appointment duration" value={draft.appointmentDuration} onChange={event => update('appointmentDuration', event.target.value)} />
-                <Input id="bp-booking-rules" label="Booking rules" value={draft.bookingRules} onChange={event => update('bookingRules', event.target.value)} />
-                <Input id="bp-service-fulfillment" label="Fulfillment / delivery" value={draft.fulfillment} onChange={event => update('fulfillment', event.target.value)} />
+                <BPInput id="bp-duration" label="Typical appointment duration" value={draft.appointmentDuration} onChange={event => update('appointmentDuration', event.target.value)} />
+                <BPInput id="bp-booking-rules" label="Booking rules" value={draft.bookingRules} onChange={event => update('bookingRules', event.target.value)} />
+                <BPInput id="bp-service-fulfillment" label="Fulfillment / delivery" value={draft.fulfillment} onChange={event => update('fulfillment', event.target.value)} />
               </div>
             </Section>
           )}
@@ -785,9 +817,9 @@ export const BusinessProfile: React.FC<{
           {(draft.businessModels.includes('Product sales') || draft.businessModels.includes('Marketplace')) && (
             <Section title="Product Fulfillment" description="Shown for physical-product or marketplace models where inventory and delivery context matters.">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                <Input id="bp-inventory" label="Inventory model" value={draft.inventory} onChange={event => update('inventory', event.target.value)} />
-                <Input id="bp-shipping" label="Shipping / delivery areas" value={draft.shipping} onChange={event => update('shipping', event.target.value)} />
-                <Input id="bp-fulfillment" label="Fulfillment method" value={draft.fulfillment} onChange={event => update('fulfillment', event.target.value)} />
+                <BPInput id="bp-inventory" label="Inventory model" value={draft.inventory} onChange={event => update('inventory', event.target.value)} />
+                <BPInput id="bp-shipping" label="Shipping / delivery areas" value={draft.shipping} onChange={event => update('shipping', event.target.value)} />
+                <BPInput id="bp-fulfillment" label="Fulfillment method" value={draft.fulfillment} onChange={event => update('fulfillment', event.target.value)} />
               </div>
             </Section>
           )}
@@ -796,12 +828,12 @@ export const BusinessProfile: React.FC<{
             <div className="space-y-4">
               <div><div className="mb-2 text-xs font-medium text-[var(--text-secondary)]">Accepted payment methods</div><ToggleChips values={paymentOptions} selected={draft.acceptedPayments} onChange={values => update('acceptedPayments', values)} ariaLabel="Payment methods" /></div>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                <Input id="bp-payment-terms" label="Payment terms" value={draft.paymentTerms} onChange={event => update('paymentTerms', event.target.value)} placeholder="Due on receipt, Net 30…" />
-                <Input id="bp-credit-terms" label="Credit terms" value={draft.creditTerms} onChange={event => update('creditTerms', event.target.value)} />
-                <Input id="bp-deposit" label="Deposit requirements" value={draft.depositRequirements} onChange={event => update('depositRequirements', event.target.value)} />
-                <Input id="bp-atv" label="Average transaction / order value" value={draft.averageTransactionValue} onChange={event => update('averageTransactionValue', event.target.value)} placeholder="Amount or range" />
-                <Input id="bp-commercial-cycle" label="Typical commercial sales cycle" value={draft.typicalSalesCycle} onChange={event => update('typicalSalesCycle', event.target.value)} />
-                <Input id="bp-recurring-revenue" label="Recurring revenue model" value={draft.recurringRevenue} onChange={event => update('recurringRevenue', event.target.value)} />
+                <BPInput id="bp-payment-terms" label="Payment terms" value={draft.paymentTerms} onChange={event => update('paymentTerms', event.target.value)} placeholder="Due on receipt, Net 30…" />
+                <BPInput id="bp-credit-terms" label="Credit terms" value={draft.creditTerms} onChange={event => update('creditTerms', event.target.value)} />
+                <BPInput id="bp-deposit" label="Deposit requirements" value={draft.depositRequirements} onChange={event => update('depositRequirements', event.target.value)} />
+                <BPInput id="bp-atv" label="Average transaction / order value" value={draft.averageTransactionValue} onChange={event => update('averageTransactionValue', event.target.value)} placeholder="Amount or range" />
+                <BPInput id="bp-commercial-cycle" label="Typical commercial sales cycle" value={draft.typicalSalesCycle} onChange={event => update('typicalSalesCycle', event.target.value)} />
+                <BPInput id="bp-recurring-revenue" label="Recurring revenue model" value={draft.recurringRevenue} onChange={event => update('recurringRevenue', event.target.value)} />
               </div>
             </div>
           </Section>
@@ -827,8 +859,8 @@ export const BusinessProfile: React.FC<{
       <Card padding="md">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <div className="flex gap-3"><Gauge className="mt-0.5 h-4 w-4 shrink-0 text-[var(--text-secondary)]" /><div><div className="text-xs font-semibold text-[var(--text-primary)]">Coverage is contextual</div><p className="mt-1 text-[10px] leading-relaxed text-[var(--text-muted)]">APEX tracks usable context by business dimension instead of reducing the business to one score.</p></div></div>
-          <div className="flex gap-3"><FileCheck2 className="mt-0.5 h-4 w-4 shrink-0 text-[var(--text-secondary)]" /><div><div className="text-xs font-semibold text-[var(--text-primary)]">Knowledge stays attributable</div><p className="mt-1 text-[10px] leading-relaxed text-[var(--text-muted)]">Declared facts, beliefs, observations, calculations and later inferences remain distinguishable.</p></div></div>
-          <div className="flex gap-3"><Target className="mt-0.5 h-4 w-4 shrink-0 text-[var(--text-secondary)]" /><div><div className="text-xs font-semibold text-[var(--text-primary)]">Understanding is not action</div><p className="mt-1 text-[10px] leading-relaxed text-[var(--text-muted)]">Profile context informs the intelligence layer; recommendations and execution remain separate surfaces.</p></div></div>
+          <div className="flex gap-3"><FileCheck2 className="mt-0.5 h-4 w-4 shrink-0 text-[var(--text-secondary)]" /><div><div className="text-xs font-semibold text-[var(--text-primary)]">Keep information current</div><p className="mt-1 text-[10px] leading-relaxed text-[var(--text-muted)]">Update the profile when your business, offers, customers or operating context changes.</p></div></div>
+          <div className="flex gap-3"><Target className="mt-0.5 h-4 w-4 shrink-0 text-[var(--text-secondary)]" /><div><div className="text-xs font-semibold text-[var(--text-primary)]">Build only what you need</div><p className="mt-1 text-[10px] leading-relaxed text-[var(--text-muted)]">Foundation is enough to start. Discovery and Precision can be completed later.</p></div></div>
         </div>
       </Card>
     </div>
