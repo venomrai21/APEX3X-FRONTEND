@@ -26,7 +26,7 @@ export const CurrencySelector: React.FC<{
     <div className="space-y-2">
       <div className="text-xs font-medium text-[var(--text-secondary)]">{label}</div>
       <div className="relative">
-        <Button type="button" variant="secondary" className="w-full justify-between text-left" onClick={() => setOpen(current => !current)} aria-expanded={open} aria-haspopup="listbox">
+        <Button type="button" variant="secondary" className="w-full justify-between text-left" onClick={() => setOpen(current => !current)} aria-label={label} aria-expanded={open} aria-haspopup="listbox">
           <span className="min-w-0 truncate">
             {selected ? <><span className="font-mono font-semibold">{selected.code}</span><span className="ml-2 text-[var(--text-secondary)]">{selected.name}</span><span className="ml-2 text-[var(--text-muted)]">{selected.symbol || ''}</span></> : <span className="text-[var(--text-muted)]">Search and select a currency</span>}
           </span>
