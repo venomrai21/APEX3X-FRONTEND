@@ -174,15 +174,15 @@ const createGoal = (): Goal => ({
   priority: 'high',
 });
 
-const createDraft = (workspace: Workspace | null): BusinessProfileDraft => ({
-  businessName: workspace?.name ?? '',
-  industry: workspace?.industry ?? '',
+const createDraft = (): BusinessProfileDraft => ({
+  businessName: '',
+  industry: '',
   description: '',
   products: [],
   targetCustomers: [],
   targetCustomerDescription: '',
   businessModels: [],
-  location: workspace?.registeredAddress ?? '',
+  location: '',
   market: '',
   story: '',
   beliefs: '',
@@ -216,16 +216,16 @@ const createDraft = (workspace: Workspace | null): BusinessProfileDraft => ({
   valueProposition: '',
   promises: '',
   proofPoints: '',
-  website: workspace?.website ?? '',
+  website: '',
   socialProfiles: '',
   legalName: '',
   tradingName: '',
   entityType: '',
   registrationNumber: '',
-  taxId: workspace?.taxId ?? '',
+  taxId: '',
   taxJurisdiction: '',
   incorporationDate: '',
-  registeredAddress: workspace?.registeredAddress ?? '',
+  registeredAddress: '',
   licenses: '',
   certifications: '',
   regulatoryRequirements: '',
@@ -260,9 +260,9 @@ const createDraft = (workspace: Workspace | null): BusinessProfileDraft => ({
 });
 
 const stageMeta: Record<StageId, { title: string; subtitle: string }> = {
-  1: { title: 'Business Foundation', subtitle: 'The minimum context APEX needs to start working.' },
-  2: { title: 'Business Discovery', subtitle: 'Capture how the business actually operates, where value is created, and where friction exists.' },
-  3: { title: 'Business Precision', subtitle: 'Add deeper legal, operational and commercial context when it becomes useful.' },
+  1: { title: 'Business Basics', subtitle: 'The essential information APEX needs to understand your business.' },
+  2: { title: 'How Your Business Works', subtitle: 'Tell APEX how you find customers, sell, deliver, and grow.' },
+  3: { title: 'More Business Details', subtitle: 'Add legal, operational, payment, and other details when they are useful.' },
 };
 
 const customerTypes = ['Consumers / Individuals', 'Families', 'Small businesses', 'Medium businesses', 'Enterprises', 'Startups', 'Professionals', 'Government', 'Other'];
@@ -355,9 +355,9 @@ export const BusinessProfile: React.FC<{
   workspace: Workspace | null;
   addToast: (toast: { type: 'success' | 'warning' | 'error' | 'info'; title: string; description?: string }) => void;
   onWorkspaceUpdated: (workspace: Workspace) => void;
-}> = ({ workspace, addToast, onWorkspaceUpdated }) => {
+}> = ({ addToast }) => {
   const [activeStage, setActiveStage] = useState<StageId>(1);
-  const [draft, setDraft] = useState<BusinessProfileDraft>(() => createDraft(workspace));
+  const [draft, setDraft] = useState<BusinessProfileDraft>(() => createDraft());
   const [profileLoaded, setProfileLoaded] = useState(false);
   const [savingStage, setSavingStage] = useState<StageId | null>(null);
   const [expandedProduct, setExpandedProduct] = useState<string | null>(null);
@@ -403,7 +403,7 @@ export const BusinessProfile: React.FC<{
   }, [addToast]);
 
   const coverage = useMemo(() => [
-    { label: 'Business Foundation', ready: stageReady },
+    { label: 'Business Basics', ready: stageReady },
     { label: 'Customer Understanding', ready: draft.targetCustomers.length > 0 || Boolean(draft.targetCustomerDescription.trim()) || draft.customerSegments.length > 0 },
     { label: 'Revenue Model', ready: draft.businessModels.length > 0 || draft.products.some(item => Boolean(item.name.trim())) },
     { label: 'Sales Process', ready: Boolean(draft.salesJourney.trim() || draft.qualificationCriteria.trim() || draft.salesCycle.trim()) },
@@ -430,16 +430,6 @@ export const BusinessProfile: React.FC<{
   const saveStage = async (stage: StageId) => {
     setSavingStage(stage);
     try {
-      if (stage === 1 && workspace) {
-        const updated = await api.updateWorkspace({
-          name: draft.businessName,
-          industry: draft.industry,
-          website: draft.website,
-          registeredAddress: draft.location,
-          taxId: draft.taxId,
-        });
-        onWorkspaceUpdated(updated);
-      }
       const saved = await api.updateBusinessProfile({
         profile: draft as unknown as Record<string, any>,
         foundationCompleted: stage === 1 ? stageReady : foundationCompleted,
@@ -491,8 +481,8 @@ export const BusinessProfile: React.FC<{
               <Sparkles className="h-4 w-4 text-[var(--text-primary)]" />
               <Badge variant="neutral" size="sm">APEX Business Understanding</Badge>
             </div>
-            <h2 className="text-xl font-semibold tracking-tight text-[var(--text-primary)]">Teach APEX your business — progressively.</h2>
-            <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">Stage 1 gives APEX the minimum reliable context to start working. Stages 2 and 3 deepen understanding as your business context becomes richer.</p>
+            <h2 className="text-xl font-semibold tracking-tight text-[var(--text-primary)]">Tell APEX about your business — step by step.</h2>
+            <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">Start with the basics. Add more detail whenever you are ready.</p>
           </div>
           <div className="w-full shrink-0 lg:w-72 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3">
             <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">Context coverage</div>
@@ -502,7 +492,7 @@ export const BusinessProfile: React.FC<{
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-2 md:grid-cols-3" role="tablist" aria-label="Business Profile stages">
+        <div className="grid grid-cols-1 gap-2 md:grid-cols-3" role="tablist" aria-label="Business information steps">
           {[1, 2, 3].map(stageNumber => {
             const stage = stageNumber as StageId;
             const active = activeStage === stage;
@@ -551,7 +541,7 @@ export const BusinessProfile: React.FC<{
         <Card padding="lg" className="space-y-7">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">Stage 01 · Required for activation</div>
+              <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">Step 1 · Required to get started</div>
               <h3 className="mt-1 text-lg font-semibold text-[var(--text-primary)]">Business Foundation</h3>
               <p className="mt-1 max-w-2xl text-xs leading-relaxed text-[var(--text-secondary)]">The smallest useful business context. Complete this stage and enter APEX; everything deeper can wait.</p>
             </div>
@@ -621,14 +611,14 @@ export const BusinessProfile: React.FC<{
         <Card padding="lg" className="space-y-7">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">Stage 02 · Optional</div>
-              <h3 className="mt-1 text-lg font-semibold text-[var(--text-primary)]">Business Discovery</h3>
+              <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">Step 2 · Optional</div>
+              <h3 className="mt-1 text-lg font-semibold text-[var(--text-primary)]">How Your Business Works</h3>
               <p className="mt-1 max-w-2xl text-xs leading-relaxed text-[var(--text-secondary)]">Capture how the business sees reality: facts, beliefs, evidence, uncertainty, motivation and constraints. APEX keeps these perspectives attributable so later observations can corroborate or challenge them.</p>
             </div>
-            <Badge variant="neutral" size="sm">OPTIONAL · {stage2Complete}/8 discovery signals</Badge>
+            <Badge variant="neutral" size="sm">OPTIONAL · {stage2Complete}/8 details</Badge>
           </div>
 
-          <Section title="Discovery Signals" description="These six inputs intentionally capture different kinds of knowledge. APEX treats them as distinct signals rather than blending them into one business score.">
+          <Section title="Business Details" description="These six inputs intentionally capture different kinds of knowledge. APEX treats them as distinct signals rather than blending them into one business score.">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <TextAreaField id="bp-beliefs" label="Beliefs" value={draft.beliefs} onChange={value => update('beliefs', value)} placeholder="What do you believe is true about your customers, market, offer or growth?" />
               <TextAreaField id="bp-evidence" label="Evidence" value={draft.evidence} onChange={value => update('evidence', value)} placeholder="What data, customer feedback, transactions, experiments or other evidence supports those beliefs?" />
@@ -757,7 +747,7 @@ export const BusinessProfile: React.FC<{
 
           <div className="flex flex-col gap-3 border-t border-[var(--border-subtle)] pt-6 sm:flex-row sm:items-center sm:justify-between">
             <div><div className="text-xs font-semibold text-[var(--text-primary)]">Business Discovery</div><p className="mt-1 text-[10px] text-[var(--text-muted)]">Save this stage whenever you are ready. You can leave and return later.</p></div>
-            <Button variant="primary" size="md" isLoading={savingStage === 2} onClick={() => saveStage(2)} leftIcon={<Save className="h-4 w-4" />}>Save Intelligence</Button>
+            <Button variant="primary" size="md" isLoading={savingStage === 2} onClick={() => saveStage(2)} leftIcon={<Save className="h-4 w-4" />}>Save Business Details</Button>
           </div>
         </Card>
       )}
@@ -766,7 +756,7 @@ export const BusinessProfile: React.FC<{
         <Card padding="lg" className="space-y-7">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">Stage 03 · Optional & conditional</div>
+              <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">Step 3 · Optional</div>
               <h3 className="mt-1 text-lg font-semibold text-[var(--text-primary)]">Operations & Verification</h3>
               <p className="mt-1 max-w-2xl text-xs leading-relaxed text-[var(--text-secondary)]">Add deeper business infrastructure only where it applies. Legal/compliance facts remain separate from growth intelligence; operational rules become execution context.</p>
             </div>
@@ -850,8 +840,8 @@ export const BusinessProfile: React.FC<{
           </Section>
 
           <div className="flex flex-col gap-3 border-t border-[var(--border-subtle)] pt-6 sm:flex-row sm:items-center sm:justify-between">
-            <div><div className="text-xs font-semibold text-[var(--text-primary)]">Business Precision</div><p className="mt-1 text-[10px] text-[var(--text-muted)]">Conditional sections appear only when their business model makes them relevant.</p></div>
-            <Button variant="primary" size="md" isLoading={savingStage === 3} onClick={() => saveStage(3)} leftIcon={<Save className="h-4 w-4" />}>Save Operations</Button>
+            <div><div className="text-xs font-semibold text-[var(--text-primary)]">More Business Details</div><p className="mt-1 text-[10px] text-[var(--text-muted)]">Conditional sections appear only when their business model makes them relevant.</p></div>
+            <Button variant="primary" size="md" isLoading={savingStage === 3} onClick={() => saveStage(3)} leftIcon={<Save className="h-4 w-4" />}>Save Details</Button>
           </div>
         </Card>
       )}
