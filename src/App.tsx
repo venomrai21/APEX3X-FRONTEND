@@ -19,6 +19,7 @@ import { AiProviderHubView } from './views/AiProviderHubView';
 import { TeamSecurityView } from './views/TeamSecurityView';
 import { BillingView } from './views/BillingView';
 import { SettingsView } from './views/SettingsView';
+import { BusinessProfileView } from './views/BusinessProfileView';
 import { ModuleSurfaceView } from './views/ModuleSurfaceView';
 
 const MainViewRouter: React.FC = () => {
@@ -28,6 +29,7 @@ const MainViewRouter: React.FC = () => {
     case 'brain': return <BrainView />;
     case 'insights': return <BusinessInsightsView />;
     case 'conversations': return <ConversationsView />;
+    case 'business_profile': return <BusinessProfileView />;
     case 'campaigns': return <ModuleSurfaceView module="campaigns" />;
     case 'advertising': return <ModuleSurfaceView module="advertising" />;
     case 'creative_library': return <ModuleSurfaceView module="creative_library" />;
