@@ -134,6 +134,8 @@ export const DashboardView: React.FC = () => {
     const failedWorkflowRuns = aux.workflowLogs.filter(log => log.status === 'failed').length;
     const connectedIntegrations = aux.integrations.filter(connection => connection.status === 'connected').length;
     const integrationAttention = aux.integrations.filter(connection => ['error', 'disconnected', 'pending'].includes(connection.status)).length;
+    const invoiceCurrencies = [...new Set(aux.invoices.map(invoice => invoice.currency).filter(Boolean))] as string[];
+    const formatLedgerTotal = (value: number) => invoiceCurrencies.length === 1 ? money(value, invoiceCurrencies[0]) : invoiceCurrencies.length > 1 ? 'Multiple currencies' : money(value, currency);
     const totalInvoiced = aux.invoices.reduce((sum, invoice) => sum + invoice.amount, 0);
     const collected = aux.invoices.filter(invoice => invoice.status === 'paid').reduce((sum, invoice) => sum + invoice.amount, 0);
     const outstanding = aux.invoices.filter(invoice => invoice.status !== 'paid' && invoice.status !== 'draft').reduce((sum, invoice) => sum + invoice.amount, 0);
@@ -165,7 +167,7 @@ export const DashboardView: React.FC = () => {
       activeCustomers, atRiskCustomers, averageHealth, openLeads, highRiskLeads, pendingBookings,
       unreadConversations, urgentConversations, activeWorkflows, failedWorkflowRuns, connectedIntegrations,
       integrationAttention, totalInvoiced, collected, outstanding, overdue, collectionRate, riskByCategory,
-      cycleCounts, latestSync, recentSignals,
+      cycleCounts, latestSync, recentSignals, invoiceCurrencies, formatLedgerTotal,
     };
   }, [aux, data, currency]);
 
@@ -269,8 +271,8 @@ export const DashboardView: React.FC = () => {
                 ['Open leads', String(derived.openLeads), derived.highRiskLeads + ' high-risk'],
                 ['Active customers', String(derived.activeCustomers), derived.atRiskCustomers + ' at risk'],
                 ['Open deals', String(recentDeals.filter(deal => !['closed_won', 'closed_lost'].includes(deal.stage)).length), money(metrics.activePipelineValue, currency)],
-                ['Outstanding invoices', String(aux.invoices.filter(invoice => invoice.status !== 'paid' && invoice.status !== 'draft').length), money(derived.outstanding, currency)],
-                ['Collected', money(derived.collected, currency), derived.collectionRate === null ? 'Collection rate unavailable' : derived.collectionRate + '% of invoiced value'],
+                ['Outstanding invoices', String(aux.invoices.filter(invoice => invoice.status !== 'paid' && invoice.status !== 'draft').length), derived.formatLedgerTotal(derived.outstanding)],
+                ['Collected', derived.formatLedgerTotal(derived.collected), derived.collectionRate === null ? 'Collection rate unavailable' : derived.collectionRate + '% of invoiced value'],
               ].map(([label, value, detail]) => <div key={label} className="flex items-center justify-between rounded-lg border border-white/[0.06] bg-[#0b0b11] px-3 py-2.5"><span className="text-xs text-zinc-400">{label}</span><div className="text-right"><div className="text-sm font-semibold text-zinc-100">{value}</div><div className="text-[10px] text-zinc-600">{detail}</div></div></div>)}
             </div>
           </Card>
@@ -295,7 +297,7 @@ export const DashboardView: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        <Card variant="improved" padding="lg"><div className="flex items-center justify-between pb-4 border-b border-white/[0.07]"><div><h3 className="text-sm font-semibold text-zinc-100 uppercase tracking-wider">Cash & Collections</h3><p className="text-xs text-zinc-400 mt-1">Current invoice ledger totals; mixed transaction currencies are not silently normalized here.</p></div><Receipt className="w-4 h-4 text-zinc-400" /></div><div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-4">{[['Invoiced', money(derived.totalInvoiced, currency)], ['Collected', money(derived.collected, currency)], ['Outstanding', money(derived.outstanding, currency)], ['Overdue', money(derived.overdue, currency)]].map(([label, value]) => <div key={label} className="rounded-lg border border-white/[0.06] p-3"><span className="text-[10px] text-zinc-500">{label}</span><div className="mt-1 text-sm font-semibold text-zinc-100">{value}</div></div>)}</div><div className="mt-3 text-[10px] text-zinc-600">{derived.collectionRate === null ? 'Collection rate unavailable from current ledger.' : 'Collection rate: ' + derived.collectionRate + '%.'} Cross-currency reporting requires the future FX service contract.</div></Card>
+        <Card variant="improved" padding="lg"><div className="flex items-center justify-between pb-4 border-b border-white/[0.07]"><div><h3 className="text-sm font-semibold text-zinc-100 uppercase tracking-wider">Cash & Collections</h3><p className="text-xs text-zinc-400 mt-1">Current invoice ledger totals. Mixed transaction currencies are kept separate until the FX service is connected.</p></div><Receipt className="w-4 h-4 text-zinc-400" /></div><div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-4">{[['Invoiced', derived.formatLedgerTotal(derived.totalInvoiced)], ['Collected', derived.formatLedgerTotal(derived.collected)], ['Outstanding', derived.formatLedgerTotal(derived.outstanding)], ['Overdue', derived.formatLedgerTotal(derived.overdue)]].map(([label, value]) => <div key={label} className="rounded-lg border border-white/[0.06] p-3"><span className="text-[10px] text-zinc-500">{label}</span><div className="mt-1 text-sm font-semibold text-zinc-100">{value}</div></div>)}</div><div className="mt-3 text-[10px] text-zinc-600">{derived.collectionRate === null ? 'Collection rate unavailable from current ledger.' : 'Collection rate: ' + derived.collectionRate + '%.'} Cross-currency reporting requires the future FX service contract.</div></Card>
 
         <Card variant="improved" padding="lg"><div className="flex items-center justify-between pb-4 border-b border-white/[0.07]"><div><h3 className="text-sm font-semibold text-zinc-100 uppercase tracking-wider">Connected Ecosystem</h3><p className="text-xs text-zinc-400 mt-1">Integration health and synchronization trust signals.</p></div><PlugZap className="w-4 h-4 text-zinc-400" /></div><div className="grid grid-cols-2 gap-3 pt-4"><div className="rounded-lg border border-white/[0.06] p-3"><span className="text-[10px] text-zinc-500">Connected</span><div className="mt-1 text-lg font-semibold text-zinc-100">{derived.connectedIntegrations}</div></div><div className="rounded-lg border border-white/[0.06] p-3"><span className="text-[10px] text-zinc-500">Needs attention</span><div className="mt-1 text-lg font-semibold text-zinc-100">{derived.integrationAttention}</div></div></div><div className="mt-3 rounded-lg border border-white/[0.06] p-3 text-[10px] text-zinc-500">Last integration sync: {dateLabel(derived.latestSync)}</div><Button variant="ghost" size="sm" className="w-full mt-3" onClick={() => setActiveNav('integrations')}>Open integrations</Button></Card>
       </div>
