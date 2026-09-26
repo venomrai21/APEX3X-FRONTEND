@@ -73,7 +73,7 @@ jobs:
           if (await businessProfileNav.count() === 0) {
             throw new Error('Business Profile navigation item was not rendered.');
           }
-          await businessProfileNav.click();
+          await businessProfileNav.locator('..').click();
           await page.waitForTimeout(500);
 
           const tooltip = page.locator('[role="tooltip"]').first();
