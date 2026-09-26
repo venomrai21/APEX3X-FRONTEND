@@ -1,0 +1,71 @@
+name: APEX3X Frontend Runtime Verification
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browser-smoke:
+    name: Verify Cloudflare Pages React runtime
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install browser test dependency
+        run: npm install --no-save playwright@1.55.0
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Verify live UI
+        run: |
+          node --input-type=module <<'EOF'
+          import { chromium } from 'playwright';
+
+          const url = 'https://apex3x-frontend.pages.dev/';
+          const browser = await chromium.launch({ headless: true });
+          const page = await browser.newPage();
+
+          const errors = [];
+          page.on('pageerror', error => errors.push(`pageerror: ${error.message}`));
+          page.on('console', message => {
+            if (message.type() === 'error') errors.push(`console: ${message.text()}`);
+          });
+          page.on('requestfailed', request => {
+            errors.push(`requestfailed: ${request.url()} — ${request.failure()?.errorText || 'unknown'}`);
+          });
+
+          const response = await page.goto(url, { waitUntil: 'networkidle', timeout: 60000 });
+          if (!response || !response.ok()) {
+            throw new Error(`Live Pages origin returned ${response?.status() ?? 'no response'}`);
+          }
+
+          await page.waitForTimeout(1500);
+
+          const result = await page.evaluate(() => ({
+            title: document.title,
+            rootHtmlLength: document.getElementById('root')?.innerHTML.length ?? 0,
+            bodyTextLength: document.body.innerText.trim().length,
+            hasAppShell: Boolean(document.querySelector('#apex-main-content')),
+            hasNavigation: Boolean(document.querySelector('[aria-label="Primary navigation"]')),
+          }));
+
+          console.log(JSON.stringify(result, null, 2));
+
+          if (errors.length) {
+            console.error(errors.join('\n'));
+            throw new Error('Browser runtime errors detected.');
+          }
+
+          if (!result.hasAppShell || !result.hasNavigation || result.rootHtmlLength === 0 || result.bodyTextLength === 0) {
+            throw new Error('React mounted without the expected APEX UI shell.');
+          }
+
+          await browser.close();
+          EOF
