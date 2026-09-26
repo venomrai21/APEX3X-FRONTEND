@@ -101,5 +101,25 @@ jobs:
 
           console.log('Business Profile tooltip hover behavior verified.');
 
+          const currencyButton = page.getByRole('button', { name: 'Business Currency', exact: true });
+          if (await currencyButton.count() === 0) {
+            throw new Error('Global Business Currency selector was not rendered.');
+          }
+          await currencyButton.click();
+
+          const currencyCountText = page.getByText(/All supported ISO \/ CLDR currencies ·/).first();
+          await currencyCountText.waitFor({ state: 'visible', timeout: 2000 });
+          const currencyCountMatch = (await currencyCountText.innerText()).match(/·\s*(\d+)$/);
+          const currencyCount = currencyCountMatch ? Number(currencyCountMatch[1]) : 0;
+          if (currencyCount < 100) {
+            throw new Error(`Currency registry exposes only ${currencyCount} entries; expected broad ISO / CLDR coverage.`);
+          }
+
+          const currencySearch = page.getByRole('textbox', { name: 'Search currencies', exact: true });
+          await currencySearch.fill('INR');
+          const inrOption = page.getByRole('option').filter({ hasText: 'INR' }).first();
+          await inrOption.waitFor({ state: 'visible', timeout: 2000 });
+          console.log(`Currency registry verified with ${currencyCount} supported entries and INR search.`);
+
           await browser.close();
           EOF
