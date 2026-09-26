@@ -50,18 +50,10 @@ const INITIAL_ORGANISATION: Organisation = {
   shortName: 'APEX',
 };
 
-const INITIAL_WORKSPACE: Workspace = {
-  id: 'apex-workspace',
-  name: 'APEX',
-  slug: 'apex',
-  industry: '',
-  website: '',
-  currency: 'INR',
-  timezone: 'Asia/Kolkata',
-  verificationStatus: 'unverified',
-  organisationId: INITIAL_ORGANISATION.id,
-  createdAt: '',
-};
+const createEmptyWorkspaceState = (): { current: Workspace | null; available: Workspace[] } => ({
+  current: null,
+  available: [],
+});
 
 const applyTheme = () => {
   if (typeof document === 'undefined') return;
@@ -71,8 +63,8 @@ const applyTheme = () => {
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [organisation, setOrganisation] = useState<Organisation>(INITIAL_ORGANISATION);
-  const [currentWorkspace, setCurrentWorkspace] = useState<Workspace | null>(INITIAL_WORKSPACE);
-  const [availableWorkspaces, setAvailableWorkspaces] = useState<Workspace[]>([INITIAL_WORKSPACE]);
+  const [currentWorkspace, setCurrentWorkspace] = useState<Workspace | null>(() => createEmptyWorkspaceState().current);
+  const [availableWorkspaces, setAvailableWorkspaces] = useState<Workspace[]>(() => createEmptyWorkspaceState().available);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [activeNav, setActiveNav] = useState<NavItemKey>('dashboard');
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
