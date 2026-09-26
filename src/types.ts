@@ -1,5 +1,5 @@
 export type NavItemKey =
-  | 'dashboard' | 'conversations' | 'campaigns' | 'advertising' | 'creative_library' | 'social_publishing' | 'forms' | 'growth_intelligence'
+  | 'dashboard' | 'conversations' | 'business_profile' | 'campaigns' | 'advertising' | 'creative_library' | 'social_publishing' | 'forms' | 'growth_intelligence'
   | 'leads' | 'customers' | 'bookings' | 'pipeline' | 'invoices' | 'workflows' | 'integrations' | 'ai_hub' | 'team' | 'billing' | 'settings'
   | 'brain' | 'insights' | 'marketing';
 
