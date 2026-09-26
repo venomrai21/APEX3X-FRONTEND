@@ -11,12 +11,23 @@ export const DashboardView: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [executingId, setExecutingId] = useState<string | null>(null);
   const [pinnedDealIds, setPinnedDealIds] = useState<string[]>([]);
-const [businessProfile, setBusinessProfile] = useState<BusinessProfileData | null>(null);
+  const [businessProfile, setBusinessProfile] = useState<BusinessProfileData | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
   
   const fetchDashboard = async () => {
-    try { setLoading(true); setData(await api.getDashboardSummary()); }
-    catch (err) { console.error('Failed fetching dashboard:', err); }
-    finally { setLoading(false); }
+    try {
+      setLoading(true);
+      setLoadError(null);
+      const result = await api.getDashboardSummary();
+      if (!result || typeof result !== 'object' || !result.autonomousCycleStatus || !result.metrics) {
+        throw new Error('Live workspace dashboard data is not available at this frontend origin.');
+      }
+      setData(result);
+    } catch (err) {
+      console.error('Failed fetching dashboard:', err);
+      setData(null);
+      setLoadError(err instanceof Error ? err.message : 'Live workspace data is unavailable.');
+    } finally { setLoading(false); }
   };
 
   useEffect(() => { fetchDashboard(); api.getBusinessProfile().then(setBusinessProfile).catch(err => console.error('Failed fetching business profile:', err)); }, [refreshKey]);
@@ -33,7 +44,27 @@ const [businessProfile, setBusinessProfile] = useState<BusinessProfileData | nul
     } finally { setExecutingId(null); }
   };
 
-  if (loading || !data) return <div className="space-y-6"><div className="grid grid-cols-1 md:grid-cols-4 gap-4">{[1,2,3,4].map(i => <Skeleton key={i} className="h-28" />)}</div><Skeleton className="h-64" /><div className="grid grid-cols-1 md:grid-cols-2 gap-6"><Skeleton className="h-72" /><Skeleton className="h-72" /></div></div>;
+  if (loading) return <div className="space-y-6"><div className="grid grid-cols-1 md:grid-cols-4 gap-4">{[1,2,3,4].map(i => <Skeleton key={i} className="h-28" />)}</div><Skeleton className="h-64" /><div className="grid grid-cols-1 md:grid-cols-2 gap-6"><Skeleton className="h-72" /><Skeleton className="h-72" /></div></div>;
+
+  if (!data) return (
+    <div className="space-y-6 pb-12">
+      <APEXReveal>
+        <div className="p-6 rounded-xl bg-[#0d0d14] border border-white/[0.08] shadow-xl shadow-black/60">
+          <div className="flex items-center gap-2">
+            <span className="p-1 rounded bg-white/[0.06] text-zinc-200 border border-white/[0.10]"><Bot className="w-4 h-4" /></span>
+            <h2 className="text-base font-serif-display font-semibold text-zinc-100">Command Center</h2>
+          </div>
+          <p className="text-sm text-zinc-300 mt-3">The APEX interface is ready. Live workspace data is not available at this frontend origin yet.</p>
+          <p className="text-xs text-zinc-500 mt-2 max-w-2xl">No business metrics or activity are being fabricated. Connect the existing SaaS API to this frontend origin to populate the Command Center.</p>
+          {loadError && <p className="text-[11px] text-zinc-600 mt-3 font-mono">{loadError}</p>}
+          <div className="mt-5 flex flex-wrap gap-2">
+            <Button variant="primary" size="sm" onClick={() => setActiveNav('business_profile')}>Open Business Profile</Button>
+            <Button variant="ghost" size="sm" onClick={fetchDashboard}>Retry live data</Button>
+          </div>
+        </div>
+      </APEXReveal>
+    </div>
+  );
 
   const { metrics, autonomousCycleStatus, pendingAlerts, recentDeals } = data;
   const cycleSteps = [
