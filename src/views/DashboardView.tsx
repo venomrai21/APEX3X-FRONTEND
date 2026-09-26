@@ -10,8 +10,9 @@ export const DashboardView: React.FC = () => {
   const [data, setData] = useState<DashboardSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [executingId, setExecutingId] = useState<string | null>(null);
-  const [pinnedDealIds, setPinnedDealIds] = useState<string[]>([]);\n  const [businessProfile, setBusinessProfile] = useState<BusinessProfileData | null>(null);
-
+  const [pinnedDealIds, setPinnedDealIds] = useState<string[]>([]);
+const [businessProfile, setBusinessProfile] = useState<BusinessProfileData | null>(null);
+  
   const fetchDashboard = async () => {
     try { setLoading(true); setData(await api.getDashboardSummary()); }
     catch (err) { console.error('Failed fetching dashboard:', err); }
