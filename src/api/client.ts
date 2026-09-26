@@ -24,8 +24,11 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
   if (currentActiveWorkspaceId) headers.set('x-workspace-id', currentActiveWorkspaceId);
 
   const response = await fetch(`${baseUrl}${endpoint}`, { ...options, headers, credentials: 'include' });
-  const payload = await response.json().catch(() => ({}));
+  const contentType = response.headers.get('content-type') || '';
+  const isJson = contentType.toLowerCase().includes('application/json');
+  const payload = isJson ? await response.json().catch(() => null) : null;
   if (!response.ok) throw new Error(payload?.error || `Request failed (${response.status})`);
+  if (!isJson || payload === null) throw new Error(`API endpoint ${endpoint} did not return JSON data.`);
   return payload as T;
 }
 
