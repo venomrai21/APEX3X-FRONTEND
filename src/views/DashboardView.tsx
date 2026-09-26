@@ -78,7 +78,7 @@ const [businessProfile, setBusinessProfile] = useState<BusinessProfileData | nul
             <h3 className="text-sm font-semibold text-zinc-100 uppercase tracking-wider flex items-center gap-2"><Building2 className="w-4 h-4 text-zinc-300" /> APEX Business Understanding</h3>
             <p className="text-xs text-zinc-400 mt-1">What APEX currently knows about this business, backed by cloud-persisted profile context.</p>
           </div>
-          <button onClick={() => setActiveNav('settings')} className="text-xs text-zinc-300 hover:text-white font-medium flex items-center gap-1">View complete profile <ChevronRight className="w-3 h-3" /></button>
+          <button onClick={() => setActiveNav('business_profile')} className="text-xs text-zinc-300 hover:text-white font-medium flex items-center gap-1">View complete profile <ChevronRight className="w-3 h-3" /></button>
         </div>
         {businessProfile ? (() => {
           const p = businessProfile.profile || {};
