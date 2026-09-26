@@ -128,7 +128,6 @@ export const DashboardView: React.FC = () => {
     const openLeads = aux.leads.filter(lead => !['converted', 'lost'].includes(lead.status)).length;
     const highRiskLeads = aux.leads.filter(lead => lead.leakRisk === 'high').length;
     const pendingBookings = aux.bookings.filter(booking => booking.status === 'pending').length;
-    const noShowExposure = 0;
     const unreadConversations = aux.conversations.reduce((sum, conversation) => sum + conversation.unreadCount, 0);
     const urgentConversations = aux.conversations.filter(conversation => conversation.priority === 'high' && conversation.status !== 'resolved').length;
     const activeWorkflows = aux.workflows.filter(workflow => workflow.isActive).length;
@@ -159,11 +158,11 @@ export const DashboardView: React.FC = () => {
       ...aux.conversations.map(item => ({ id: 'conversation-' + item.id, time: item.lastMessageAt, label: 'Conversation updated', detail: item.contactName + ' · ' + item.channel })),
       ...aux.bookings.map(item => ({ id: 'booking-' + item.id, time: item.scheduledAt, label: 'Booking scheduled', detail: item.title + ' · ' + item.customerName })),
       ...aux.invoices.map(item => ({ id: 'invoice-' + item.id, time: item.issueDate, label: 'Invoice issued', detail: item.invoiceNumber + ' · ' + money(item.amount, item.currency || currency) })),
-      ...data!.recentDeals.map(item => ({ id: 'deal-' + item.id, time: item.updatedAt, label: 'Deal updated', detail: item.title + ' · ' + money(item.value, currency) })),
+      ...(data?.recentDeals || []).map(item => ({ id: 'deal-' + item.id, time: item.updatedAt, label: 'Deal updated', detail: item.title + ' · ' + money(item.value, currency) })),
     ].filter(item => item.time).sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()).slice(0, 8);
 
     return {
-      activeCustomers, atRiskCustomers, averageHealth, openLeads, highRiskLeads, pendingBookings, noShowExposure,
+      activeCustomers, atRiskCustomers, averageHealth, openLeads, highRiskLeads, pendingBookings,
       unreadConversations, urgentConversations, activeWorkflows, failedWorkflowRuns, connectedIntegrations,
       integrationAttention, totalInvoiced, collected, outstanding, overdue, collectionRate, riskByCategory,
       cycleCounts, latestSync, recentSignals,
