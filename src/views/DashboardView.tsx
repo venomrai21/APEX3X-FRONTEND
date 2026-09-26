@@ -24,13 +24,13 @@ export const DashboardView: React.FC = () => {
       }
       setData(result);
     } catch (err) {
-      console.error('Failed fetching dashboard:', err);
+      console.warn('Live dashboard data unavailable:', err);
       setData(null);
       setLoadError(err instanceof Error ? err.message : 'Live workspace data is unavailable.');
     } finally { setLoading(false); }
   };
 
-  useEffect(() => { fetchDashboard(); api.getBusinessProfile().then(setBusinessProfile).catch(err => console.error('Failed fetching business profile:', err)); }, [refreshKey]);
+  useEffect(() => { fetchDashboard(); api.getBusinessProfile().then(setBusinessProfile).catch(err => console.warn('Live business profile data unavailable:', err)); }, [refreshKey]);
 
   const handleExecuteAction = async (alertId: string) => {
     try {
