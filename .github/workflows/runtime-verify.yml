@@ -11,7 +11,7 @@ permissions:
 jobs:
   browser-smoke:
     name: Verify Cloudflare Pages React runtime
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
