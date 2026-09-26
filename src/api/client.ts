@@ -31,7 +31,8 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
 
 export const api = {
   getMe: () => request<{ user: User; workspace: Workspace }>('/api/auth/me'),
-getBusinessProfile: () => request<BusinessProfileData>('/api/business-profile'),
+  getBusinessProfile: () => request<BusinessProfileData>('/api/business-profile'),
+  updateBusinessProfile: (data: { profile: Record<string, any>; foundationCompleted: boolean; stage2CompletedCount: number; stage3Completion: number }) => request<BusinessProfileData>('/api/business-profile', { method: 'PUT', body: JSON.stringify(data) }),
   getWorkspaces: () => request<Workspace[]>('/api/workspaces'),
   createWorkspace: (data: Partial<Workspace>) => request<Workspace>('/api/workspaces', { method: 'POST', body: JSON.stringify(data) }),
   updateWorkspace: (data: Partial<Workspace> & { logoUrl?: string }) => { if (!currentActiveWorkspaceId) throw new Error('Workspace context is not available.'); return request<Workspace>(`/api/workspaces/${currentActiveWorkspaceId}`, { method: 'PUT', body: JSON.stringify(data) }).then((payload: any) => payload.workspace || payload); },
