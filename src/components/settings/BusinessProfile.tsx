@@ -330,6 +330,38 @@ const FieldLabel: React.FC<{ label: string }> = ({ label }) => {
 };
 
 const BPInput: React.FC<React.ComponentProps<typeof Input>> = ({ label, ...props }) => (
+  <BPInput {...props} label={typeof label === 'string' ? <FieldLabel label={label} /> : label} />
+);
+
+const BPSelect: React.FC<React.ComponentProps<typeof Select>> = ({ label, ...props }) => (
+  <BPSelect {...props} label={typeof label === 'string' ? <FieldLabel label={label} /> : label} />
+);
+
+const FIELD_INFO: Record<string, string> = {
+  'Business Name': 'Enter the business name APEX should use as the workspace business identity.',
+  'Industry': 'Choose the industry that most closely describes what the business does.',
+  'What does your business do?': 'Describe what the business provides, who it serves, and the problem it solves.',
+  'Business ID': 'Enter the applicable business or government identifier for the business. The label stays jurisdiction-neutral.',
+  'Registered Headquarters Address': 'Enter the legally registered headquarters address.',
+  'Website': 'Enter the official business website URL.',
+};
+
+const FieldLabel: React.FC<{ label: string }> = ({ label }) => {
+  const details = FIELD_INFO[label] || `Enter the business-specific value for ${label.toLowerCase()}. Leave it blank when it does not apply.`;
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      <span>{label}</span>
+      <span className="group relative inline-flex h-3.5 w-3.5 items-center justify-center rounded-full border border-[var(--border-strong)] text-[9px] font-semibold leading-none text-[var(--text-muted)]">
+        <span aria-hidden="true">i</span>
+        <span role="tooltip" className="pointer-events-none invisible absolute left-0 top-full z-50 mt-2 w-64 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2 text-[11px] font-normal leading-relaxed text-[var(--text-secondary)] opacity-0 shadow-xl transition-[opacity,visibility] duration-100 group-hover:visible group-hover:opacity-100">
+          {details}
+        </span>
+      </span>
+    </span>
+  );
+};
+
+const BPInput: React.FC<React.ComponentProps<typeof Input>> = ({ label, ...props }) => (
   <Input {...props} label={typeof label === 'string' ? <FieldLabel label={label} /> : label} />
 );
 
