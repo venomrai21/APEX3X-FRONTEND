@@ -69,11 +69,11 @@ jobs:
             throw new Error('React mounted without the expected APEX UI shell.');
           }
 
-          const businessProfileNav = page.locator('[aria-label="Primary navigation"]').getByText('Business Profile', { exact: true });
+          const businessProfileNav = page.getByRole('button', { name: 'Open Business profile', exact: true });
           if (await businessProfileNav.count() === 0) {
-            throw new Error('Business Profile navigation item was not rendered.');
+            throw new Error('Business Profile header control was not rendered.');
           }
-          await businessProfileNav.locator('..').click();
+          await businessProfileNav.click();
           await page.waitForTimeout(500);
 
           const tooltip = page.locator('[role="tooltip"]').first();
