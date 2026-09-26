@@ -1,4 +1,5 @@
 import { CurrencyDefinition, CurrencyRegistryExtension } from './types';
+import { currencies } from 'countries-list/currencies';
 
 const extensionRegistry = new Map<string, CurrencyRegistryExtension>();
 
@@ -42,6 +43,7 @@ export function registerCurrencyExtensions(entries: CurrencyRegistryExtension[])
 export function getCurrencyRegistry(locale = getLocale()): CurrencyDefinition[] {
   const runtimeEntries = getSupportedCodes().map(code => ({
     code,
+    numericCode: (currencies as Record<string, { numeric?: string }>)[code]?.numeric,
     name: getDisplayName(code, locale),
     symbol: getSymbol(code, locale, 'symbol'),
     narrowSymbol: getSymbol(code, locale, 'narrowSymbol'),
