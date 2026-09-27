@@ -147,7 +147,7 @@ jobs:
           }
           await currencyButton.click();
 
-          const currencyCountText = page.getByText(/All supported ISO \/ CLDR currencies ·/).first();
+          const currencyCountText = page.getByText(/All supported currencies ·/).first();
           await currencyCountText.waitFor({ state: 'visible', timeout: 2000 });
           const currencyCountMatch = (await currencyCountText.innerText()).match(/·\s*(\d+)$/);
           const currencyCount = currencyCountMatch ? Number(currencyCountMatch[1]) : 0;
