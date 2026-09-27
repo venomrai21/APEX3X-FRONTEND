@@ -4,6 +4,7 @@ import {
   MapPin, Plus, Save, Sparkles, Target, Trash2, Users, X
 } from 'lucide-react';
 import { api } from '../../api/client';
+import { useApp } from '../../context/AppContext';
 import { Badge, Button, Card, Input, Select } from '../apex3x';
 import { CurrencySelector } from '../currency/CurrencySelector';
 
@@ -356,6 +357,7 @@ const TextAreaField: React.FC<{ id: string; label: string; value: string; onChan
 );
 
 export const BusinessProfile: React.FC<{
+  const { updateWorkspaceIdentity } = useApp();
   addToast: (toast: { type: 'success' | 'warning' | 'error' | 'info'; title: string; description?: string }) => void;
 }> = ({ addToast }) => {
   const [activeStage, setActiveStage] = useState<StageId>(1);
@@ -440,7 +442,7 @@ export const BusinessProfile: React.FC<{
         stage2CompletedCount: stage2Complete,
         stage3Completion: stage3Complete,
       });
-      if (stage === 1 && draft.primaryCurrency) { try { await api.updateWorkspace({ currency: draft.primaryCurrency }); } catch (workspaceError) { console.warn('Workspace currency sync unavailable:', workspaceError); } }
+      if (stage === 1 && draft.primaryCurrency) { try { await api.updateWorkspace({ currency: draft.primaryCurrency }); updateWorkspaceIdentity({ currency: draft.primaryCurrency }); } catch (workspaceError) { console.warn('Workspace currency sync unavailable:', workspaceError); } }
       setFoundationCompleted(saved.foundationCompleted);
       setProfileLoaded(true);
       addToast({
