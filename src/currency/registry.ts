@@ -7,32 +7,43 @@ const getLocale = (locale?: string) => locale || (typeof navigator !== 'undefine
 
 const getSupportedCodes = (): string[] => {
   const intl = Intl as typeof Intl & { supportedValuesOf?: (key: 'currency') => string[] };
-  if (typeof intl.supportedValuesOf === 'function') return intl.supportedValuesOf('currency').map(code => code.toUpperCase());
-  return [];
+  const runtimeCodes = typeof intl.supportedValuesOf === 'function' ? intl.supportedValuesOf('currency') : [];
+  return Array.from(new Set([...runtimeCodes, ...Object.keys(currencies)])).map(code => code.toUpperCase());
 };
 
-const getDisplayName = (code: string, locale: string): string => {
+type CurrencyDatasetEntry = {
+  name?: string;
+  symbol?: string;
+  numeric?: string;
+  decimals?: number;
+  withdrawn?: boolean;
+};
+
+const getDatasetEntry = (code: string): CurrencyDatasetEntry | undefined =>
+  (currencies as Record<string, CurrencyDatasetEntry>)[code];
+
+const getDisplayName = (code: string, locale: string, fallback?: string): string => {
   try {
     const DisplayNamesCtor = (Intl as any).DisplayNames;
-    if (DisplayNamesCtor) return new DisplayNamesCtor([locale], { type: 'currency' }).of(code) || code;
+    if (DisplayNamesCtor) return new DisplayNamesCtor([locale], { type: 'currency' }).of(code) || fallback || code;
   } catch { /* fall through */ }
-  return code;
+  return fallback || code;
 };
 
-const getSymbol = (code: string, locale: string, display: 'symbol' | 'narrowSymbol'): string | undefined => {
+const getSymbol = (code: string, locale: string, display: 'symbol' | 'narrowSymbol', fallback?: string): string | undefined => {
   try {
     const parts = new Intl.NumberFormat(locale, { style: 'currency', currency: code, currencyDisplay: display }).formatToParts(0);
-    return parts.find(part => part.type === 'currency')?.value || code;
+    return parts.find(part => part.type === 'currency')?.value || fallback;
   } catch {
-    return undefined;
+    return fallback;
   }
 };
 
-const getMinorUnit = (code: string, locale: string): number | undefined => {
+const getMinorUnit = (code: string, locale: string, fallback?: number): number | undefined => {
   try {
     return new Intl.NumberFormat(locale, { style: 'currency', currency: code }).resolvedOptions().maximumFractionDigits;
   } catch {
-    return undefined;
+    return fallback;
   }
 };
 
@@ -41,16 +52,19 @@ export function registerCurrencyExtensions(entries: CurrencyRegistryExtension[])
 }
 
 export function getCurrencyRegistry(locale = getLocale()): CurrencyDefinition[] {
-  const runtimeEntries = getSupportedCodes().map(code => ({
-    code,
-    numericCode: (currencies as Record<string, { numeric?: string }>)[code]?.numeric,
-    name: getDisplayName(code, locale),
-    symbol: getSymbol(code, locale, 'symbol'),
-    narrowSymbol: getSymbol(code, locale, 'narrowSymbol'),
-    minorUnit: getMinorUnit(code, locale),
-    status: 'supported' as const,
-    source: 'CLDR_RUNTIME' as const,
-  }));
+  const runtimeEntries = getSupportedCodes().map(code => {
+    const dataset = getDatasetEntry(code);
+    return {
+      code,
+      numericCode: dataset?.numeric,
+      name: getDisplayName(code, locale, dataset?.name),
+      symbol: getSymbol(code, locale, 'symbol', dataset?.symbol),
+      narrowSymbol: getSymbol(code, locale, 'narrowSymbol', dataset?.symbol),
+      minorUnit: getMinorUnit(code, locale, dataset?.decimals),
+      status: dataset?.withdrawn ? 'historical' as const : 'supported' as const,
+      source: 'CLDR_RUNTIME' as const,
+    };
+  });
 
   const merged = new Map<string, CurrencyDefinition>(runtimeEntries.map(entry => [entry.code, entry]));
   extensionRegistry.forEach((entry, code) => merged.set(code, entry));
