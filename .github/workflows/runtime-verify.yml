@@ -122,6 +122,11 @@ jobs:
 
           console.log('Business Profile tooltip hover behavior verified.');
 
+          const businessProfileStage = page.getByRole('tab', { name: /Stage 03/i });
+          await businessProfileStage.waitFor({ state: 'visible', timeout: 3000 });
+          await businessProfileStage.click();
+          await page.waitForTimeout(300);
+
           const currencyButton = page.getByRole('button', { name: 'Business Currency', exact: true });
           if (await currencyButton.count() === 0) {
             throw new Error('Global Business Currency selector was not rendered.');
