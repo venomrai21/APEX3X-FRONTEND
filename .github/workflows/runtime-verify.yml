@@ -19,12 +19,33 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Cache npm and Playwright browser
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            ~/.cache/ms-playwright
+          key: runtime-${{ runner.os }}-${{ hashFiles('package.json') }}-playwright-1.55.0
+          restore-keys: |
+            runtime-${{ runner.os }}-
       - name: Install browser test dependency
-        run: npm install --no-save playwright@1.55.0
+        run: npm install --no-save --prefer-offline --no-audit --no-fund playwright@1.55.0
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
-      - name: Wait for Pages deployment propagation
-        run: sleep 45
+      - name: Wait for Pages deployment readiness
+        run: |
+          url="https://apex3x-frontend.pages.dev/"
+          for attempt in $(seq 1 18); do
+            status="$(curl -L -s -o /dev/null -w '%{http_code}' --max-time 10 "$url" || true)"
+            if [ "$status" = "200" ]; then
+              echo "Cloudflare Pages is responding with HTTP 200 on attempt $attempt."
+              exit 0
+            fi
+            echo "Attempt $attempt: Pages returned ${status:-no-response}; waiting 5s."
+            sleep 5
+          done
+          echo "Cloudflare Pages did not become ready within 90 seconds."
+          exit 1
       - name: Verify live UI
         run: |
           node --input-type=module <<'EOF'
