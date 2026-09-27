@@ -79,7 +79,7 @@ export const DashboardView: React.FC = () => {
   const upcoming = snapshot.bookings.filter(b => new Date(b.scheduledAt).getTime() >= Date.now() && b.status !== 'cancelled').length;
   const pendingBookings = snapshot.bookings.filter(b => b.status === 'pending').length;
   const overdueInvoices = snapshot.invoices.filter(i => i.status === 'overdue' || i.status === 'in_collection');
-  const invoiceCurrencies = Array.from(new Set(snapshot.invoices.map(i => i.currency).filter(Boolean)));
+  const invoiceCurrencies = Array.from(new Set(snapshot.invoices.map(i => i.currency).filter((value): value is string => Boolean(value))));
   const invoiceReportingCurrency = invoiceCurrencies.length === 1 ? invoiceCurrencies[0] : null;
   const invoiced = snapshot.invoices.reduce((sum, i) => invoiceReportingCurrency && i.currency === invoiceReportingCurrency ? sum + i.amount : sum, 0);
   const collected = snapshot.invoices.filter(i => i.status === 'paid' && (!invoiceReportingCurrency || i.currency === invoiceReportingCurrency)).reduce((sum, i) => sum + i.amount, 0);
