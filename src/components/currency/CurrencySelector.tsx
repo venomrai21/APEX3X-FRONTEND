@@ -62,7 +62,7 @@ export const CurrencySelector: React.FC<{
           </div>
         )}
       </div>
-      <p className="text-[10px] leading-relaxed text-[var(--text-muted)]">Currency identity is stored by ISO 4217 code. Symbols are presentation only. The registry combines the browser's CLDR-backed Intl metadata with a bundled ISO 4217 dataset fallback and can be extended by an authoritative APEX registry later.</p>
+      <p className="text-[10px] leading-relaxed text-[var(--text-muted)]">Currency identity is stored by ISO 4217 code. Symbols are presentation only. The registry is generated from the browser's CLDR-backed Intl currency data and can be extended by an authoritative APEX registry later.</p>
     </div>
   );
 };
