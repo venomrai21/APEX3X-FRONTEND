@@ -52,7 +52,7 @@ export function getCurrencyRegistry(locale = getLocale()): CurrencyDefinition[] 
     source: 'CLDR_RUNTIME' as const,
   }));
 
-  const merged = new Map(runtimeEntries.map(entry => [entry.code, entry]));
+  const merged = new Map<string, CurrencyDefinition>(runtimeEntries.map(entry => [entry.code, entry]));
   extensionRegistry.forEach((entry, code) => merged.set(code, entry));
   return Array.from(merged.values()).sort((a, b) => a.name.localeCompare(b.name, locale, { sensitivity: 'base' }) || a.code.localeCompare(b.code));
 }
