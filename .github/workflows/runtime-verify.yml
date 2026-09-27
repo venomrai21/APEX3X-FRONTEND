@@ -128,7 +128,11 @@ jobs:
           console.log('Business Profile tooltip hover behavior verified.');
 
           await page.keyboard.press('Escape');
-          const sidebarBusinessProfile = page.locator('aside[aria-label="Primary navigation"] button').filter({ hasText: 'Business Profile' }).first();
+          const coreGroup = page.locator('aside[aria-label="Primary navigation"] div[role="group"][aria-label="Core"]');
+          const coreToggle = coreGroup.locator('button').first();
+          await coreToggle.click({ force: true });
+          await page.waitForTimeout(250);
+          const sidebarBusinessProfile = coreGroup.locator('button').filter({ hasText: 'Business Profile' }).first();
           await sidebarBusinessProfile.click({ force: true });
           await page.waitForFunction(() => document.title === 'Business Profile — APEX3X', null, { timeout: 3000 });
 
