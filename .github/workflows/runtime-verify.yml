@@ -141,10 +141,10 @@ jobs:
           await businessProfileStage.click();
           await page.waitForTimeout(300);
 
-          const currencyButton = page.getByRole('button', { name: 'Business Currency', exact: true });
-          if (await currencyButton.count() === 0) {
-            throw new Error('Global Business Currency selector was not rendered.');
-          }
+          const currencyLabel = page.getByText('Business Currency', { exact: true }).first();
+          await currencyLabel.waitFor({ state: 'visible', timeout: 3000 });
+          const currencyButton = currencyLabel.locator('..').getByRole('button').first();
+          await currencyButton.waitFor({ state: 'visible', timeout: 2000 });
           await currencyButton.click();
 
           const currencyCountText = page.getByText(/All supported currencies ·/).first();
