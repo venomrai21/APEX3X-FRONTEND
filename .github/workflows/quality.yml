@@ -1,8 +1,6 @@
 name: APEX3X Frontend Quality
 
 on:
-  push:
-    branches: [main]
   pull_request:
     branches: [main]
 
