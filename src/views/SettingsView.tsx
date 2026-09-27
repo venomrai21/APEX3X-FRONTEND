@@ -39,7 +39,7 @@ export const SettingsView: React.FC = () => {
       addToast({
         type: 'warning',
         title: 'Workspace details required',
-        description: 'Enter a workspace name and URL.',
+        description: 'Enter a workspace name and URL slug.',
       });
       return;
     }
@@ -53,7 +53,7 @@ export const SettingsView: React.FC = () => {
       addToast({
         type: 'success',
         title: 'Workspace settings saved',
-        description: 'Workspace settings were updated.',
+        description: 'Workspace configuration was updated.',
       });
     } catch (error) {
       addToast({
@@ -129,16 +129,16 @@ export const SettingsView: React.FC = () => {
         <div>
           <h2 className="text-lg font-semibold text-[var(--text-primary)]">Workspace Settings</h2>
           <p className="mt-1 text-xs text-[var(--text-secondary)]">
-            Manage your workspace settings.
+            Manage the current workspace. Business information lives in Business Profile.
           </p>
         </div>
 
         <Card padding="lg">
           <div className="space-y-5">
             <div>
-              <h3 className="text-sm font-semibold text-[var(--text-primary)]">Workspace Details</h3>
+              <h3 className="text-sm font-semibold text-[var(--text-primary)]">Workspace Configuration</h3>
               <p className="mt-1 text-[11px] text-[var(--text-secondary)]">
-                Set the name, URL and branding used for this workspace.
+                Configure the workspace identity used inside APEX. This does not replace your business information.
               </p>
             </div>
 
@@ -150,7 +150,7 @@ export const SettingsView: React.FC = () => {
                 placeholder="Workspace name"
               />
               <Input
-                label="Workspace URL"
+                label="Workspace URL Slug"
                 value={workspaceSlug}
                 onChange={event => setWorkspaceSlug(event.target.value)}
                 placeholder="workspace-name"

@@ -134,8 +134,6 @@ type BusinessProfileDraft = {
   communicationRules: string;
   operationalConstraints: string;
   currency: string;
-  reportingCurrency: string;
-  acceptedCurrencies: string[];
 };
 
 const sourceMeta = (source: Source = 'user_declared'): ProfileMeta => ({
@@ -261,8 +259,6 @@ const createDraft = (): BusinessProfileDraft => ({
   communicationRules: '',
   operationalConstraints: '',
   currency: '',
-  reportingCurrency: '',
-  acceptedCurrencies: [],
 });
 
 const stageMeta: Record<StageId, { title: string; subtitle: string }> = {
@@ -482,9 +478,9 @@ export const BusinessProfile: React.FC<{
     <div className="space-y-5">
       {profileLoadError && (
         <Card padding="md">
-          <div className="text-xs font-semibold text-[var(--text-primary)]">Business profile unavailable</div>
+          <div className="text-xs font-semibold text-[var(--text-primary)]">Cloud business profile not connected</div>
           <p className="mt-1 text-[11px] leading-relaxed text-[var(--text-secondary)]">
-            We couldn't load your saved business details.
+            The form is blank because no business profile data was returned by the connected API. No sample business data is being inserted.
           </p>
         </Card>
       )}
@@ -534,20 +530,20 @@ export const BusinessProfile: React.FC<{
         <div className="flex items-start justify-between gap-3">
           <div>
             <div className="text-xs font-semibold text-[var(--text-primary)]">What APEX now understands</div>
-            <p className="mt-1 text-[10px] leading-relaxed text-[var(--text-muted)]">This is what APEX currently knows about your business.</p>
+            <p className="mt-1 text-[10px] leading-relaxed text-[var(--text-muted)]">This summary reflects declared business context. Connected data and observed activity can later corroborate or refine it.</p>
           </div>
-          {foundationCompleted && <Badge variant="success" size="sm">Business details complete</Badge>}
+          {foundationCompleted && <Badge variant="success" size="sm">Foundation complete</Badge>}
         </div>
         {understandingSummary.length ? (
           <ul className="space-y-1.5 text-[11px] text-[var(--text-secondary)]">{understandingSummary.slice(0, 6).map((item, index) => <li key={index} className="flex gap-2"><span className="text-[var(--text-muted)]">•</span><span>{item}</span></li>)}</ul>
         ) : (
-          <p className="text-[11px] text-[var(--text-muted)]">Complete your business details and this summary will update.</p>
+          <p className="text-[11px] text-[var(--text-muted)]">Start with the Foundation fields and this summary will update as you provide reliable context.</p>
         )}
       </Card>
 
       {!stageReady && foundationCompleted === false && (
         <Card padding="md">
-          <div className="text-[11px] text-[var(--text-secondary)]"><span className="font-semibold text-[var(--text-primary)]">Next useful step:</span> complete your business details so APEX can start working with your business.</div>
+          <div className="text-[11px] text-[var(--text-secondary)]"><span className="font-semibold text-[var(--text-primary)]">Next useful step:</span> complete the Foundation so APEX can start working with a reliable business context.</div>
         </Card>
       )}
 
@@ -559,7 +555,7 @@ export const BusinessProfile: React.FC<{
               <h3 className="mt-1 text-lg font-semibold text-[var(--text-primary)]">Business Basics</h3>
               <p className="mt-1 max-w-2xl text-xs leading-relaxed text-[var(--text-secondary)]">The smallest useful business context. Complete this stage and enter APEX; everything deeper can wait.</p>
             </div>
-            <Badge variant={stageReady ? 'success' : 'neutral'} size="sm">{stageReady ? 'READY TO USE APEX' : 'BUSINESS DETAILS INCOMPLETE'}</Badge>
+            <Badge variant={stageReady ? 'success' : 'neutral'} size="sm">{stageReady ? 'READY TO USE APEX' : 'FOUNDATION INCOMPLETE'}</Badge>
           </div>
 
           <Section title="Identity" description="Tell APEX what the business is. These are the only identity fields required at activation.">
@@ -595,7 +591,7 @@ export const BusinessProfile: React.FC<{
             </div>
           </Section>
 
-          <Section title="Target Customers" description="Tell APEX who you serve so it can make more relevant decisions.">
+          <Section title="Target Customers" description="This is the customer's declared view of who they serve. APEX can later compare it with observed data instead of silently replacing it.">
             <ToggleChips values={customerTypes} selected={draft.targetCustomers} onChange={values => update('targetCustomers', values)} ariaLabel="Target customer types" />
             <TextAreaField id="bp-target-customer-description" label="Primary customer description" value={draft.targetCustomerDescription} onChange={value => update('targetCustomerDescription', value)} placeholder="Who typically buys from you, and why?" />
           </Section>
@@ -613,10 +609,10 @@ export const BusinessProfile: React.FC<{
 
           <div className="flex flex-col gap-3 border-t border-[var(--border-subtle)] pt-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <div className="text-xs font-semibold text-[var(--text-primary)]">Business setup: {stageReady ? 'Complete' : 'In progress'}</div>
-              <p className="mt-1 text-[10px] text-[var(--text-muted)]">Complete your business basics to start using APEX. You can add more detail later.</p>
+              <div className="text-xs font-semibold text-[var(--text-primary)]">Foundation status: {stageReady ? 'Complete' : 'In progress'}</div>
+              <p className="mt-1 text-[10px] text-[var(--text-muted)]">Complete the Foundation to unlock the path into APEX. Discovery and Precision remain optional.</p>
             </div>
-            <Button variant="primary" size="md" isLoading={savingStage === 1} onClick={() => saveStage(1)} disabled={!stageReady} leftIcon={<Save className="h-4 w-4" />}>Save Business Details</Button>
+            <Button variant="primary" size="md" isLoading={savingStage === 1} onClick={() => saveStage(1)} disabled={!stageReady} leftIcon={<Save className="h-4 w-4" />}>Save Foundation</Button>
           </div>
         </Card>
       )}
@@ -772,12 +768,12 @@ export const BusinessProfile: React.FC<{
             <div>
               <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">Step 3 · Optional</div>
               <h3 className="mt-1 text-lg font-semibold text-[var(--text-primary)]">Operations & Verification</h3>
-              <p className="mt-1 max-w-2xl text-xs leading-relaxed text-[var(--text-secondary)]">Add the business details that are relevant to how you operate.</p>
+              <p className="mt-1 max-w-2xl text-xs leading-relaxed text-[var(--text-secondary)]">Add deeper business infrastructure only where it applies. Legal/compliance facts remain separate from growth intelligence; operational rules become execution context.</p>
             </div>
-            <Badge variant="neutral" size="sm">OPTIONAL</Badge>
+            <Badge variant="neutral" size="sm">OPTIONAL · CONDITIONAL</Badge>
           </div>
 
-          <Section title="Legal & Registration" description="Add formal business and registration details.">
+          <Section title="Legal & Registration" description="Formal business facts. These should be treated as legal/compliance context, not as marketing or growth assumptions.">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <BPInput id="bp-legal-name" label="Legal business name" value={draft.legalName} onChange={event => update('legalName', event.target.value)} />
               <BPInput id="bp-trading-name" label="Trading / brand name" value={draft.tradingName} onChange={event => update('tradingName', event.target.value)} />
@@ -794,7 +790,7 @@ export const BusinessProfile: React.FC<{
             </div>
           </Section>
 
-          <Section title="Operational Structure" description="Tell APEX about your people, locations, hours and capacity.">
+          <Section title="Operational Structure" description="Describe people, locations, hours and capacity. These values can later be enriched by connected systems.">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <BPSelect id="bp-employees" label="Employee count / range" value={draft.employeeRange} onChange={event => update('employeeRange', event.target.value)} options={[{ value: '', label: 'Select range' }, { value: '1', label: '1' }, { value: '2_10', label: '2–10' }, { value: '11_50', label: '11–50' }, { value: '51_200', label: '51–200' }, { value: '201_500', label: '201–500' }, { value: '500_plus', label: '500+' }]} />
               <BPInput id="bp-departments" label="Departments" value={draft.departments} onChange={event => update('departments', event.target.value)} placeholder="Sales, operations, finance…" />
@@ -809,7 +805,7 @@ export const BusinessProfile: React.FC<{
           </Section>
 
           {(draft.businessModels.includes('Service business') || draft.businessModels.includes('Appointment')) && (
-            <Section title="Appointments & Service Delivery" description="Add appointment and service details when they apply.">
+            <Section title="Appointments & Service Delivery" description="Shown when the business model indicates a service or appointment workflow.">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 <BPInput id="bp-duration" label="Typical appointment duration" value={draft.appointmentDuration} onChange={event => update('appointmentDuration', event.target.value)} />
                 <BPInput id="bp-booking-rules" label="Booking rules" value={draft.bookingRules} onChange={event => update('bookingRules', event.target.value)} />
@@ -828,28 +824,11 @@ export const BusinessProfile: React.FC<{
             </Section>
           )}
 
-          <Section title="Currency" description="Set your main business currency, reporting currency, and the currencies you accept.">
-            <div className="space-y-5">
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <CurrencySelector label="Business Currency" value={draft.currency} onChange={value => update('currency', value)} />
-                <CurrencySelector label="Reporting Currency" value={draft.reportingCurrency || draft.currency} onChange={value => update('reportingCurrency', value)} />
-              </div>
-              <div className="space-y-2">
-                <div className="text-xs font-medium text-[var(--text-secondary)]">Accepted currencies</div>
-                <p className="text-[11px] leading-relaxed text-[var(--text-muted)]">Choose the currencies your business uses for customer transactions. Each transaction keeps its own currency.</p>
-                <div className="flex flex-wrap gap-2">
-                  {draft.acceptedCurrencies.map(code => (
-                    <button key={code} type="button" onClick={() => update('acceptedCurrencies', draft.acceptedCurrencies.filter(item => item !== code))} className="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-3 py-1.5 text-xs text-[var(--text-primary)]">
-                      {code} <span className="ml-1 text-[var(--text-muted)]">×</span>
-                    </button>
-                  ))}
-                  <CurrencySelector label="Add currency" value="" onChange={value => value && !draft.acceptedCurrencies.includes(value) && update('acceptedCurrencies', [...draft.acceptedCurrencies, value])} />
-                </div>
-              </div>
-            </div>
+          <Section title="Currency" description="Choose the business presentation currency used for financial values across APEX. Currency identity uses the ISO 4217 code; the displayed symbol is locale-aware.">
+            <CurrencySelector value={draft.currency} onChange={value => update('currency', value)} />
           </Section>
 
-          <Section title="Payments & Commercial" description="Add the payment and commercial details APEX should consider.">
+          <Section title="Payments & Commercial" description="Keep sensitive financial detail minimal. Prefer connected payment/accounting data for authoritative metrics.">
             <div className="space-y-4">
               <div><div className="mb-2 text-xs font-medium text-[var(--text-secondary)]">Accepted payment methods</div><ToggleChips values={paymentOptions} selected={draft.acceptedPayments} onChange={values => update('acceptedPayments', values)} ariaLabel="Payment methods" /></div>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -863,7 +842,7 @@ export const BusinessProfile: React.FC<{
             </div>
           </Section>
 
-          <Section title="Policies & Constraints" description="Tell APEX about business rules it should consider when operating.">
+          <Section title="Policies & Constraints" description="Operational rules are execution guardrails. They should inform actions only after the relevant permission/autonomy layer authorizes them.">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <TextAreaField id="bp-refund" label="Refund policy" value={draft.refundPolicy} onChange={value => update('refundPolicy', value)} />
               <TextAreaField id="bp-cancellation" label="Cancellation policy" value={draft.cancellationPolicy} onChange={value => update('cancellationPolicy', value)} />
@@ -875,7 +854,7 @@ export const BusinessProfile: React.FC<{
           </Section>
 
           <div className="flex flex-col gap-3 border-t border-[var(--border-subtle)] pt-6 sm:flex-row sm:items-center sm:justify-between">
-            <div><div className="text-xs font-semibold text-[var(--text-primary)]">More Business Details</div><p className="mt-1 text-[10px] text-[var(--text-muted)]">Only relevant business details are shown here.</p></div>
+            <div><div className="text-xs font-semibold text-[var(--text-primary)]">More Business Details</div><p className="mt-1 text-[10px] text-[var(--text-muted)]">Conditional sections appear only when their business model makes them relevant.</p></div>
             <Button variant="primary" size="md" isLoading={savingStage === 3} onClick={() => saveStage(3)} leftIcon={<Save className="h-4 w-4" />}>Save Details</Button>
           </div>
         </Card>
@@ -885,7 +864,7 @@ export const BusinessProfile: React.FC<{
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <div className="flex gap-3"><Gauge className="mt-0.5 h-4 w-4 shrink-0 text-[var(--text-secondary)]" /><div><div className="text-xs font-semibold text-[var(--text-primary)]">Coverage is contextual</div><p className="mt-1 text-[10px] leading-relaxed text-[var(--text-muted)]">APEX tracks usable context by business dimension instead of reducing the business to one score.</p></div></div>
           <div className="flex gap-3"><FileCheck2 className="mt-0.5 h-4 w-4 shrink-0 text-[var(--text-secondary)]" /><div><div className="text-xs font-semibold text-[var(--text-primary)]">Keep information current</div><p className="mt-1 text-[10px] leading-relaxed text-[var(--text-muted)]">Update the profile when your business, offers, customers or operating context changes.</p></div></div>
-          <div className="flex gap-3"><Target className="mt-0.5 h-4 w-4 shrink-0 text-[var(--text-secondary)]" /><div><div className="text-xs font-semibold text-[var(--text-primary)]">Build only what you need</div><p className="mt-1 text-[10px] leading-relaxed text-[var(--text-muted)]">Start with the essentials. You can add more detail later.</p></div></div>
+          <div className="flex gap-3"><Target className="mt-0.5 h-4 w-4 shrink-0 text-[var(--text-secondary)]" /><div><div className="text-xs font-semibold text-[var(--text-primary)]">Build only what you need</div><p className="mt-1 text-[10px] leading-relaxed text-[var(--text-muted)]">Foundation is enough to start. Discovery and Precision can be completed later.</p></div></div>
         </div>
       </Card>
     </div>
