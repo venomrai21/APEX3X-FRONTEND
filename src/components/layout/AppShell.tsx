@@ -26,7 +26,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
     { title: 'Sell & Revenue', items: [{ key: 'pipeline', label: 'Sales Pipeline', icon: <GitPullRequest className="w-4 h-4" /> }, { key: 'invoices', label: 'Invoices & Payments', icon: <CreditCard className="w-4 h-4" /> }] },
     { title: 'Automation', items: [{ key: 'workflows', label: 'Automate', icon: <Workflow className="w-4 h-4" /> }] },
     { title: 'Connected Ecosystem', items: [{ key: 'integrations', label: 'Integrations Hub', icon: <Plug className="w-4 h-4" /> }, { key: 'ai_hub', label: 'AI Provider Hub', icon: <Bot className="w-4 h-4" /> }] },
-    { title: 'Governance', items: [{ key: 'team', label: 'Team & Security', icon: <Shield className="w-4 h-4" /> }, { key: 'billing', label: 'Billing & Entitlements', icon: <CreditCard className="w-4 h-4" /> }, { key: 'settings', label: 'Workspace Settings', icon: <Settings2 className="w-4 h-4" /> }] },
+    { title: 'Governance', items: [{ key: 'team', label: 'Team & Security', icon: <Shield className="w-4 h-4" /> }, { key: 'billing', label: 'Billing & Usage', icon: <CreditCard className="w-4 h-4" /> }, { key: 'settings', label: 'Workspace Settings', icon: <Settings2 className="w-4 h-4" /> }] },
   ];
   const userName = currentUser?.name || 'Account unavailable';
   const selectNav = (key: string) => setActiveNav(key as NavItemKey);
@@ -53,7 +53,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
       integrations: 'Integrations Hub',
       ai_hub: 'AI Provider Hub',
       team: 'Team & Security',
-      billing: 'Billing & Entitlements',
+      billing: 'Billing & Usage',
       settings: 'Workspace Settings',
       marketing: 'Marketing',
     };
