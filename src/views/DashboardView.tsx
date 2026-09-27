@@ -57,9 +57,17 @@ export const DashboardView: React.FC = () => {
     try {
       setLoading(true);
       setLoadError(null);
+      const profileResult = await api.getBusinessProfile();
+      setBusinessProfile(profileResult);
+      if (!profileResult.foundationCompleted) {
+        setData(null);
+        setAux(emptyAux);
+        setLoadError(null);
+        return;
+      }
       const summary = await api.getDashboardSummary();
       if (!summary || typeof summary !== 'object' || !summary.autonomousCycleStatus || !summary.metrics) {
-        throw new Error('Live workspace dashboard data is not available at this frontend origin.');
+        throw new Error('BUSINESS_DATA_LOAD_FAILED');
       }
       setData(summary);
 
@@ -73,7 +81,6 @@ export const DashboardView: React.FC = () => {
         api.getWorkflowLogs(),
         api.getIntegrations(),
         api.getMarketingOverview(),
-        api.getBusinessProfile(),
       ]);
 
       const [customers, leads, bookings, conversations, invoices, workflows, workflowLogs, integrations, marketing, profile] = results;
@@ -88,13 +95,14 @@ export const DashboardView: React.FC = () => {
         integrations: integrations.status === 'fulfilled' ? integrations.value : [],
         marketing: marketing.status === 'fulfilled' ? marketing.value : null,
       });
-      setBusinessProfile(profile.status === 'fulfilled' ? profile.value : null);
+      // Business profile was loaded before the dashboard request so profile completeness
+      // is never confused with a live-data failure.
     } catch (err) {
       console.warn('Live dashboard data unavailable:', err);
       setData(null);
       setAux(emptyAux);
       setBusinessProfile(null);
-      setLoadError(err instanceof Error ? err.message : 'Live workspace data is unavailable.');
+      setLoadError('BUSINESS_DATA_LOAD_FAILED');
     } finally {
       setLoading(false);
     }
@@ -176,15 +184,21 @@ export const DashboardView: React.FC = () => {
   }
 
   if (!data) {
+    const profileIncomplete = businessProfile ? !businessProfile.foundationCompleted : false;
     return (
       <div className="space-y-6 pb-12">
         <APEXReveal>
           <div className="p-6 rounded-xl bg-[#0d0d14] border border-white/[0.08] shadow-xl shadow-black/60">
             <div className="flex items-center gap-2"><span className="p-1 rounded bg-white/[0.06] text-zinc-200 border border-white/[0.10]"><Bot className="w-4 h-4" /></span><h2 className="text-base font-serif-display font-semibold text-zinc-100">Command Center</h2></div>
-            <p className="text-sm text-zinc-300 mt-3">We couldn't load your business data.</p>
-            <p className="text-xs text-zinc-500 mt-2 max-w-2xl">Check your connection and try again.</p>
-            {loadError && <p className="text-[11px] text-zinc-600 mt-3 font-mono">{loadError}</p>}
-            <div className="mt-5 flex flex-wrap gap-2"><Button variant="primary" size="sm" onClick={() => setActiveNav('business_profile')}>Open Business Profile</Button><Button variant="ghost" size="sm" onClick={fetchDashboard} leftIcon={<RefreshCw className="w-3.5 h-3.5" />}>Retry live data</Button></div>
+            {profileIncomplete ? <>
+              <p className="text-sm text-zinc-300 mt-3">Complete your business profile</p>
+              <p className="text-xs text-zinc-500 mt-2 max-w-2xl">Add your business details so APEX can understand your business and personalize your Command Center.</p>
+              <div className="mt-5"><Button variant="primary" size="sm" onClick={() => setActiveNav('business_profile')}>Complete Profile</Button></div>
+            </> : <>
+              <p className="text-sm text-zinc-300 mt-3">We couldn't load your business data</p>
+              <p className="text-xs text-zinc-500 mt-2 max-w-2xl">Please try again.</p>
+              <div className="mt-5"><Button variant="ghost" size="sm" onClick={fetchDashboard} leftIcon={<RefreshCw className="w-3.5 h-3.5" />}>Try Again</Button></div>
+            </>}
           </div>
         </APEXReveal>
       </div>
