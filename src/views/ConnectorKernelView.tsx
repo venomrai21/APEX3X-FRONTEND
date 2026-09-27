@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowRight, CheckCircle2, ChevronRight, Clock3, Code2, Database, FileKey2, Globe2, HeartPulse, KeyRound, LockKeyhole, Plug, RefreshCw, Search, Server, ShieldCheck, Webhook connection, X, Zap, Workflow } from 'lucide-react';
+import { ArrowRight, CheckCircle2, ChevronRight, Clock3, Code2, Database, FileKey2, Globe2, HeartPulse, KeyRound, LockKeyhole, Plug, RefreshCw, Search, Server, ShieldCheck, Webhook, X, Zap, Workflow } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { api } from '../api/client';
 import { IntegrationConnection } from '../types';
