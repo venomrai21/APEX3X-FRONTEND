@@ -20,7 +20,7 @@ const catalog = [
 ] as const;
 const tabs: Array<[Tab,string]> = [['overview','Overview'],['discover','Discover'],['connections','Connections'],['capabilities','What APEX can do'],['events','Events'],['actions','Actions'],['resources','Resources'],['health','Health'],['policy','Access'],['security','Security'],['audit','Activity']];
 
-export const ServiceKernelView: React.FC = () => {
+export const ConnectorKernelView: React.FC = () => {
  const { addToast, triggerRefresh, refreshKey } = useApp(); const [items,setItems]=useState<IntegrationConnection[]>([]); const [loading,setLoading]=useState(true); const [tab,setTab]=useState<Tab>('overview'); const [query,setQuery]=useState(''); const [category,setCategory]=useState('All'); const [method,setMethod]=useState('All'); const [status,setStatus]=useState('All'); const [selected,setSelected]=useState<IntegrationConnection|null>(null); const [open,setOpen]=useState(false); const [busy,setBusy]=useState<string|null>(null);
  const load=async()=>{try{setLoading(true);setItems(await api.getIntegrations())}catch(e){console.error('Integrations unavailable:',e);setItems([])}finally{setLoading(false)}}; useEffect(()=>{load()},[refreshKey]);
  const connected=items.filter(i=>i.status==='connected').length, pending=items.filter(i=>i.status==='pending'||i.status==='syncing').length, errors=items.filter(i=>i.status==='error').length, capabilityCount=items.reduce((n,i)=>n+i.capabilities.length,0);
