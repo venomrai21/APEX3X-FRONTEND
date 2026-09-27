@@ -1,3 +1,4 @@
+import { formatMoney } from '../../../currency';
 import React from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { APEXMOTION } from '../motion';
@@ -69,7 +70,7 @@ export const APEXSpotlight: React.FC<MotionProps & { intensity?: number }> = ({ 
 };
 
 /** Unlumen/Magic UI-style animated value surface; the value itself remains business data. */
-export const APEXMetric: React.FC<{ value: number; prefix?: string; suffix?: string; className?: string }> = ({ value, prefix = '', suffix = '', className = '' }) => {
+export const APEXMetric: React.FC<{ value: number; prefix?: string; suffix?: string; currency?: string; className?: string }> = ({ value, prefix = '', suffix = '', currency, className = '' }) => {
   const reducedMotion = useReducedMotion();
   return (
     <motion.span
@@ -78,7 +79,7 @@ export const APEXMetric: React.FC<{ value: number; prefix?: string; suffix?: str
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: reducedMotion ? 0 : APEXMOTION.duration.fast / 1000, ease: APEXMOTION.ease.standard }}
     >
-      {prefix}{value.toLocaleString()}{suffix}
+      {prefix}{currency ? formatMoney(value, currency) : value.toLocaleString()}{suffix}
     </motion.span>
   );
 };
