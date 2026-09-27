@@ -37,11 +37,11 @@ export const CurrencySelector: React.FC<{
             <div className="border-b border-[var(--border-subtle)] p-2">
               <div className="flex items-center gap-2 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2">
                 <Search className="h-4 w-4 text-[var(--text-muted)]" />
-                <input autoFocus value={query} onChange={event => setQuery(event.target.value)} placeholder="Search by name, code, numeric code or symbol" className="w-full bg-transparent text-xs text-[var(--text-primary)] outline-none placeholder:text-[var(--text-muted)]" aria-label="Search currencies" />
+                <input autoFocus value={query} onChange={event => setQuery(event.target.value)} placeholder="Search currencies" className="w-full bg-transparent text-xs text-[var(--text-primary)] outline-none placeholder:text-[var(--text-muted)]" aria-label="Search currencies" />
               </div>
             </div>
             <div ref={listRef} className="max-h-80 overflow-y-auto p-1" role="listbox" aria-label="All supported currencies">
-              <div className="px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">All supported currencies · {filtered.length}</div>
+              <div className="px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">Currencies</div>
               {filtered.length > 0 ? (
                 <div style={{ height: rowVirtualizer.getTotalSize(), position: 'relative' }}>
                   {rowVirtualizer.getVirtualItems().map(item => {
@@ -50,7 +50,6 @@ export const CurrencySelector: React.FC<{
                       <button key={currency.code} type="button" role="option" aria-selected={currency.code === value.toUpperCase()} onClick={() => { onChange(currency.code); setOpen(false); setQuery(''); }} className="absolute left-0 right-0 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left hover:bg-[var(--surface)]" style={{ transform: 'translateY(' + item.start + 'px)', height: item.size }}>
                         <span className="w-12 shrink-0 font-mono text-xs font-semibold text-[var(--text-primary)]">{currency.code}</span>
                         <span className="min-w-0 flex-1 truncate text-xs text-[var(--text-secondary)]">{currency.name}</span>
-                        <span className="w-12 shrink-0 text-right text-[10px] font-mono text-[var(--text-muted)]">{currency.numericCode || ''}</span>
                         <span className="w-10 shrink-0 text-right text-xs text-[var(--text-muted)]">{currency.symbol || ''}</span>
                         {currency.code === value.toUpperCase() && <Check className="h-3.5 w-3.5 shrink-0 text-[var(--text-primary)]" />}
                       </button>
