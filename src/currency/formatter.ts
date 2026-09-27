@@ -9,11 +9,12 @@ export function formatMoney(
 ) {
   if (amount == null || !Number.isFinite(amount)) return "—";
   const code = String(currency || "").toUpperCase();
+  const normalizedLocale = locale.replace(/@.*$/, "");
   if (!code) return "Currency not set";
   try {
     const d = getCurrency(code);
     const digits = d?.minorUnit;
-    return new Intl.NumberFormat(locale, {
+    return new Intl.NumberFormat(normalizedLocale, {
       style: "currency",
       currency: code,
       ...(typeof digits === "number"
@@ -21,7 +22,7 @@ export function formatMoney(
         : {}),
     }).format(amount);
   } catch {
-    return code + " " + new Intl.NumberFormat(locale).format(amount);
+    return code + " " + new Intl.NumberFormat(normalizedLocale).format(amount);
   }
 }
 
