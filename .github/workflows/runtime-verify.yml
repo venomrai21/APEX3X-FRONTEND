@@ -122,7 +122,8 @@ jobs:
 
           console.log('Business Profile tooltip hover behavior verified.');
 
-          const sidebarBusinessProfile = page.getByRole('button', { name: 'Business Profile', exact: true }).first();
+          await page.keyboard.press('Escape');
+          const sidebarBusinessProfile = page.locator('aside[aria-label="Primary navigation"]').getByRole('button', { name: 'Business Profile', exact: true });
           await sidebarBusinessProfile.waitFor({ state: 'visible', timeout: 3000 });
           await sidebarBusinessProfile.click();
           await page.waitForTimeout(500);
