@@ -1,152 +1,121 @@
-import React, { useState, useEffect } from 'react';
-import { AlertTriangle, Bot, CheckCircle2, DollarSign, TrendingUp, ShieldCheck, Zap, ChevronRight, Sparkles, Building2, Users, Target, Settings2 } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { AlertTriangle, Bot, DollarSign, TrendingUp, ShieldCheck, Zap, ChevronRight, Sparkles, Users, MessageSquare, CalendarDays, Workflow, Plug, Megaphone, Receipt, Activity, ArrowUpRight, RefreshCw } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { api } from '../api/client';
-import { DashboardSummary, BusinessProfileData } from '../types';
-import { Badge, Button, Card, Skeleton, APEXMetric, APEXReveal, APEXSpotlight, AnimatedList, AnimatedProgress, ExpandableCard, PinnedList } from '../components/apex3x';
+import { DashboardSummary, BusinessProfileData, Customer, Appointment, ConversationThread, WorkflowRule, WorkflowExecutionLog, IntegrationConnection, MarketingOverview, Invoice } from '../types';
+import { Badge, Button, Card, Skeleton, APEXReveal, ExpandableCard } from '../components/apex3x';
+import { formatMoney } from '../currency';
+
+type Snapshot = { customers: Customer[]; bookings: Appointment[]; conversations: ConversationThread[]; workflows: WorkflowRule[]; workflowLogs: WorkflowExecutionLog[]; integrations: IntegrationConnection[]; marketing: MarketingOverview | null; invoices: Invoice[]; };
+const emptySnapshot = (): Snapshot => ({ customers: [], bookings: [], conversations: [], workflows: [], workflowLogs: [], integrations: [], marketing: null, invoices: [] });
+
+async function loadSnapshot(): Promise<Snapshot> {
+  const results = await Promise.allSettled([
+    api.getCustomers(), api.getBookings(), api.getConversations(), api.getWorkflows(),
+    api.getWorkflowLogs(), api.getIntegrations(), api.getMarketingOverview(), api.getInvoices(),
+  ]);
+  const out = emptySnapshot();
+  const values = results.map(r => r.status === 'fulfilled' ? r.value : null);
+  out.customers = (values[0] as Customer[] | null) || [];
+  out.bookings = (values[1] as Appointment[] | null) || [];
+  out.conversations = (values[2] as ConversationThread[] | null) || [];
+  out.workflows = (values[3] as WorkflowRule[] | null) || [];
+  out.workflowLogs = (values[4] as WorkflowExecutionLog[] | null) || [];
+  out.integrations = (values[5] as IntegrationConnection[] | null) || [];
+  out.marketing = (values[6] as MarketingOverview | null) || null;
+  out.invoices = (values[7] as Invoice[] | null) || [];
+  return out;
+}
+
+const riskLabels: Record<string, string> = { unresponsive_lead: 'Lead leakage', overdue_receivable: 'Receivables', ad_spend_leak: 'Advertising', calendar_noshow: 'Bookings', pipeline_stall: 'Pipeline' };
 
 export const DashboardView: React.FC = () => {
   const { setActiveNav, addToast, triggerRefresh, refreshKey } = useApp();
   const [data, setData] = useState<DashboardSummary | null>(null);
+  const [profile, setProfile] = useState<BusinessProfileData | null>(null);
+  const [snapshot, setSnapshot] = useState<Snapshot>(emptySnapshot());
   const [loading, setLoading] = useState(true);
   const [executingId, setExecutingId] = useState<string | null>(null);
-  const [pinnedDealIds, setPinnedDealIds] = useState<string[]>([]);
-  const [businessProfile, setBusinessProfile] = useState<BusinessProfileData | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
-  
-  const fetchDashboard = async () => {
-    try {
-      setLoading(true);
-      setLoadError(null);
-      const result = await api.getDashboardSummary();
-      if (!result || typeof result !== 'object' || !result.autonomousCycleStatus || !result.metrics) {
-        throw new Error('Live workspace dashboard data is not available at this frontend origin.');
-      }
-      setData(result);
-    } catch (err) {
-      console.warn('Live dashboard data unavailable:', err);
-      setData(null);
-      setLoadError(err instanceof Error ? err.message : 'Live workspace data is unavailable.');
-    } finally { setLoading(false); }
+
+  const fetchAll = async () => {
+    setLoading(true);
+    setLoadError(null);
+    const [dashboardResult, profileResult, snapshotResult] = await Promise.allSettled([api.getDashboardSummary(), api.getBusinessProfile(), loadSnapshot()]);
+    if (dashboardResult.status === 'fulfilled' && dashboardResult.value?.metrics && dashboardResult.value?.autonomousCycleStatus) setData(dashboardResult.value);
+    else { setData(null); setLoadError(dashboardResult.status === 'rejected' ? (dashboardResult.reason instanceof Error ? dashboardResult.reason.message : 'Live dashboard data is unavailable.') : 'Live dashboard data is unavailable.'); }
+    if (profileResult.status === 'fulfilled') setProfile(profileResult.value);
+    else setProfile(null);
+    if (snapshotResult.status === 'fulfilled') setSnapshot(snapshotResult.value);
+    else setSnapshot(emptySnapshot());
+    setLoading(false);
   };
 
-  useEffect(() => { fetchDashboard(); api.getBusinessProfile().then(setBusinessProfile).catch(err => console.warn('Live business profile data unavailable:', err)); }, [refreshKey]);
+  useEffect(() => { fetchAll(); }, [refreshKey]);
 
-  const handleExecuteAction = async (alertId: string) => {
-    try {
-      setExecutingId(alertId);
-      const res = await api.executeBrainAction(alertId);
-      addToast({ type: 'success', title: 'Autonomous Action Executed', description: res.message });
-      await fetchDashboard();
-      triggerRefresh();
-    } catch (err) {
-      addToast({ type: 'error', title: 'Execution Failed', description: (err as Error).message });
-    } finally { setExecutingId(null); }
+  const execute = async (id: string) => {
+    try { setExecutingId(id); const result = await api.executeBrainAction(id); addToast({ type: 'success', title: 'Action executed', description: result.message }); await fetchAll(); triggerRefresh(); }
+    catch (error) { addToast({ type: 'error', title: 'Execution failed', description: error instanceof Error ? error.message : 'Unable to execute the action.' }); }
+    finally { setExecutingId(null); }
   };
 
-  if (loading) return <div className="space-y-6"><div className="grid grid-cols-1 md:grid-cols-4 gap-4">{[1,2,3,4].map(i => <Skeleton key={i} className="h-28" />)}</div><Skeleton className="h-64" /><div className="grid grid-cols-1 md:grid-cols-2 gap-6"><Skeleton className="h-72" /><Skeleton className="h-72" /></div></div>;
+  if (loading) return <div className="space-y-6"><div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">{Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-28" />)}</div><Skeleton className="h-52" /><div className="grid grid-cols-1 gap-6 lg:grid-cols-2"><Skeleton className="h-72" /><Skeleton className="h-72" /></div></div>;
 
-  if (!data) return (
-    <div className="space-y-6 pb-12">
-      <APEXReveal>
-        <div className="p-6 rounded-xl bg-[#0d0d14] border border-white/[0.08] shadow-xl shadow-black/60">
-          <div className="flex items-center gap-2">
-            <span className="p-1 rounded bg-white/[0.06] text-zinc-200 border border-white/[0.10]"><Bot className="w-4 h-4" /></span>
-            <h2 className="text-base font-serif-display font-semibold text-zinc-100">Command Center</h2>
-          </div>
-          <p className="text-sm text-zinc-300 mt-3">The APEX interface is ready. Live workspace data is not available at this frontend origin yet.</p>
-          <p className="text-xs text-zinc-500 mt-2 max-w-2xl">No business metrics or activity are being fabricated. Connect the existing SaaS API to this frontend origin to populate the Command Center.</p>
-          {loadError && <p className="text-[11px] text-zinc-600 mt-3 font-mono">{loadError}</p>}
-          <div className="mt-5 flex flex-wrap gap-2">
-            <Button variant="primary" size="sm" onClick={() => setActiveNav('business_profile')}>Open Business Profile</Button>
-            <Button variant="ghost" size="sm" onClick={fetchDashboard}>Retry live data</Button>
-          </div>
-        </div>
-      </APEXReveal>
-    </div>
-  );
+  if (!data) {
+    const complete = Boolean(profile?.foundationCompleted);
+    return <div className="space-y-6 pb-12"><APEXReveal><Card padding="lg"><div className="flex items-start gap-3"><Bot className="mt-0.5 h-4 w-4 text-zinc-300" /><div><h2 className="text-base font-semibold text-zinc-100">Command Center</h2><p className="mt-2 text-sm text-zinc-300">{complete ? "We couldn't load your business data. Check your connection and try again." : 'Complete your business profile to start using the Command Center.'}</p><p className="mt-2 text-xs text-zinc-500">{complete ? 'Your business profile is available, but live dashboard data could not be loaded.' : 'Add your business basics so APEX can work with a reliable business context.'}</p>{complete && loadError && <p className="mt-2 text-[11px] text-zinc-600">{loadError}</p>}<Button className="mt-5" variant="primary" size="sm" onClick={() => complete ? fetchAll() : setActiveNav('business_profile')} leftIcon={complete ? <RefreshCw className="h-3.5 w-3.5" /> : <Sparkles className="h-3.5 w-3.5" />}>{complete ? 'Try again' : 'Complete Business Profile'}</Button></div></div></Card></APEXReveal></div>;
+  }
 
-  const { metrics, autonomousCycleStatus, pendingAlerts, recentDeals } = data;
-  const cycleSteps = [
-    { step: '1. DETECT', desc: 'Identify revenue leakage and operational latency', label: `${autonomousCycleStatus.detectedAnomalies} anomaly signals` },
-    { step: '2. UNDERSTAND', desc: 'Diagnose operational root cause', label: 'Root-cause analysis' },
-    { step: '3. DECIDE', desc: 'Prescribe highest-leverage actions', label: 'Decision state' },
-    { step: '4. ACT', desc: 'Dispatch through connected channels', label: 'Dispatch state' },
-    { step: '5. LEARN', desc: 'Tune operational parameters from outcomes', label: 'Feedback state' },
+  const { metrics, autonomousCycleStatus, pendingAlerts, recentDeals, workspace } = data;
+  const currency = workspace.currency;
+  const activeCustomers = snapshot.customers.filter(c => c.status === 'active');
+  const atRiskCustomers = snapshot.customers.filter(c => c.status === 'at_risk');
+  const unread = snapshot.conversations.reduce((sum, c) => sum + c.unreadCount, 0);
+  const highPriority = snapshot.conversations.filter(c => c.priority === 'high' && c.status !== 'resolved').length;
+  const activeWorkflows = snapshot.workflows.filter(w => w.isActive).length;
+  const failedWorkflows = snapshot.workflowLogs.filter(l => l.status === 'failed').length;
+  const connected = snapshot.integrations.filter(i => i.status === 'connected').length;
+  const attention = snapshot.integrations.filter(i => i.status === 'error' || i.status === 'disconnected');
+  const upcoming = snapshot.bookings.filter(b => new Date(b.scheduledAt).getTime() >= Date.now() && b.status !== 'cancelled').length;
+  const pendingBookings = snapshot.bookings.filter(b => b.status === 'pending').length;
+  const overdueInvoices = snapshot.invoices.filter(i => i.status === 'overdue' || i.status === 'in_collection');
+  const invoiced = snapshot.invoices.reduce((sum, i) => sum + i.amount, 0);
+  const collected = snapshot.invoices.filter(i => i.status === 'paid').reduce((sum, i) => sum + i.amount, 0);
+  const outstanding = snapshot.invoices.filter(i => i.status !== 'paid' && i.status !== 'draft').reduce((sum, i) => sum + i.amount, 0);
+  const collectionRate = invoiced ? Math.round(collected / invoiced * 100) : null;
+  const riskBreakdown = pendingAlerts.reduce<Record<string, number>>((out, a) => { out[a.category] = (out[a.category] || 0) + a.revenueAtRisk; return out; }, {});
+  const activity = [
+    ...recentDeals.map(d => ({ title: 'Deal updated', detail: d.title, time: d.updatedAt })),
+    ...snapshot.invoices.map(i => ({ title: i.status === 'paid' ? 'Payment received' : i.status === 'overdue' ? 'Invoice overdue' : 'Invoice activity', detail: i.invoiceNumber + ' · ' + i.customerName, time: i.paidAt || i.dueDate })),
+    ...snapshot.bookings.map(b => ({ title: 'Booking ' + b.status, detail: b.title + ' · ' + b.customerName, time: b.scheduledAt })),
+    ...snapshot.conversations.map(c => ({ title: 'Customer conversation', detail: c.contactName + ' · ' + c.channel, time: c.lastMessageAt })),
+    ...snapshot.workflowLogs.map(l => ({ title: 'Automation ' + l.status, detail: l.details, time: l.executedAt })),
+  ].filter(x => x.time).sort((a,b) => new Date(b.time).getTime() - new Date(a.time).getTime()).slice(0, 8);
+
+  const metricCards = [
+    ['Revenue at Risk', formatMoney(metrics.totalRevenueAtRisk, currency), 'Detected leakage', AlertTriangle],
+    ['Active Pipeline', formatMoney(metrics.activePipelineValue, currency), 'Current open value', TrendingUp],
+    ['Overdue Receivables', formatMoney(metrics.overdueReceivables, currency), 'Current overdue', DollarSign],
+    ['Active Customers', String(metrics.activeCustomersCount), 'Current customers', Users],
+    ['Open Leads', String(metrics.openLeadsCount), 'Waiting in CRM', ArrowUpRight],
+    ['System Health', metrics.systemHealth + '%', String(metrics.connectedIntegrationsCount) + ' connected', ShieldCheck],
   ];
-  const dealItems = recentDeals.map(deal => ({ id: deal.id, title: deal.title, meta: `${deal.company} · $${deal.value.toLocaleString()} · ${deal.probability}%`, pinned: pinnedDealIds.includes(deal.id) }));
 
   return <div className="space-y-6 pb-12">
-    <APEXReveal>
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 rounded-xl bg-[#0d0d14] border border-white/[0.08] shadow-xl shadow-black/60">
-        <div>
-          <div className="flex items-center gap-2"><span className="p-1 rounded bg-white/[0.06] text-zinc-200 border border-white/[0.10]"><Bot className="w-4 h-4" /></span><h2 className="text-base font-serif-display font-semibold text-zinc-100">Overview</h2><Badge variant="default" size="sm">{autonomousCycleStatus.currentPhase || 'Current cycle state'}</Badge></div>
-          <p className="text-xs text-zinc-400 mt-1 max-w-2xl">Your business activity at a glance.</p>
-        </div>
-        <Button variant="primary" size="sm" onClick={() => setActiveNav('brain')} leftIcon={<Sparkles className="w-3.5 h-3.5" />}>View Brain Diagnostics</Button>
-      </div>
-    </APEXReveal>
+    <APEXReveal><div className="flex flex-col gap-4 rounded-xl border border-white/[0.08] bg-[#0d0d14] p-5 shadow-xl shadow-black/60 md:flex-row md:items-center md:justify-between"><div><div className="flex items-center gap-2"><Bot className="h-4 w-4 text-zinc-200" /><h2 className="text-base font-semibold text-zinc-100">Command Center</h2><Badge variant="default" size="sm">{autonomousCycleStatus.currentPhase || 'Live cycle'}</Badge></div><p className="mt-1 text-xs text-zinc-400">{workspace.name} · live workspace snapshot</p></div><div className="flex gap-2"><Button variant="ghost" size="sm" onClick={fetchAll} leftIcon={<RefreshCw className="h-3.5 w-3.5" />}>Refresh</Button><Button variant="primary" size="sm" onClick={() => setActiveNav('brain')} leftIcon={<Sparkles className="h-3.5 w-3.5" />}>View Brain Diagnostics</Button></div></div></APEXReveal>
 
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <APEXSpotlight className="group rounded-xl border border-white/[0.08] bg-[#0b0b11]">
-        <Card variant="default" padding="md" className="border-0 bg-transparent"><div className="flex items-center justify-between"><span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Revenue at Risk</span><span className="p-1.5 rounded-lg bg-white/[0.05] text-zinc-300 border border-white/[0.08]"><AlertTriangle className="w-4 h-4" /></span></div><div className="mt-3"><APEXMetric value={metrics.totalRevenueAtRisk} prefix="$" className="text-2xl font-serif-display font-bold text-zinc-100" /><div className="flex items-center gap-1.5 mt-1 text-[11px] text-zinc-400"><span className="text-zinc-200 font-medium">{autonomousCycleStatus.detectedAnomalies} anomalies</span><span>reported by current business data</span></div></div></Card>
-      </APEXSpotlight>
-      <APEXSpotlight className="group rounded-xl border border-white/[0.08] bg-[#0b0b11]">
-        <Card variant="default" padding="md" className="border-0 bg-transparent"><div className="flex items-center justify-between"><span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Active Pipeline</span><span className="p-1.5 rounded-lg bg-white/[0.05] text-zinc-300 border border-white/[0.08]"><TrendingUp className="w-4 h-4" /></span></div><div className="mt-3"><APEXMetric value={metrics.activePipelineValue} prefix="$" className="text-2xl font-serif-display font-bold text-zinc-100" /><div className="flex items-center gap-1.5 mt-1 text-[11px] text-zinc-400"><span className="font-medium text-zinc-200">${metrics.wonValueThisMonth.toLocaleString()}</span><span>won this billing cycle</span></div></div></Card>
-      </APEXSpotlight>
-      <APEXSpotlight className="group rounded-xl border border-white/[0.08] bg-[#0b0b11]">
-        <Card variant="default" padding="md" className="border-0 bg-transparent"><div className="flex items-center justify-between"><span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Overdue Receivables</span><span className="p-1.5 rounded-lg bg-white/[0.05] text-zinc-300 border border-white/[0.08]"><DollarSign className="w-4 h-4" /></span></div><div className="mt-3"><APEXMetric value={metrics.overdueReceivables} prefix="$" className="text-2xl font-serif-display font-bold text-zinc-100" /><div className="text-[11px] text-zinc-400 mt-1">Current receivables business data</div></div></Card>
-      </APEXSpotlight>
-      <APEXSpotlight className="group rounded-xl border border-white/[0.08] bg-[#0b0b11]">
-        <Card variant="default" padding="md" className="border-0 bg-transparent"><div className="flex items-center justify-between"><span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">System Health</span><span className="p-1.5 rounded-lg bg-white/[0.05] text-zinc-300 border border-white/[0.08]"><ShieldCheck className="w-4 h-4" /></span></div><div className="mt-3"><APEXMetric value={metrics.systemHealth} suffix="%" className="text-2xl font-serif-display font-bold text-zinc-100" /><AnimatedProgress value={metrics.systemHealth} label="Live health signal" showValue={false} className="mt-2" /><div className="text-[11px] text-zinc-400 mt-1">{metrics.connectedIntegrationsCount} connected integrations reported</div></div></Card>
-      </APEXSpotlight>
-    </div>
+    <section><div className="mb-3 flex items-center justify-between"><div><h3 className="text-sm font-semibold text-zinc-100">Business Status</h3><p className="text-xs text-zinc-500">Current commercial and operating state.</p></div><span className="text-[10px] text-zinc-600">Reporting currency · {currency || 'not set'}</span></div><div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">{metricCards.map(([label,value,detail,Icon]) => <Card key={String(label)} padding="md" className="border-white/[0.08] bg-[#0b0b11]"><div className="flex items-center justify-between"><span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">{String(label)}</span><Icon className="h-4 w-4 text-zinc-500" /></div><div className="mt-3 text-xl font-semibold text-zinc-100">{String(value)}</div><div className="mt-1 text-[10px] text-zinc-500">{String(detail)}</div></Card>)}</div></section>
 
-    <APEXReveal delay={0.04}>
-      <Card variant="improved" padding="lg" className="border-white/[0.08]">
-        <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 pb-4 border-b border-white/[0.07]">
-          <div>
-            <h3 className="text-sm font-semibold text-zinc-100 uppercase tracking-wider flex items-center gap-2"><Building2 className="w-4 h-4 text-zinc-300" /> APEX Business Understanding</h3>
-            <p className="text-xs text-zinc-400 mt-1">What APEX currently knows about this business, backed by cloud-persisted profile context.</p>
-          </div>
-          <button onClick={() => setActiveNav('business_profile')} className="text-xs text-zinc-300 hover:text-white font-medium flex items-center gap-1">View complete profile <ChevronRight className="w-3 h-3" /></button>
-        </div>
-        {businessProfile ? (() => {
-          const p = businessProfile.profile || {};
-          const offers = Array.isArray(p.products) ? p.products.filter((item: any) => item?.name).length : 0;
-          const customers = Array.isArray(p.targetCustomers) ? p.targetCustomers.join(', ') : (p.targetCustomerDescription || 'Not yet defined');
-          const models = Array.isArray(p.businessModels) ? p.businessModels.join(', ') : 'Not yet defined';
-          const goals = Array.isArray(p.growthPriorities) ? p.growthPriorities.join(', ') : (Array.isArray(p.goals) ? p.goals.map((g: any) => g?.goal).filter(Boolean).join(', ') : 'Not yet defined');
-          const field = (value: any, fallback = 'Not yet defined') => String(value || '').trim() || fallback;
-          const items = [
-            { icon: Building2, label: 'Business Foundation', values: [field(p.businessName), field(p.industry), field(p.market || p.location), field(models), `${offers} offer${offers === 1 ? '' : 's'} defined`] },
-            { icon: Users, label: 'Customer Understanding', values: [customers, field(p.primaryAcquisitionChannel || p.acquisitionChannels?.[0]), field(p.biggestChallenge || p.challenges)] },
-            { icon: DollarSign, label: 'Revenue & Sales', values: [field(p.salesJourney), field(p.salesCycle || p.typicalSalesCycle), field(p.conversionDefinition), field(p.averageTransactionValue), field(p.paymentTerms)] },
-            { icon: Settings2, label: 'Operations', values: [field(p.serviceArea), field(p.businessHours), field(p.languages), field(p.capacity)] },
-            { icon: Target, label: 'Goals & Priorities', values: [field(p.currentCondition), field(p.biggestChallenge), goals] },
-          ];
-          return <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-3 pt-4">
-            {items.map(({ icon: Icon, label, values }) => <div key={label} className="rounded-lg border border-white/[0.07] bg-[#0b0b11] p-4 min-h-[150px]">
-              <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-zinc-200"><Icon className="w-3.5 h-3.5 text-zinc-400" />{label}</div>
-              <div className="mt-3 space-y-2">{values.map((value, index) => <div key={index} className={index === 0 ? 'text-xs text-zinc-200 leading-snug' : 'text-[10px] text-zinc-500 leading-snug'}>{value}</div>)}</div>
-            </div>)}
-          </div>;
-        })() : <div className="pt-4 text-xs text-zinc-500">Business understanding will appear here after the cloud profile is available.</div>}
-        {businessProfile && <div className="mt-4 flex flex-wrap items-center gap-2 text-[10px] text-zinc-500">
-          <span className="rounded-full border border-white/[0.07] px-2 py-1">Cloud source</span>
-          <span className="rounded-full border border-white/[0.07] px-2 py-1">{businessProfile.foundationCompleted ? 'Foundation confirmed' : 'Foundation incomplete'}</span>
-          <span className="rounded-full border border-white/[0.07] px-2 py-1">Updated {businessProfile.updatedAt ? new Date(businessProfile.updatedAt).toLocaleString() : 'not yet'}</span>
-        </div>}
-      </Card>
-    </APEXReveal>
+    <div className="grid grid-cols-1 gap-6 xl:grid-cols-12"><APEXReveal className="xl:col-span-7"><Card padding="lg" className="h-full border-white/[0.08]"><div className="flex items-center justify-between border-b border-white/[0.07] pb-4"><div><h3 className="text-sm font-semibold text-zinc-100">Revenue at Risk</h3><p className="mt-1 text-xs text-zinc-500">Detected leakage grouped by source.</p></div><Badge variant="default" size="sm">{pendingAlerts.length} issues</Badge></div>{pendingAlerts.length ? <div className="mt-4 space-y-2">{Object.entries(riskBreakdown).map(([category,amount]) => <div key={category} className="flex items-center justify-between rounded-lg border border-white/[0.06] bg-[#0b0b11] p-3"><span className="text-xs text-zinc-300">{riskLabels[category] || category}</span><span className="text-xs font-semibold text-zinc-100">{formatMoney(amount, currency)}</span></div>)}</div> : <p className="mt-4 text-xs text-zinc-500">No revenue-risk alerts are currently reported.</p>}</Card></APEXReveal><APEXReveal className="xl:col-span-5"><Card padding="lg" className="h-full border-white/[0.08]"><div className="flex items-center justify-between border-b border-white/[0.07] pb-4"><div><h3 className="text-sm font-semibold text-zinc-100">APEX Cycle</h3><p className="mt-1 text-xs text-zinc-500">Detect → Understand → Decide → Act → Learn.</p></div><Badge variant="default" size="sm">{autonomousCycleStatus.detectedAnomalies} detected</Badge></div><div className="mt-4 space-y-2">{[['Detect',autonomousCycleStatus.detectedAnomalies + ' anomaly signals'],['Understand','Root-cause telemetry not reported'],['Decide',pendingAlerts.length + ' actionable alerts'],['Act','Execution state reported per action'],['Learn','Outcome telemetry not reported']].map(([stage,state],i)=><div key={stage} className="flex items-center gap-3 rounded-lg border border-white/[0.06] bg-[#0b0b11] p-3"><span className="flex h-6 w-6 items-center justify-center rounded-full border border-white/[0.10] text-[10px] font-mono text-zinc-400">{i+1}</span><div><div className="text-xs font-semibold text-zinc-200">{stage}</div><div className="text-[10px] text-zinc-500">{state}</div></div></div>)}</div></Card></APEXReveal></div>
 
-    <APEXReveal delay={0.05}>
-      <Card variant="improved" padding="lg" className="border-white/[0.08]"><div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-white/[0.07]"><div><h3 className="text-sm font-semibold text-zinc-100 uppercase tracking-wider flex items-center gap-2"><Zap className="w-4 h-4 text-zinc-300" /> Operating Cycle</h3><p className="text-xs text-zinc-400 mt-0.5">The operating cycle is represented from current workspace data.</p></div><Badge variant="default" size="sm"><CheckCircle2 className="w-3 h-3" /> Recovered ${autonomousCycleStatus.recoveredRevenueMonth.toLocaleString()} this month</Badge></div><div className="grid grid-cols-1 sm:grid-cols-5 gap-3 pt-4">{cycleSteps.map(item => <div key={item.step} className="p-3 rounded-lg border bg-[#0b0b11] border-white/[0.07] space-y-1.5"><div className="flex items-center justify-between"><span className="text-[11px] font-mono font-semibold text-zinc-200">{item.step}</span></div><p className="text-[11px] text-zinc-400 leading-snug">{item.desc}</p><p className="text-[10px] font-mono text-zinc-500 pt-1">{item.label}</p></div>)}</div></Card>
-    </APEXReveal>
+    <APEXReveal><Card padding="lg" className="border-white/[0.08]"><div className="flex items-center justify-between border-b border-white/[0.07] pb-4"><div><h3 className="text-sm font-semibold text-zinc-100">Priority Actions</h3><p className="mt-1 text-xs text-zinc-500">Problems APEX can act on from current workspace data.</p></div><button onClick={() => setActiveNav('brain')} className="text-xs text-zinc-300 hover:text-white">View all <ChevronRight className="inline h-3 w-3" /></button></div><div className="mt-4 space-y-3">{pendingAlerts.length === 0 ? <p className="text-xs text-zinc-500">Nothing currently requires intervention.</p> : pendingAlerts.slice(0,5).map(alert => <ExpandableCard key={alert.id} title={alert.headline} summary={alert.severity.toUpperCase() + ' · ' + formatMoney(alert.revenueAtRisk,currency) + ' at risk'}><div className="space-y-3"><p className="text-xs leading-relaxed text-zinc-300">{alert.detectedIssue}</p><div className="rounded-lg border border-white/[0.06] bg-[#07070b] p-3 text-xs text-zinc-300"><span className="font-medium text-zinc-200">Recommended action: </span>{alert.recommendedAction}</div><div className="flex justify-end"><Button variant="primary" size="sm" isLoading={executingId===alert.id} onClick={() => execute(alert.id)} leftIcon={<Zap className="h-3.5 w-3.5" />}>Execute</Button></div></div></ExpandableCard>)}</div></Card></APEXReveal>
 
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      <div className="lg:col-span-7 space-y-4"><div className="flex items-center justify-between"><div><h3 className="text-sm font-semibold text-zinc-100 flex items-center gap-2">Revenue Issues <span className="text-xs px-2 py-0.5 rounded-full bg-white/[0.08] text-zinc-200 font-mono">{pendingAlerts.length}</span></h3><p className="text-xs text-zinc-400 mt-0.5">Decisions available in your workspace.</p></div><button onClick={() => setActiveNav('brain')} className="text-xs text-zinc-300 hover:text-white font-medium flex items-center gap-1">View Details <ChevronRight className="w-3 h-3" /></button></div><AnimatedList className="space-y-3">{pendingAlerts.length === 0 ? [<Card key="empty" padding="md"><p className="text-xs text-zinc-500">No pending interventions.</p></Card>] : pendingAlerts.map(alert => <ExpandableCard key={alert.id} title={alert.headline} summary={`${alert.severity.toUpperCase()} · $${alert.revenueAtRisk.toLocaleString()} at risk`}><div className="space-y-3"><div className="flex items-center gap-2"><Badge variant="default" size="sm"><AlertTriangle className="w-3 h-3" /> {alert.severity.toUpperCase()}</Badge><span className="text-[11px] text-zinc-500 font-mono">{new Date(alert.suggestedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span></div><p className="text-xs text-zinc-300 leading-relaxed">{alert.detectedIssue}</p><div className="p-3 rounded-lg bg-[#07070b] border border-white/[0.06] text-xs text-zinc-300"><span className="text-zinc-200 font-medium">Prescribed Action: </span>{alert.recommendedAction}</div><div className="flex justify-end"><Button variant="primary" size="sm" isLoading={executingId === alert.id} onClick={() => handleExecuteAction(alert.id)} leftIcon={<Zap className="w-3.5 h-3.5" />}>Execute</Button></div></div></ExpandableCard>)}</AnimatedList></div>
-      <div className="lg:col-span-5 space-y-4"><div className="flex items-center justify-between"><div><h3 className="text-sm font-semibold text-zinc-100">Commercial Pipeline</h3><p className="text-xs text-zinc-400 mt-0.5">Your current deals and pipeline.</p></div><button onClick={() => setActiveNav('pipeline')} className="text-xs text-zinc-300 hover:text-white font-medium flex items-center gap-1">Pipeline Board <ChevronRight className="w-3 h-3" /></button></div><Card variant="default" padding="md"><PinnedList items={dealItems} onTogglePin={id => setPinnedDealIds(ids => ids.includes(id) ? ids.filter(x => x !== id) : [...ids, id])} renderItem={item => <div><p className="text-xs font-semibold text-zinc-200 truncate">{item.title}</p><p className="text-[10px] text-zinc-500 mt-0.5 truncate">{item.meta}</p></div>} /><div className="pt-3 mt-2 border-t border-white/[0.06] text-center"><Button variant="ghost" size="sm" className="w-full text-xs text-zinc-400" onClick={() => setActiveNav('pipeline')}>View all pipeline stages &rarr;</Button></div></Card></div>
-    </div>
+    <div className="grid grid-cols-1 gap-6 xl:grid-cols-3"><Card padding="lg"><div className="flex items-center gap-2"><Users className="h-4 w-4 text-zinc-500" /><h3 className="text-sm font-semibold text-zinc-100">Customer Health</h3></div><div className="mt-4 grid grid-cols-2 gap-3"><div><div className="text-lg font-semibold text-zinc-100">{activeCustomers.length || metrics.activeCustomersCount}</div><div className="text-[10px] text-zinc-500">Active</div></div><div><div className="text-lg font-semibold text-zinc-100">{atRiskCustomers.length}</div><div className="text-[10px] text-zinc-500">At risk</div></div></div><div className="mt-4 text-xs text-zinc-400">Observed lifetime value · {formatMoney(activeCustomers.reduce((sum,c)=>sum+c.lifetimeValue,0),currency)}</div><Button variant="ghost" size="sm" className="mt-3 w-full" onClick={() => setActiveNav('customers')}>Open Customers</Button></Card><Card padding="lg"><div className="flex items-center gap-2"><CalendarDays className="h-4 w-4 text-zinc-500" /><h3 className="text-sm font-semibold text-zinc-100">Operations</h3></div><div className="mt-4 space-y-2 text-xs text-zinc-300"><div className="flex justify-between"><span>Upcoming bookings</span><b>{upcoming}</b></div><div className="flex justify-between"><span>Pending confirmation</span><b>{pendingBookings}</b></div><div className="flex justify-between"><span>Unread conversations</span><b>{unread}</b></div><div className="flex justify-between"><span>High-priority conversations</span><b>{highPriority}</b></div></div><Button variant="ghost" size="sm" className="mt-3 w-full" onClick={() => setActiveNav('bookings')}>Open Operations</Button></Card><Card padding="lg"><div className="flex items-center gap-2"><Workflow className="h-4 w-4 text-zinc-500" /><h3 className="text-sm font-semibold text-zinc-100">Automation</h3></div><div className="mt-4 space-y-2 text-xs text-zinc-300"><div className="flex justify-between"><span>Active workflows</span><b>{activeWorkflows}</b></div><div className="flex justify-between"><span>Failed executions</span><b>{failedWorkflows}</b></div><div className="flex justify-between"><span>Recent executions</span><b>{snapshot.workflowLogs.length}</b></div></div><Button variant="ghost" size="sm" className="mt-3 w-full" onClick={() => setActiveNav('workflows')}>Open Automation</Button></Card></div>
+
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2"><Card padding="lg"><div className="flex items-center gap-2"><Megaphone className="h-4 w-4 text-zinc-500" /><h3 className="text-sm font-semibold text-zinc-100">Acquisition & Growth</h3></div>{snapshot.marketing ? <div className="mt-4 grid grid-cols-2 gap-4 text-xs"><div><div className="text-lg font-semibold text-zinc-100">{formatMoney(snapshot.marketing.googleAds.monthlySpend+snapshot.marketing.metaAds.monthlySpend,currency)}</div><div className="text-[10px] text-zinc-500">Ad spend</div></div><div><div className="text-lg font-semibold text-zinc-100">{snapshot.marketing.metaAds.leadsGenerated+snapshot.marketing.googleAds.conversions}</div><div className="text-[10px] text-zinc-500">Tracked leads / conversions</div></div><div><div className="text-lg font-semibold text-zinc-100">{formatMoney(snapshot.marketing.googleAds.lostRoasOpportunity,currency)}</div><div className="text-[10px] text-zinc-500">Lost opportunity</div></div><div><div className="text-lg font-semibold text-zinc-100">{snapshot.marketing.googleAds.campaigns.filter(c=>c.status==='leaking').length}</div><div className="text-[10px] text-zinc-500">Leaking campaigns</div></div></div> : <p className="mt-4 text-xs text-zinc-500">Marketing data is not available from connected sources.</p>}<Button variant="ghost" size="sm" className="mt-3 w-full" onClick={() => setActiveNav('campaigns')}>Open Campaigns</Button></Card><Card padding="lg"><div className="flex items-center gap-2"><Receipt className="h-4 w-4 text-zinc-500" /><h3 className="text-sm font-semibold text-zinc-100">Cash & Collections</h3></div><div className="mt-4 grid grid-cols-2 gap-4 text-xs"><div><div className="text-lg font-semibold text-zinc-100">{formatMoney(invoiced,currency)}</div><div className="text-[10px] text-zinc-500">Invoiced</div></div><div><div className="text-lg font-semibold text-zinc-100">{formatMoney(collected,currency)}</div><div className="text-[10px] text-zinc-500">Collected</div></div><div><div className="text-lg font-semibold text-zinc-100">{formatMoney(outstanding,currency)}</div><div className="text-[10px] text-zinc-500">Outstanding</div></div><div><div className="text-lg font-semibold text-zinc-100">{overdueInvoices.length} overdue · {collectionRate==null?'—':collectionRate+'%'} collected</div><div className="text-[10px] text-zinc-500">Collection state</div></div></div><Button variant="ghost" size="sm" className="mt-3 w-full" onClick={() => setActiveNav('invoices')}>Open Invoices</Button></Card></div>
+
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2"><Card padding="lg"><div className="flex items-center gap-2"><Plug className="h-4 w-4 text-zinc-500" /><h3 className="text-sm font-semibold text-zinc-100">Connected Ecosystem</h3></div><div className="mt-4 space-y-3"><div className="flex justify-between text-xs text-zinc-300"><span>Connected</span><b>{connected || metrics.connectedIntegrationsCount}</b></div><div className="flex justify-between text-xs text-zinc-300"><span>Needs attention</span><b>{attention.length}</b></div>{attention.slice(0,3).map(item=><div key={item.id} className="rounded-lg border border-white/[0.06] p-2 text-[10px] text-zinc-500">{item.name} · {item.status}</div>)}</div><Button variant="ghost" size="sm" className="mt-3 w-full" onClick={() => setActiveNav('integrations')}>Open Integrations</Button></Card><Card padding="lg"><div className="flex items-center gap-2"><MessageSquare className="h-4 w-4 text-zinc-500" /><h3 className="text-sm font-semibold text-zinc-100">Recent Business Activity</h3></div><div className="mt-2">{activity.length ? activity.map((item,index)=><div key={index} className="flex items-start gap-3 border-b border-white/[0.06] py-3 last:border-0"><Activity className="mt-0.5 h-3.5 w-3.5 shrink-0 text-zinc-500" /><div className="min-w-0 flex-1"><p className="text-xs text-zinc-200">{item.title}</p><p className="mt-0.5 truncate text-[10px] text-zinc-500">{item.detail}</p></div><span className="shrink-0 text-[10px] text-zinc-600">{new Date(item.time).toLocaleString()}</span></div>) : <p className="py-4 text-xs text-zinc-500">No recent activity was returned.</p>}</div></Card></div>
+
+    <APEXReveal><Card padding="lg" className="border-white/[0.08]"><div className="flex items-center justify-between"><div><h3 className="text-sm font-semibold text-zinc-100">Commercial Pipeline</h3><p className="mt-1 text-xs text-zinc-500">Active commercial flow from current workspace data.</p></div><Button variant="ghost" size="sm" onClick={() => setActiveNav('pipeline')}>Open Pipeline</Button></div><div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3"><div className="rounded-lg border border-white/[0.06] p-3"><div className="text-lg font-semibold text-zinc-100">{metrics.openLeadsCount}</div><div className="text-[10px] text-zinc-500">Open leads</div></div><div className="rounded-lg border border-white/[0.06] p-3"><div className="text-lg font-semibold text-zinc-100">{formatMoney(metrics.activePipelineValue,currency)}</div><div className="text-[10px] text-zinc-500">Active pipeline</div></div><div className="rounded-lg border border-white/[0.06] p-3"><div className="text-lg font-semibold text-zinc-100">{formatMoney(metrics.wonValueThisMonth,currency)}</div><div className="text-[10px] text-zinc-500">Won this billing cycle</div></div></div></Card></APEXReveal>
   </div>;
 };

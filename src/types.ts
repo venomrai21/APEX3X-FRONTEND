@@ -3,6 +3,9 @@ export type NavItemKey =
   | 'leads' | 'customers' | 'bookings' | 'pipeline' | 'invoices' | 'workflows' | 'integrations' | 'ai_hub' | 'team' | 'billing' | 'settings'
   | 'brain' | 'insights' | 'marketing';
 
+export type CurrencyStatus = 'active' | 'historical' | 'fund' | 'precious_metal' | 'custom';
+export interface CurrencyDefinition { code: string; name: string; nativeName?: string; symbol?: string; nativeSymbol?: string; numericCode?: string; minorUnit?: number; status: CurrencyStatus; source: 'ISO4217+CLDR' | 'CUSTOM' | 'API'; }
+
 export interface Organisation { id: string; name: string; shortName: string; logoUrl?: string; }
 export interface Workspace { id: string; name: string; slug: string; industry: string; website: string; currency: string; timezone: string; verificationStatus: 'verified' | 'in_review' | 'unverified'; taxId?: string; registeredAddress?: string; createdAt: string; organisationId?: string; iconUrl?: string; }
 export interface User { id: string; email: string; name: string; role: 'platform_owner' | 'owner' | 'admin' | 'manager' | 'operator' | 'specialist' | 'marketing' | 'sales' | 'finance' | 'support' | 'viewer'; workspaceId: string; avatarUrl?: string; }

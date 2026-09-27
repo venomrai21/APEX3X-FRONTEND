@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { api } from '../../api/client';
 import { Badge, Button, Card, Input, Select } from '../apex3x';
+import { CurrencySelector } from '../currency/CurrencySelector';
 
 type StageId = 1 | 2 | 3;
 type Source = 'user_declared' | 'connected' | 'observed' | 'calculated' | 'inferred';
@@ -120,6 +121,8 @@ type BusinessProfileDraft = {
   inventory: string;
   shipping: string;
   acceptedPayments: string[];
+  primaryCurrency: string;
+  acceptedCurrencies: string[];
   paymentTerms: string;
   creditTerms: string;
   depositRequirements: string;
@@ -244,6 +247,8 @@ const createDraft = (): BusinessProfileDraft => ({
   inventory: '',
   shipping: '',
   acceptedPayments: [],
+  primaryCurrency: '',
+  acceptedCurrencies: [],
   paymentTerms: '',
   creditTerms: '',
   depositRequirements: '',
@@ -407,7 +412,7 @@ export const BusinessProfile: React.FC<{
     { label: 'Revenue Model', ready: draft.businessModels.length > 0 || draft.products.some(item => Boolean(item.name.trim())) },
     { label: 'Sales Process', ready: Boolean(draft.salesJourney.trim() || draft.qualificationCriteria.trim() || draft.salesCycle.trim()) },
     { label: 'Operations', ready: Boolean(draft.serviceArea.trim() || draft.capacity.trim() || draft.fulfillment.trim()) },
-    { label: 'Financial Context', ready: Boolean(draft.averageTransactionValue.trim() || draft.paymentTerms.trim() || draft.recurringRevenue.trim()) },
+    { label: 'Financial Context', ready: Boolean(draft.primaryCurrency || draft.averageTransactionValue.trim() || draft.paymentTerms.trim() || draft.recurringRevenue.trim()) },
     { label: 'Customer Journey', ready: Boolean(draft.acquisitionChannels.length || draft.conversionDefinition.trim() || draft.objections.trim()) },
     { label: 'Goals & Priorities', ready: Boolean(draft.goals.length || draft.growthPriorities.length || draft.biggestChallenge.trim()) },
   ], [draft, stageReady]);
@@ -435,6 +440,7 @@ export const BusinessProfile: React.FC<{
         stage2CompletedCount: stage2Complete,
         stage3Completion: stage3Complete,
       });
+      if (stage === 1 && draft.primaryCurrency) { try { await api.updateWorkspace({ currency: draft.primaryCurrency }); } catch (workspaceError) { console.warn('Workspace currency sync unavailable:', workspaceError); } }
       setFoundationCompleted(saved.foundationCompleted);
       setProfileLoaded(true);
       addToast({
@@ -595,6 +601,16 @@ export const BusinessProfile: React.FC<{
 
           <Section title="Business Model" description="Select every revenue model that genuinely applies. This helps APEX reason about acquisition, conversion and retention.">
             <ToggleChips values={businessModels} selected={draft.businessModels} onChange={values => update('businessModels', values)} ariaLabel="Business models" />
+          </Section>
+
+
+
+          <Section title="Currencies" description="Choose the business reporting currency and the currencies the business accepts. Transaction currency remains separate from reporting currency.">
+            <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+              <CurrencySelector value={draft.primaryCurrency} onChange={value => update('primaryCurrency', value)} label="Primary / Reporting Currency" description="Used for business-level reporting and display." />
+              <CurrencySelector value="" values={draft.acceptedCurrencies} onValuesChange={values => update('acceptedCurrencies', values)} multiple label="Accepted / Operating Currencies" description="Select every currency the business genuinely transacts in." />
+            </div>
+            <div className="rounded-lg border border-[var(--border-subtle)] bg-[var(--surface)] px-3 py-2 text-[10px] leading-relaxed text-[var(--text-muted)]">Currency identity is stored by ISO 4217 code. Symbols are presentation only. Exchange rates are a separate service concern.</div>
           </Section>
 
           <Section title="Location & Market" description="Physical headquarters and customer market are separate concepts. Provide either or both as applicable.">
