@@ -141,6 +141,10 @@ jobs:
           await businessProfileStage.click();
           await page.waitForTimeout(300);
 
+          console.log('Stage 03 selected:', await businessProfileStage.getAttribute('aria-selected'));
+          console.log('Currency text count:', await page.getByText('Currency', { exact: true }).count());
+          console.log('Business Currency button count:', await page.getByRole('button', { name: 'Business Currency', exact: true }).count());
+
           const currencyButton = page.getByRole('button', { name: 'Business Currency', exact: true });
           if (await currencyButton.count() === 0) {
             throw new Error('Global Business Currency selector was not rendered.');
