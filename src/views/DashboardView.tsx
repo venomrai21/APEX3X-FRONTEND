@@ -30,7 +30,7 @@ async function loadSnapshot(): Promise<Snapshot> {
 const riskLabels: Record<string, string> = { unresponsive_lead: 'Lead leakage', overdue_receivable: 'Receivables', ad_spend_leak: 'Advertising', calendar_noshow: 'Bookings', pipeline_stall: 'Pipeline' };
 
 export const DashboardView: React.FC = () => {
-  const { setActiveNav, addToast, triggerRefresh, refreshKey } = useApp();
+  const { setActiveNav, addToast, triggerRefresh, refreshKey, currentWorkspace } = useApp();
   const [data, setData] = useState<DashboardSummary | null>(null);
   const [profile, setProfile] = useState<BusinessProfileData | null>(null);
   const [snapshot, setSnapshot] = useState<Snapshot>(emptySnapshot());
@@ -61,12 +61,36 @@ export const DashboardView: React.FC = () => {
 
   if (loading) return <div className="space-y-6"><div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">{Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-28" />)}</div><Skeleton className="h-52" /><div className="grid grid-cols-1 gap-6 lg:grid-cols-2"><Skeleton className="h-72" /><Skeleton className="h-72" /></div></div>;
 
-  if (!data) {
-    const complete = Boolean(profile?.foundationCompleted);
-    return <div className="space-y-6 pb-12"><APEXReveal><Card padding="lg"><div className="flex items-start gap-3"><Bot className="mt-0.5 h-4 w-4 text-zinc-300" /><div><h2 className="text-base font-semibold text-zinc-100">Command Center</h2><p className="mt-2 text-sm text-zinc-300">{complete ? "We couldn't load your business data. Check your connection and try again." : 'Complete your business profile to start using the Command Center.'}</p><p className="mt-2 text-xs text-zinc-500">{complete ? 'Your business profile is available, but live dashboard data could not be loaded.' : 'Add your business basics so APEX can work with a reliable business context.'}</p>{complete && loadError && <p className="mt-2 text-[11px] text-zinc-600">{loadError}</p>}<Button className="mt-5" variant="primary" size="sm" onClick={() => complete ? fetchAll() : setActiveNav('business_profile')} leftIcon={complete ? <RefreshCw className="h-3.5 w-3.5" /> : <Sparkles className="h-3.5 w-3.5" />}>{complete ? 'Try again' : 'Complete Business Profile'}</Button></div></div></Card></APEXReveal></div>;
-  }
-
-  const { metrics, autonomousCycleStatus, pendingAlerts, recentDeals, workspace } = data;
+  const dashboardUnavailable = !data && Boolean(profile?.foundationCompleted);
+  const workspace = data?.workspace || currentWorkspace || {
+    id: 'local',
+    name: 'Your Business',
+    slug: 'your-business',
+    industry: '',
+    website: '',
+    currency: 'USD',
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
+    verificationStatus: 'unverified' as const,
+    createdAt: new Date(0).toISOString(),
+  };
+  const metrics = data?.metrics || {
+    totalRevenueAtRisk: 0,
+    activePipelineValue: 0,
+    wonValueThisMonth: 0,
+    overdueReceivables: 0,
+    activeCustomersCount: snapshot.customers.filter(c => c.status === 'active').length,
+    openLeadsCount: 0,
+    systemHealth: 0,
+    connectedIntegrationsCount: snapshot.integrations.filter(i => i.status === 'connected').length,
+  };
+  const autonomousCycleStatus = data?.autonomousCycleStatus || {
+    currentPhase: 'Getting started',
+    detectedAnomalies: 0,
+    recoveredRevenueMonth: 0,
+  };
+  const pendingAlerts = data?.pendingAlerts || [];
+  const recentDeals = data?.recentDeals || [];
+  const metricUnavailable = dashboardUnavailable ? 'Unavailable' : null;
   const currency = workspace.currency;
   const activeCustomers = snapshot.customers.filter(c => c.status === 'active');
   const atRiskCustomers = snapshot.customers.filter(c => c.status === 'at_risk');
@@ -96,18 +120,18 @@ export const DashboardView: React.FC = () => {
   ].filter(x => x.time).sort((a,b) => new Date(b.time).getTime() - new Date(a.time).getTime()).slice(0, 8);
 
   const metricCards: Array<{ label: string; value: string; detail: string; Icon: React.ElementType }> = [
-    { label: 'Revenue at Risk', value: formatMoney(metrics.totalRevenueAtRisk, currency), detail: 'Detected leakage', Icon: AlertTriangle },
-    { label: 'Active Pipeline', value: formatMoney(metrics.activePipelineValue, currency), detail: 'Current open value', Icon: TrendingUp },
-    { label: 'Overdue Receivables', value: formatMoney(metrics.overdueReceivables, currency), detail: 'Current overdue', Icon: DollarSign },
-    { label: 'Active Customers', value: String(metrics.activeCustomersCount), detail: 'Current customers', Icon: Users },
-    { label: 'Open Leads', value: String(metrics.openLeadsCount), detail: 'Waiting in CRM', Icon: ArrowUpRight },
-    { label: 'System Health', value: metrics.systemHealth + '%', detail: String(metrics.connectedIntegrationsCount) + ' connected', Icon: ShieldCheck },
+    { label: 'Revenue at Risk', value: metricUnavailable || formatMoney(metrics.totalRevenueAtRisk, currency), detail: metricUnavailable ? 'Dashboard data unavailable' : 'Detected leakage', Icon: AlertTriangle },
+    { label: 'Active Pipeline', value: metricUnavailable || formatMoney(metrics.activePipelineValue, currency), detail: metricUnavailable ? 'Dashboard data unavailable' : 'Current open value', Icon: TrendingUp },
+    { label: 'Overdue Receivables', value: metricUnavailable || formatMoney(metrics.overdueReceivables, currency), detail: metricUnavailable ? 'Dashboard data unavailable' : 'Current overdue', Icon: DollarSign },
+    { label: 'Active Customers', value: metricUnavailable || String(metrics.activeCustomersCount), detail: metricUnavailable ? 'Dashboard data unavailable' : 'Current customers', Icon: Users },
+    { label: 'Open Leads', value: metricUnavailable || String(metrics.openLeadsCount), detail: metricUnavailable ? 'Dashboard data unavailable' : 'Waiting in CRM', Icon: ArrowUpRight },
+    { label: 'System Health', value: metricUnavailable || metrics.systemHealth + '%', detail: metricUnavailable ? 'Dashboard data unavailable' : String(metrics.connectedIntegrationsCount) + ' connected', Icon: ShieldCheck },
   ];
 
   return <div className="space-y-6 pb-12">
     <APEXReveal><div className="flex flex-col gap-4 rounded-xl border border-white/[0.08] bg-[#0d0d14] p-5 shadow-xl shadow-black/60 md:flex-row md:items-center md:justify-between"><div><div className="flex items-center gap-2"><Bot className="h-4 w-4 text-zinc-200" /><h2 className="text-base font-semibold text-zinc-100">Command Center</h2><Badge variant="default" size="sm">{autonomousCycleStatus.currentPhase || 'Live cycle'}</Badge></div><p className="mt-1 text-xs text-zinc-400">{workspace.name} · live workspace snapshot</p></div><div className="flex gap-2"><Button variant="ghost" size="sm" onClick={fetchAll} leftIcon={<RefreshCw className="h-3.5 w-3.5" />}>Refresh</Button><Button variant="primary" size="sm" onClick={() => setActiveNav('brain')} leftIcon={<Sparkles className="h-3.5 w-3.5" />}>View Brain Diagnostics</Button></div></div></APEXReveal>
 
-    <section><div className="mb-3 flex items-center justify-between"><div><h3 className="text-sm font-semibold text-zinc-100">Business Status</h3><p className="text-xs text-zinc-500">Current commercial and operating state.</p></div><span className="text-[10px] text-zinc-600">Reporting currency · {currency || 'not set'}</span></div><div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">{metricCards.map(({ label, value, detail, Icon }) => <Card key={label} padding="md" className="border-white/[0.08] bg-[#0b0b11]"><div className="flex items-center justify-between"><span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">{String(label)}</span><Icon className="h-4 w-4 text-zinc-500" /></div><div className="mt-3 text-xl font-semibold text-zinc-100">{String(value)}</div><div className="mt-1 text-[10px] text-zinc-500">{String(detail)}</div></Card>)}</div></section>
+    <section><div className="mb-3 flex items-center justify-between"><div><h3 className="text-sm font-semibold text-zinc-100">Business Status</h3><p className="text-xs text-zinc-500">Current commercial and operating state.</p></div><span className="text-[10px] text-zinc-600">{metricUnavailable ? 'Some live dashboard data is unavailable' : `Reporting currency · ${currency}`}</span></div><div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">{metricCards.map(({ label, value, detail, Icon }) => <Card key={label} padding="md" className="border-white/[0.08] bg-[#0b0b11]"><div className="flex items-center justify-between"><span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">{String(label)}</span><Icon className="h-4 w-4 text-zinc-500" /></div><div className="mt-3 text-xl font-semibold text-zinc-100">{String(value)}</div><div className="mt-1 text-[10px] text-zinc-500">{String(detail)}</div></Card>)}</div></section>
 
     <div className="grid grid-cols-1 gap-6 xl:grid-cols-12"><APEXReveal className="xl:col-span-7"><Card padding="lg" className="h-full border-white/[0.08]"><div className="flex items-center justify-between border-b border-white/[0.07] pb-4"><div><h3 className="text-sm font-semibold text-zinc-100">Revenue at Risk</h3><p className="mt-1 text-xs text-zinc-500">Detected leakage grouped by source.</p></div><Badge variant="default" size="sm">{pendingAlerts.length} issues</Badge></div>{pendingAlerts.length ? <div className="mt-4 space-y-2">{Object.entries(riskBreakdown).map(([category,amount]) => <div key={category} className="flex items-center justify-between rounded-lg border border-white/[0.06] bg-[#0b0b11] p-3"><span className="text-xs text-zinc-300">{riskLabels[category] || category}</span><span className="text-xs font-semibold text-zinc-100">{formatMoney(amount as number, currency)}</span></div>)}</div> : <p className="mt-4 text-xs text-zinc-500">No revenue-risk alerts are currently reported.</p>}</Card></APEXReveal><APEXReveal className="xl:col-span-5"><Card padding="lg" className="h-full border-white/[0.08]"><div className="flex items-center justify-between border-b border-white/[0.07] pb-4"><div><h3 className="text-sm font-semibold text-zinc-100">APEX Cycle</h3><p className="mt-1 text-xs text-zinc-500">Detect → Understand → Decide → Act → Learn.</p></div><Badge variant="default" size="sm">{autonomousCycleStatus.detectedAnomalies} detected</Badge></div><div className="mt-4 space-y-2">{([['Detect',autonomousCycleStatus.detectedAnomalies + ' anomaly signals'],['Understand','Root-cause telemetry not reported'],['Decide',pendingAlerts.length + ' actionable alerts'],['Act','Execution state reported per action'],['Learn','Outcome telemetry not reported'] ] as Array<[string,string]>).map(([stage,state],i)=><div key={stage} className="flex items-center gap-3 rounded-lg border border-white/[0.06] bg-[#0b0b11] p-3"><span className="flex h-6 w-6 items-center justify-center rounded-full border border-white/[0.10] text-[10px] font-mono text-zinc-400">{i+1}</span><div><div className="text-xs font-semibold text-zinc-200">{stage}</div><div className="text-[10px] text-zinc-500">{state}</div></div></div>)}</div></Card></APEXReveal></div>
 
