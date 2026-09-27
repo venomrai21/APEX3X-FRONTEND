@@ -25,7 +25,7 @@ jobs:
           path: |
             ~/.npm
             ~/.cache/ms-playwright
-          key: runtime-${{ runner.os }}-${{ hashFiles('package.json') }}-playwright-1.55.0
+          key: runtime-${{ runner.os }}-${{ hashFiles('package.json', 'package-lock.json') }}-playwright-1.55.0
           restore-keys: |
             runtime-${{ runner.os }}-
       - name: Install browser test dependency
