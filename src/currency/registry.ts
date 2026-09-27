@@ -14,7 +14,7 @@ const getSupportedCodes = (): string[] => {
 const getDisplayName = (code: string, locale: string): string => {
   try {
     const DisplayNamesCtor = (Intl as any).DisplayNames;
-    if (DisplayNamesCtor) return DisplayNamesCtor([locale], { type: 'currency' }).of(code) || code;
+    if (DisplayNamesCtor) return new DisplayNamesCtor([locale], { type: 'currency' }).of(code) || code;
   } catch { /* fall through */ }
   return code;
 };
