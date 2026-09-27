@@ -134,6 +134,8 @@ type BusinessProfileDraft = {
   communicationRules: string;
   operationalConstraints: string;
   currency: string;
+  reportingCurrency: string;
+  acceptedCurrencies: string[];
 };
 
 const sourceMeta = (source: Source = 'user_declared'): ProfileMeta => ({
@@ -259,6 +261,8 @@ const createDraft = (): BusinessProfileDraft => ({
   communicationRules: '',
   operationalConstraints: '',
   currency: '',
+  reportingCurrency: '',
+  acceptedCurrencies: [],
 });
 
 const stageMeta: Record<StageId, { title: string; subtitle: string }> = {
@@ -824,8 +828,25 @@ export const BusinessProfile: React.FC<{
             </Section>
           )}
 
-          <Section title="Currency" description="Choose the currency APEX should use for your financial amounts.">
-            <CurrencySelector value={draft.currency} onChange={value => update('currency', value)} />
+          <Section title="Currency" description="Set your main business currency, reporting currency, and the currencies you accept.">
+            <div className="space-y-5">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <CurrencySelector label="Business Currency" value={draft.currency} onChange={value => update('currency', value)} />
+                <CurrencySelector label="Reporting Currency" value={draft.reportingCurrency || draft.currency} onChange={value => update('reportingCurrency', value)} />
+              </div>
+              <div className="space-y-2">
+                <div className="text-xs font-medium text-[var(--text-secondary)]">Accepted currencies</div>
+                <p className="text-[11px] leading-relaxed text-[var(--text-muted)]">Choose the currencies your business uses for customer transactions. Each transaction keeps its own currency.</p>
+                <div className="flex flex-wrap gap-2">
+                  {draft.acceptedCurrencies.map(code => (
+                    <button key={code} type="button" onClick={() => update('acceptedCurrencies', draft.acceptedCurrencies.filter(item => item !== code))} className="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-3 py-1.5 text-xs text-[var(--text-primary)]">
+                      {code} <span className="ml-1 text-[var(--text-muted)]">×</span>
+                    </button>
+                  ))}
+                  <CurrencySelector label="Add currency" value="" onChange={value => value && !draft.acceptedCurrencies.includes(value) && update('acceptedCurrencies', [...draft.acceptedCurrencies, value])} />
+                </div>
+              </div>
+            </div>
           </Section>
 
           <Section title="Payments & Commercial" description="Add the payment and commercial details APEX should consider.">
