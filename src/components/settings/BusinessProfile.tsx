@@ -5,7 +5,6 @@ import {
 } from 'lucide-react';
 import { api } from '../../api/client';
 import { Badge, Button, Card, Input, Select } from '../apex3x';
-import { CurrencySelector } from '../currency/CurrencySelector';
 
 type StageId = 1 | 2 | 3;
 type Source = 'user_declared' | 'connected' | 'observed' | 'calculated' | 'inferred';
@@ -133,7 +132,6 @@ type BusinessProfileDraft = {
   approvalRequirements: string;
   communicationRules: string;
   operationalConstraints: string;
-  currency: string;
 };
 
 const sourceMeta = (source: Source = 'user_declared'): ProfileMeta => ({
@@ -258,7 +256,6 @@ const createDraft = (): BusinessProfileDraft => ({
   approvalRequirements: '',
   communicationRules: '',
   operationalConstraints: '',
-  currency: '',
 });
 
 const stageMeta: Record<StageId, { title: string; subtitle: string }> = {
@@ -823,10 +820,6 @@ export const BusinessProfile: React.FC<{
               </div>
             </Section>
           )}
-
-          <Section title="Currency" description="Choose the business presentation currency used for financial values across APEX. Currency identity uses the ISO 4217 code; the displayed symbol is locale-aware.">
-            <CurrencySelector value={draft.currency} onChange={value => update('currency', value)} />
-          </Section>
 
           <Section title="Payments & Commercial" description="Keep sensitive financial detail minimal. Prefer connected payment/accounting data for authoritative metrics.">
             <div className="space-y-4">

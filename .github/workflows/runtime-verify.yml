@@ -1,9 +1,7 @@
 name: APEX3X Frontend Runtime Verification
 
 on:
-  workflow_run:
-    workflows: [APEX3X Frontend Cloudflare Pages]
-    types: [completed]
+  push:
     branches: [main]
   workflow_dispatch:
 
@@ -12,45 +10,21 @@ permissions:
 
 jobs:
   browser-smoke:
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     name: Verify Cloudflare Pages React runtime
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Cache npm and Playwright browser
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.npm
-            ~/.cache/ms-playwright
-          key: runtime-${{ runner.os }}-${{ hashFiles('package.json', 'package-lock.json') }}-playwright-1.55.0
-          restore-keys: |
-            runtime-${{ runner.os }}-
       - name: Install browser test dependency
-        run: npm install --no-save --prefer-offline --no-audit --no-fund playwright@1.55.0
+        run: npm install --no-save playwright@1.55.0
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
-      - name: Wait for Pages deployment readiness
-        run: |
-          url="https://apex3x-frontend.pages.dev/"
-          for attempt in $(seq 1 18); do
-            status="$(curl -L -s -o /dev/null -w '%{http_code}' --max-time 10 "$url" || true)"
-            if [ "$status" = "200" ]; then
-              echo "Cloudflare Pages is responding with HTTP 200 on attempt $attempt."
-              exit 0
-            fi
-            echo "Attempt $attempt: Pages returned ${status:-no-response}; waiting 5s."
-            sleep 5
-          done
-          echo "Cloudflare Pages did not become ready within 90 seconds."
-          exit 1
+      - name: Wait for Pages deployment propagation
+        run: sleep 45
       - name: Verify live UI
         run: |
           node --input-type=module <<'EOF'
@@ -126,40 +100,6 @@ jobs:
           }
 
           console.log('Business Profile tooltip hover behavior verified.');
-
-          await page.keyboard.press('Escape');
-          const coreGroup = page.locator('aside[aria-label="Primary navigation"] div[role="group"][aria-label="Core"]');
-          const coreToggle = coreGroup.locator('button').first();
-          await coreToggle.click({ force: true });
-          await page.waitForTimeout(250);
-          const sidebarBusinessProfile = coreGroup.locator('button').filter({ hasText: 'Business Profile' }).first();
-          await sidebarBusinessProfile.click({ force: true });
-          await page.waitForFunction(() => document.title === 'Business Profile — APEX3X', null, { timeout: 3000 });
-
-          const businessProfileStage = page.getByRole('tab', { name: /Stage 03/i });
-          await businessProfileStage.waitFor({ state: 'visible', timeout: 3000 });
-          await businessProfileStage.click();
-          await page.waitForTimeout(300);
-
-          const currencyButton = page.getByRole('button', { name: 'Business Currency', exact: true });
-          if (await currencyButton.count() === 0) {
-            throw new Error('Global Business Currency selector was not rendered.');
-          }
-          await currencyButton.click();
-
-          const currencyCountText = page.getByText(/All supported ISO \/ CLDR currencies ·/).first();
-          await currencyCountText.waitFor({ state: 'visible', timeout: 2000 });
-          const currencyCountMatch = (await currencyCountText.innerText()).match(/·\s*(\d+)$/);
-          const currencyCount = currencyCountMatch ? Number(currencyCountMatch[1]) : 0;
-          if (currencyCount < 100) {
-            throw new Error(`Currency registry exposes only ${currencyCount} entries; expected broad ISO / CLDR coverage.`);
-          }
-
-          const currencySearch = page.getByRole('textbox', { name: 'Search currencies', exact: true });
-          await currencySearch.fill('INR');
-          const inrOption = page.getByRole('option').filter({ hasText: 'INR' }).first();
-          await inrOption.waitFor({ state: 'visible', timeout: 2000 });
-          console.log(`Currency registry verified with ${currencyCount} supported entries and INR search.`);
 
           await browser.close();
           EOF
