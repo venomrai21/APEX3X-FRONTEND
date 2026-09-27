@@ -8,7 +8,7 @@ import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { Skeleton } from '../components/ui/Skeleton';
 import { AnimatedGrid, AnimatedNumber, ExpandableCard } from '../components/apex3x/adapters';
-import { UniversalService, UniversalConnectionDraft } from '../components/integrations/UniversalService';
+import { UniversalConnector, UniversalConnectionDraft } from '../components/integrations/UniversalConnector';
 
 type Tab = 'overview'|'discover'|'connections'|'capabilities'|'events'|'actions'|'resources'|'health'|'policy'|'security'|'audit';
 const protocols: Record<string,string> = { oauth2:'Secure connection', api_key:'Secure connection', basic_auth:'Secure connection', webhook:'Webhook connection', custom_http:'Custom connection', mcp:'Connected service', native:'Built-in connection' };
