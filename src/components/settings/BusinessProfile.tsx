@@ -357,9 +357,9 @@ const TextAreaField: React.FC<{ id: string; label: string; value: string; onChan
 );
 
 export const BusinessProfile: React.FC<{
-  const { updateWorkspaceIdentity } = useApp();
   addToast: (toast: { type: 'success' | 'warning' | 'error' | 'info'; title: string; description?: string }) => void;
 }> = ({ addToast }) => {
+  const { updateWorkspaceIdentity } = useApp();
   const [activeStage, setActiveStage] = useState<StageId>(1);
   const [draft, setDraft] = useState<BusinessProfileDraft>(() => createDraft());
   const [profileLoaded, setProfileLoaded] = useState(false);
