@@ -127,9 +127,9 @@ jobs:
           const coreToggle = coreSection.getByRole('button', { name: 'Core', exact: true });
           await coreToggle.click();
           const sidebarBusinessProfile = coreSection.getByRole('button', { name: 'Business Profile', exact: true });
-          await sidebarBusinessProfile.waitFor({ state: 'visible', timeout: 3000 });
-          await sidebarBusinessProfile.click();
+          await sidebarBusinessProfile.click({ force: true });
           await page.waitForTimeout(500);
+          await page.waitForFunction(() => document.title === 'Business Profile — APEX3X', null, { timeout: 3000 });
 
           const businessProfileStage = page.getByRole('tab', { name: /Stage 03/i });
           await businessProfileStage.waitFor({ state: 'visible', timeout: 3000 });
