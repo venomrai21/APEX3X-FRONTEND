@@ -122,6 +122,14 @@ jobs:
 
           console.log('Business Profile tooltip hover behavior verified.');
 
+          const businessProfileNav = page.getByRole('button', { name: 'Business Profile', exact: true }).first();
+          await businessProfileNav.waitFor({ state: 'visible', timeout: 3000 });
+          await businessProfileNav.click();
+          await page.waitForTimeout(500);
+          if (!page.url() && (await page.getByText('Business Profile', { exact: true }).count()) === 0) {
+            throw new Error('Business Profile view did not activate.');
+          }
+
           const businessProfileStage = page.getByRole('tab', { name: /Stage 03/i });
           await businessProfileStage.waitFor({ state: 'visible', timeout: 3000 });
           await businessProfileStage.click();
