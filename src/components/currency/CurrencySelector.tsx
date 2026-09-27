@@ -41,7 +41,7 @@ export const CurrencySelector: React.FC<{
               </div>
             </div>
             <div ref={listRef} className="max-h-80 overflow-y-auto p-1" role="listbox" aria-label="All supported currencies">
-              <div className="px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">All supported ISO / CLDR currencies · {filtered.length}</div>
+              <div className="px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">All supported currencies · {filtered.length}</div>
               {filtered.length > 0 ? (
                 <div style={{ height: rowVirtualizer.getTotalSize(), position: 'relative' }}>
                   {rowVirtualizer.getVirtualItems().map(item => {
@@ -62,7 +62,6 @@ export const CurrencySelector: React.FC<{
           </div>
         )}
       </div>
-      <p className="text-[10px] leading-relaxed text-[var(--text-muted)]">Currency identity is stored by ISO 4217 code. Symbols are presentation only. The registry combines the browser's CLDR-backed Intl metadata with a bundled ISO 4217 dataset fallback and can be extended by an authoritative APEX registry later.</p>
     </div>
   );
 };
